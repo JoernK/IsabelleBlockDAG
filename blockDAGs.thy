@@ -36,7 +36,7 @@ fun past_rec:: "'Block blockDAG \<Rightarrow> 'Block set \<Rightarrow> 'Block se
   "past_rec (Gen x) a = ( if (x \<in> a) then {x} else {})"
 | "past_rec (Cons b dag l) a = 
   ( if (b \<in> a) 
-      then ((past_rec dag ((a)\<union>l) ) \<union> {b}) 
+      then ( {b} \<union> (past_rec dag ((a)\<union>l) )) 
       else (past_rec dag a))" 
 
 fun past:: "'Block blockDAG \<Rightarrow> 'Block \<Rightarrow> 'Block set"
@@ -54,23 +54,24 @@ fun tips::  "'Block blockDAG  \<Rightarrow> 'Block set"
   where
   "tips bdag = (tips_rec bdag {})"
 
-fun no_duplicates_rec:: "'Block blockDAG \<Rightarrow> 'Block set \<Rightarrow> bool"
-  where
-  "no_duplicates_rec (Gen x) l = (if (x \<in> l) then False else True)"
-| "no_duplicates_rec (Cons b dag l1) l2 = (if (b \<in> l2) then False else 
-      (no_duplicates_rec dag (l2 \<union> {b})))"    
-
 fun no_duplicates:: "'Block blockDAG \<Rightarrow> bool"
-  where 
-  "no_duplicates blockDAG = no_duplicates_rec blockDAG {}"
+  where
+  "no_duplicates (Gen x) = True"
+| "no_duplicates (Cons b dag l1) = (\<not>(in_dag dag b) & (no_duplicates dag))"    
 
+fun equals_gen:: "'Block blockDAG \<Rightarrow> 'Block \<Rightarrow> bool"
+  where 
+  "equals_gen (Gen a) b = (a = b)"
+|  "equals_gen (Cons a dag l) b = equals_gen dag b"
 
 fun well_formed:: "'Block blockDAG \<Rightarrow> bool"
   where 
   "well_formed (Gen x) = True" 
 | "well_formed (Cons b dag l) =
-     (\<not>(b \<in> l) & \<not>(l = {}) & \<not>(in_dag dag b) & (well_formed dag)
-      & (\<forall>x. ((x \<in> (past_rec dag l)) \<longleftrightarrow>  ((x \<in> l)))))"
+     (\<not>(b \<in> l) & \<not>(in_dag dag b) & (well_formed dag)
+      & (\<exists>x. (x \<in> l) & equals_gen dag x)
+      & (\<forall>x. ((x \<in> l) \<longrightarrow>  ((in_dag dag x))))
+      & (\<forall>x. ((x \<in> (past_rec dag l)) \<longrightarrow>  ((x \<in> l)))))"
 
 
 fun del_from_dag:: "'Block blockDAG \<Rightarrow> 'Block \<Rightarrow> 'Block blockDAG"
@@ -80,10 +81,7 @@ fun del_from_dag:: "'Block blockDAG \<Rightarrow> 'Block \<Rightarrow> 'Block bl
     else (if (a = x) then dag else (Cons x (del_from_dag dag a) l1)))"
 
 
-fun equals_gen:: "'Block blockDAG \<Rightarrow> 'Block \<Rightarrow> bool"
-  where 
-  "equals_gen (Gen a) b = (a = b)"
-|  "equals_gen (Cons a dag l) b = equals_gen dag b"
+
 lemma del_length [simp]: "size( del_from_dag dag a) \<le> (size dag)"
   apply(induct_tac dag)
    apply(simp)
@@ -97,9 +95,6 @@ lemma del_length [simp]: "size( del_from_dag dag a) \<le> (size dag)"
   apply(simp)
 *)
   
-
-  
-
 fun equal:: "'Block blockDAG \<Rightarrow> 'Block blockDAG \<Rightarrow> bool" 
   where
   "equal (Gen a) (Gen b) = (a = b)"
@@ -113,37 +108,19 @@ fun equal:: "'Block blockDAG \<Rightarrow> 'Block blockDAG \<Rightarrow> bool"
 lemma eas0 [simp]: "well_formed (Cons a dag l) \<longrightarrow> a \<in> (tips (Cons a dag l))"
   by auto
 
-lemma eaaas [simp]: "a \<in> l \<longrightarrow> (a \<in> (l \<union> l2))"
-  by auto
-
-lemma eaaas2 [simp]: "a \<notin> (l \<union> l2) \<longleftrightarrow> (a \<notin> l & a \<notin> l2)"
-  by auto
-
-lemma wfr [simp]: "well_formed (Cons a dag l) \<longrightarrow> well_formed dag"
-  by auto
-
-lemma eas [simp]: "to_list (Gen a) = [a]"
-  by auto
-
 lemma eas2 [simp]: "to_list (Cons b (Gen  a) c)  = [b,a]"
   by auto
 
-lemma eas3 [simp]: "(set (to_list (Cons b (Gen a) c)) = {a,b})"
+lemma eas3 [simp]: "to_set (Cons b (Gen a) c) = {a,b}"
   by auto
 
 lemma eas4 [simp]: "tips (Gen a) = {a}"
   by simp
 
-lemma eas5 [simp]: "tips (Cons b (Gen a) {}) = {a,b}"
-  by auto
-
 lemma eas6 [simp]: "(no_duplicates (Cons b (Gen a) {a})) \<Longrightarrow> (tips (Cons b (Gen a) {a}) = {b})"
   by auto
 
-lemma eas7 [simp]: "well_formed (Gen a)"
-  by simp
-
-lemma eas8 [simp]: "(no_duplicates (Cons b (Gen a) {a})) \<Longrightarrow> well_formed (Cons b (Gen a) {a})"
+lemma eas8: "(no_duplicates (Cons b (Gen a) {a})) \<Longrightarrow> well_formed (Cons b (Gen a) {a})"
   by auto
 
 lemma eas9 [simp]: "\<not>(well_formed (Cons b (Gen a) {}))"
@@ -167,21 +144,14 @@ lemma eas13 [simp]: "\<not>(no_duplicates (Cons a (Gen a) {}))"
 lemma eas14 [simp] : " ((equal (Gen a ) (Cons b dag2 l2)) \<longleftrightarrow> (equal (Cons b dag2 l2) (Gen a)))"
   by auto
 
-lemma eas15 [simp]: " ((equal (Gen a ) (Gen b)) \<longleftrightarrow> (equal (Gen b) (Gen a)))"
+lemma eas15: " ((equal (Gen a ) (Gen b)) \<longleftrightarrow> (equal (Gen b) (Gen a)))"
   by auto
 
-lemma easaf [simp]: "no_duplicates (Cons a dag l) \<longrightarrow> \<not> (in_dag dag a)"
-  apply(induct_tac dag)
-   apply(simp)
-  oops
-  
- 
+lemma easaf: "no_duplicates (Cons a dag l) \<longrightarrow> \<not> (in_dag dag a)"
+  apply(auto)
 
-lemma eaas [simp]:
-  "a \<in> (tips (Cons b dag l)) \<longrightarrow> a \<notin> l"
-  oops
 
-lemma eas152 [simp]: "(x \<notin> (tips dag)) \<longrightarrow> ((del_from_dag dag x ) = dag)"
+lemma eas152: "(x \<notin> (tips dag)) \<longrightarrow> ((del_from_dag dag x ) = dag)"
   apply(induct_tac dag)
   apply(auto)
   done
@@ -192,10 +162,10 @@ lemma eas17 [simp]: "equal dag1 dag1"
    apply(simp)
   apply(auto)
   done
-lemma eas19 [simp]: "equal dag1 dag2 \<longrightarrow> equal (Cons a dag1 l) (Cons a dag2 l)"
+lemma eas19: "equal dag1 dag2 \<longrightarrow> equal (Cons a dag1 l) (Cons a dag2 l)"
   apply(auto)
   done
-lemma eas20 [simp]:
+lemma eas20:
   assumes "well_formed dag1"
   assumes "well_formed dag2"
   shows "equal (Cons a dag1 l1) (Cons b dag2 l2) \<longrightarrow>
@@ -203,16 +173,10 @@ lemma eas20 [simp]:
   apply(induction)
   oops
 
-lemma eas16 [simp]:
-  assumes "well_formed dag1"
-  assumes "well_formed dag2"
-  shows "equal dag1 dag2 \<longleftrightarrow> equal dag2 dag1"
-  
-(*
-    apply(induction)
-    apply (smt (verit, ccfv_SIG) del_from_dag.elims eas15 equal.simps(3) equal.simps(4))
-    apply(induction)
-     apply simp_all
- *) 
+lemma eas16:
+  assumes "well_formed (Cons a dag l)"
+  shows "well_formed dag & \<not>(in_dag dag a)"
+  apply (metis assms well_formed.simps(2))
+  done
 
 end
