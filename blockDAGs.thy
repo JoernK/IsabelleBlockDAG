@@ -4,9 +4,12 @@
 
 section \<open>blockDAGs\<close>
 
-theory blockDAGs
-  imports Main HOL.HOL
+theory blockDAGs imports Main "HOL-Lattice.Lattice"
 begin
+
+class bDAG =  partial_order + 
+  assumes ex_inf:  "\<exists> inf. is_inf x y inf"
+
 
 datatype 'Block blockDAG = Gen 'Block |Cons 'Block "'Block blockDAG" "'Block set" 
 
@@ -79,7 +82,7 @@ fun del_from_dag:: "'Block blockDAG \<Rightarrow> 'Block \<Rightarrow> 'Block bl
   "del_from_dag (Gen x) a = (Gen x)"
 | "del_from_dag (Cons x dag l1) a = (if (\<not>(a \<in> (tips (Cons x dag l1)))) then (Cons x dag l1) 
     else (if (a = x) then dag else (Cons x (del_from_dag dag a) l1)))"
-
+  
 
 
 lemma del_length [simp]: "size( del_from_dag dag a) \<le> (size dag)"
@@ -149,7 +152,7 @@ lemma eas15: " ((equal (Gen a ) (Gen b)) \<longleftrightarrow> (equal (Gen b) (G
 
 lemma easaf: "no_duplicates (Cons a dag l) \<longrightarrow> \<not> (in_dag dag a)"
   apply(auto)
-
+  done
 
 lemma eas152: "(x \<notin> (tips dag)) \<longrightarrow> ((del_from_dag dag x ) = dag)"
   apply(induct_tac dag)
@@ -162,9 +165,11 @@ lemma eas17 [simp]: "equal dag1 dag1"
    apply(simp)
   apply(auto)
   done
+
 lemma eas19: "equal dag1 dag2 \<longrightarrow> equal (Cons a dag1 l) (Cons a dag2 l)"
   apply(auto)
   done
+
 lemma eas20:
   assumes "well_formed dag1"
   assumes "well_formed dag2"
@@ -178,5 +183,14 @@ lemma eas16:
   shows "well_formed dag & \<not>(in_dag dag a)"
   apply (metis assms well_formed.simps(2))
   done
+
+locale wp = 
+  fixes x
+  assumes "well_formed x"
+  
+context wp
+begin 
+lemma (in wp) wf: "well_formed x"
+  using wp_axioms wp_def by blast
 
 end
