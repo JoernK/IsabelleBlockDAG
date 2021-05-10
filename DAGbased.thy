@@ -5,26 +5,25 @@
 section \<open>blockDAG\<close>
 
 theory DAGbased
-  imports Main Graph_Theory.Graph_Theory
+  imports Main Graph_Theory.Graph_Theory HOL.Order_Relation
 begin
 
 
 locale DAGbased = digraph +
   assumes cycle_free: "(u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v) \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
-  and only_new: "arc e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v)"
+  and only_new: "\<forall>e. arc e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v)"
   and genesis:  "\<exists>p.\<forall>r. (r \<in> verts G \<and> p \<in> verts G) \<Longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p" 
 
-lemma (in DAGbased) no_double_edges [simp]: 
-"\<lbrakk>u \<rightarrow>\<^bsub>G\<^esub> v\<rbrakk> \<Longrightarrow> \<not>( v \<rightarrow>\<^bsub>G\<^esub> u)"
-  using cycle_free by blast
+lemma (in DAGbased) no_double_edges: 
+"u \<rightarrow>\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^bsub>G\<^esub> u)"
+  using cycle_free by blast        
 
 definition (in DAGbased) genesis_node:: "'a \<Rightarrow> bool" where
 "genesis_node v \<equiv>  \<forall>u. (u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v)"
 
 locale tie_breakingDAG = DAGbased + 
-  fixes tie_break :: "'a \<Rightarrow> 'a \<Rightarrow> bool"
-  assumes asymmetric: "(a \<noteq> b) \<Longrightarrow> tie_break a b \<equiv> \<not> (tie_break b a)"
-  assumes transitive: "tie_break a b & tie_break b c \<Longrightarrow> tie_break a c"
+  fixes r 
+  assumes "linear_order_on (verts G) r"
 
 definition (in DAGbased) past_nodes:: "'a \<Rightarrow> 'a set"
   where 
@@ -40,79 +39,91 @@ proof(rule ccontr)
   then show "False"
     using cycle_free by auto
 qed
-  
+
+lemma (in DAGbased) past_subset: 
+  shows "past_nodes a \<subseteq> verts G"
+  using past_nodes_def by auto
+
 definition (in DAGbased) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
-  "reduce_past a = induce_subgraph G (past_nodes a)"
+  "reduce_past a \<equiv> induce_subgraph G (past_nodes a)"
 
 lemma (in DAGbased) reduce_past_subarcs:
-  "\<And>e. e \<in> arcs (reduce_past a) \<Longrightarrow> e \<in> arcs G"
+  "e \<in> arcs (reduce_past a) \<Longrightarrow> e \<in> arcs G"
   using DAGbased_axioms_def past_nodes_def reduce_past_def by auto
 
+lemma (in DAGbased) reduce_subgraph:
+  shows "induced_subgraph (reduce_past a) G"
+  using reduce_past_def induced_induce past_subset by auto
+
+
+lemma (in DAGbased) induced_subgraph_del_arcs:
+  shows "(pre_digraph.del_arc (reduce_past a) e) = (DAGbased.reduce_past (del_arc e) a)"
+proof -
+  consider (part) "e \<in> arcs(reduce_past a)" | (not_part) "e \<notin> arcs(reduce_past a)" by auto
+  then show ?thesis
+  proof cases
+    case not_part then show ?thesis
+      using reduce_past_def del_arc_simps pre_digraph.equality 
+      oops
+
+
 lemma (in DAGbased) reduce_past_path:
-  "\<And>u v. u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v \<Longrightarrow> u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v"
-  using past_nodes_def reduce_past_def
-  by (smt (verit, ccfv_threshold) adj_not_same cycle_free 
-      dominates_induce_subgraphD reachable_adjI 
-      reachable_neq_reachable1 reachable_trans
-      rtrancl_trancl_trancl tranclD trancl_trans_induct)
+  assumes "u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v" 
+  shows " u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v"
+  using assms
+proof induct
+  case base then show ?case
+    by (metis dominates_induce_subgraphD r_into_trancl' reduce_past_def)
+next case (step u v) show ?case
+    by (metis dominates_induce_subgraphD reduce_past_def step.hyps(2)
+        step.hyps(3) step.prems trancl.trancl_into_trancl) 
+qed
 
 lemma (in DAGbased) reduce_dag:
   assumes " a \<in> verts G"
   assumes "\<not>genesis_node a"
   shows "DAGbased (reduce_past a)"
-proof 
-  show "finite (verts (reduce_past a))"
-    using DAGbased_axioms_def past_nodes_def reduce_past_def by auto
-  next
-  show "finite (arcs (reduce_past a))"
-    using DAGbased_axioms_def past_nodes_def reduce_past_def by auto
-  next
-  show "\<And>e. e \<in> arcs (reduce_past a) \<Longrightarrow> tail (reduce_past a) e \<in> verts (reduce_past a)"
-    using DAGbased_axioms_def past_nodes_def reduce_past_def by auto
-  next
-  show "\<And>e. e \<in> arcs (reduce_past a) \<Longrightarrow> head (reduce_past a) e \<in> verts (reduce_past a)"
-    using DAGbased_axioms_def past_nodes_def reduce_past_def by auto
-  next
-  show "\<And>e. e \<in> arcs (reduce_past a) \<Longrightarrow> tail (reduce_past a) e \<noteq> head (reduce_past a) e"
-    using past_nodes_def reduce_past_def reduce_past_subarcs
-    by (metis induce_subgraph_head induce_subgraph_tail no_loops) 
-  next
-  show "\<And>e1 e2.
-       e1 \<in> arcs (reduce_past a) \<Longrightarrow>
-       e2 \<in> arcs (reduce_past a) \<Longrightarrow>
-       arc_to_ends (reduce_past a) e1 = arc_to_ends (reduce_past a) e2 \<Longrightarrow> e1 = e2"
-    using past_nodes_def reduce_past_def reduce_past_subarcs
-     by (metis \<open>\<And>e. e \<in> arcs (reduce_past a) \<Longrightarrow> e \<in> arcs G\<close> induce_subgraph_ends no_multi_arcs)
- next 
-   show "\<And>u v. u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v \<longrightarrow> \<not> v \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> u"
-   proof 
-     fix a u v 
-     assume "u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v"
-       have "u \<rightarrow>\<^sup>+ v"
-         by (smt (z3) \<open>u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v\<close> adj_in_verts(2) adj_not_same dominates_induce_subgraphD reachable_adjI reachable_conv' reachable_neq_reachable1 reachable_trans reduce_past_def rtrancl_trancl_trancl tranclD trancl_rtrancl_trancl trancl_trans_induct)
-       then have "\<not>v \<rightarrow>\<^sup>* u"
-         using cycle_free
-         by auto
-     then show "\<not> v \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> u"
-       using reduce_past_path
-       by (meson \<open>u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v\<close> cycle_free reachable1_in_verts(1)
-           reachable_refl reachable_rtranclI trancl_rtrancl_trancl)
-   qed
- next
-   show "\<And>e u v.
-       wf_digraph.arc (reduce_past a) e (u, v) \<longrightarrow>
-       \<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v"
-   proof 
-     fix e u v
-     assume "wf_digraph.arc (reduce_past a) e (u, v)"
-     then show "\<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v"
-       oops        
-    
-   
-  
-definition (in tie_breakingDAG) simple_vote:: "'a \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> bool" 
-  where "simple_vote a b i = (if i=0 then (tie_break a b) else (i > 0))"
+  unfolding DAGbased_def
+  using digraphI_induced 
+proof
+  show "induced_subgraph (reduce_past a) G"
+    by (simp add: induced_induce past_subset reduce_past_def)
+next  
+  show "DAGbased_axioms (reduce_past a)"
+  proof 
+    fix u v 
+    show "u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v \<longrightarrow> \<not> v \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> u"
+      by (metis cycle_free past_subset reachable_mono
+          reduce_past_def reduce_past_path subgraph_induce_subgraphI)
+  next 
+    fix u v 
+    show " \<forall>e. wf_digraph.arc (reduce_past a) e (u, v) \<longrightarrow>
+               \<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v"
+    proof
+      fix e
+      show "wf_digraph.arc (reduce_past a) e (u, v) \<longrightarrow>
+               \<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v"
+      proof
+        assume "(wf_digraph.arc (reduce_past a) e (u, v))" 
+        then have "(wf_digraph.arc G e (u, v))"
+          using arc_def reduce_past_subarcs reduce_past_def subgraph_def
+        proof -
+          have "e \<in> arcs (reduce_past a) \<and> tail (reduce_past a) e = u \<and> head (reduce_past a) e = v"
+            by (metis (no_types) \<open>wf_digraph.arc (reduce_past a) e (u, v)\<close> reduce_past_def wf_digraph.arcE wf_digraph.wellformed_induce_subgraph wf_digraph_axioms)
+          then show ?thesis
+            by (simp add: arc_def reduce_past_def)
+        qed
+        then have "\<not> u \<rightarrow>\<^sup>*\<^bsub>del_arc e\<^esub> v"
+          using only_new by auto 
+        then show "\<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v"
+          oops  
+          
+
+
+definition (in tie_breakingDAG) simple_vote:: "'a \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> bool"
+  where "simple_vote a b i =
+ (if i=0 then (if (a,b) \<in> r then True else False) else (i > 0))"
  
 
 fun (in tie_breakingDAG) sum_bool :: " bool list \<Rightarrow> int"
@@ -134,4 +145,6 @@ function (in DAGbased) vote_Spectre:: "'a \<Rightarrow> ('a \<Rightarrow> 'a \<R
   else False))))))"
   by auto
 
+termination 
+  
 
