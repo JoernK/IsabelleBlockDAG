@@ -4,13 +4,13 @@
 
 
 theory DAGbased
-  imports Main Graph_Theory.Graph_Theory HOL.Order_Relation
+  imports Main Graph_Theory.Graph_Theory HOL.Order_Relation PSL.PSL
 begin
 
 section \<open>blockDAG\<close>
 
 locale DAGbased = digraph +
-  assumes cycle_free: "(u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v) \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
+  assumes cycle_free: "\<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)"
   and only_new: "\<forall>e. arc e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v)"
   and genesis:  "\<exists>p.\<forall>r. ((r \<in> verts G \<and> p \<in> verts G) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p)"       
 
@@ -30,9 +30,9 @@ definition (in DAGbased) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
   "reduce_past a \<equiv> induce_subgraph G (past_nodes a)"
 
-lemma (in DAGbased) no_double_edges: 
-"u \<rightarrow>\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^bsub>G\<^esub> u)"
-  using cycle_free by blast  
+lemma (in DAGbased) unidirectional:
+"u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
+using cycle_free reachable1_reachable_trans by auto
 
 lemma (in DAGbased) past_nodes_ex:
   assumes "a \<in> verts G"
@@ -101,18 +101,17 @@ lemma (in DAGbased) reduce_past_dagbased:
   assumes " a \<in> verts G"
   assumes "\<not>genesis_node a"
   shows "DAGbased (reduce_past a)"
-  unfolding DAGbased_def
+  unfolding DAGbased_def 
   using digraphI_induced 
 proof
   show "induced_subgraph (reduce_past a) G"
     by (simp add: induced_induce past_nodes_verts reduce_past_def)
-next  
+next
   show "DAGbased_axioms (reduce_past a)"
   proof 
-    fix u v 
-    show "u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v \<longrightarrow> \<not> v \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> u"
-      by (metis cycle_free past_nodes_verts reachable_mono
-          reduce_past_def reduce_past_path subgraph_induce_subgraphI)
+    fix v
+    show "\<not> v \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v"
+      by (metis cycle_free reduce_past_path)
   next 
     fix u v
     show " \<forall>e. wf_digraph.arc (reduce_past a) e (u, v) \<longrightarrow>
@@ -185,7 +184,7 @@ lemma (in DAGbased) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a
 proof (rule ccontr)
   assume "\<not> past_nodes a \<inter> future_nodes a = {}"
   then show False
-    using past_nodes_def future_nodes_def cycle_free reachable1_reachable by blast
+    using past_nodes_def future_nodes_def unidirectional reachable1_reachable by blast
 qed
 
 lemma (in DAGbased) finite_past[simp]: "finite (past_nodes a)"
@@ -209,8 +208,8 @@ function (in tie_breakingDAG)  vote_Spectre:: " ('a,'b) pre_digraph \<Rightarrow
  (vote_Spectre (DAGbased.reduce_past G a) i  b c)) (set_to_list ((direct_past a)))) 
   else sumlist b c (map (\<lambda>i.
    (vote_Spectre G i b c)) (set_to_list (future_nodes a)))))))))"
-  oops
-
+ 
+  
 
 export_code sum_list  in Haskell module_name SPECTRE
 
