@@ -209,6 +209,9 @@ function (in tie_breakingDAG)  vote_Spectre:: " ('a,'b) pre_digraph \<Rightarrow
  (vote_Spectre (DAGbased.reduce_past G a) i  b c)) (set_to_list ((direct_past a)))) 
   else sumlist b c (map (\<lambda>i.
    (vote_Spectre G i b c)) (set_to_list (future_nodes a)))))))))"
+  oops
 
 
+export_code sum_list  in Haskell module_name SPECTRE
 
+end
