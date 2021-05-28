@@ -26,6 +26,7 @@ locale tie_breakingDAG = blockDAG +
 
 fun set_to_list :: "'a set \<Rightarrow> 'a list"
   where "set_to_list s = (SOME l. set l = s)"
+
 lemma  set_set_to_list:
    "finite s \<Longrightarrow> set (set_to_list s) = s"
   unfolding set_to_list.simps by (metis (mono_tags) finite_list some_eq_ex)
@@ -42,19 +43,28 @@ fun (in blockDAG) past_nodes:: "'a \<Rightarrow> 'a set"
 fun (in blockDAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
   "reduce_past a = induce_subgraph G (past_nodes a)"
-                                          
+                                       
+fun (in blockDAG) iterate_nodes:: "('a \<Rightarrow> bool) \<Rightarrow> 'a list\<Rightarrow> bool"
+  where "iterate_nodes f [] = True" 
+  | "iterate_nodes f (x#xs) = (f x \<and> (iterate_nodes f xs))"
+
+lemma (in blockDAG) iterate_all:  "iterate_nodes p a \<longleftrightarrow> (\<forall>x. (x \<in>  set a) \<longrightarrow> p x)"
+  by (induct a) auto    
+
 fun (in blockDAG) is_tip:: " 'a \<Rightarrow> bool"
-  where "is_tip a = ((a \<in> verts G) \<and>  (ALL x. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a))"
+  where "is_tip a = ((a \<in> verts G) \<and> iterate_nodes (\<lambda>x. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) (set_to_list (verts G)))"
 
 fun (in blockDAG) tips:: "('a,'b) pre_digraph \<Rightarrow>'a set"
   where "tips V = {v. blockDAG.is_tip V v}"
 
 fun (in blockDAG) is_genesis_node:: "'a \<Rightarrow> bool" where
-"is_genesis_node v = ((v \<in> verts G) \<and> (ALL x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
+"is_genesis_node v = ((v \<in> verts G) \<and> (iterate_nodes (\<lambda>x. x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v) (set_to_list (verts G))))"
+
 
 lemma (in blockDAG) genesisAlt :
  "(is_genesis_node a) \<longleftrightarrow> ((a \<in> verts G) \<and> (\<forall>r.  (r \<in> verts G) \<longrightarrow> r \<rightarrow>\<^sup>* a))"
-  by simp
+  using is_genesis_node.simps iterate_all set_set_to_list finite_verts
+  by (metis (mono_tags, lifting)) 
   
 lemma (in blockDAG) genesis_existAlt:
   "\<exists>a. is_genesis_node a"
@@ -71,7 +81,7 @@ proof(rule ccontr)
     have "\<exists> a b. is_genesis_node a \<and> is_genesis_node b \<and> \<not>a = b"
       using c by auto
     then have "\<exists>a. a \<rightarrow>\<^sup>+ a"
-      using genesisAlt reachable_trans 
+      using genesisAlt iterate_all reachable_trans 
             reachable_refl reachable_reachable1_trans reachable_neq_reachable1
       by (metis (full_types)) 
     then show False
@@ -279,42 +289,13 @@ proof safe
   fix a b
   show "is_genesis_node b \<Longrightarrow> blockDAG.is_genesis_node (reduce_past a) b"
 *)
-
-
-
-lemma (in blockDAG) reduce_less:
-  assumes " a \<in> verts G"
-  and "\<not>is_genesis_node a"
-  shows "card (verts (reduce_past a)) < card (verts G)"
-proof -
-  have "past_nodes a \<subset> verts G"
-    using assms(1) past_nodes_ex past_nodes_verts by blast
-  then show ?thesis
-    by (simp add: psubset_card_mono)
-qed 
-
-lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
-  assumes major: "DAGbased H" and sub: "induced_subgraph H G"
-    and cases: "u \<in> verts G \<Longrightarrow> P u"
-       "\<And>x y. \<lbrakk>u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x; x \<rightarrow>\<^bsub>G\<^esub> y; P x\<rbrakk> \<Longrightarrow> P y"
-  shows "P G"
-  oops  
-                                           
-fun (in blockDAG) gen_graph::"'a \<Rightarrow>('a,'b) pre_digraph" where "gen_graph a =  
-\<lparr>verts = {a}, arcs = {}, tail=tail G, head = head G\<rparr>"
-
-lemma (in blockDAG) gen_gen :"verts (gen_graph a) = {a}" by simp
   
-lemma (in blockDAG) gen_graph_sound:
-  assumes "blockDAG (gen_graph a)"
-  shows "blockDAG.is_genesis_node (gen_graph a) a"
-  using assms blockDAG.past_nodes_ex blockDAG.past_nodes_verts blockDAG.reduce_past.simps
-    blockDAG.reduce_past_not_empty by fastforce
-  
-lemma (in blockDAG) exist_sub: 
-  shows "\<exists>a. induced_subgraph (gen_graph a) G"
-  
+
 subsection \<open>Spectre\<close>
+
+
+subsection \<open>Basics\<close>
+ 
 
 
 subsection \<open>Spectre_Definition\<close>
@@ -360,10 +341,6 @@ function (in tie_breakingDAG) vote_Spectre:: " ('a,'b) pre_digraph \<Rightarrow>
   else sumlist b c (map (\<lambda>i.
    (vote_Spectre V i b c)) (set_to_list (future_nodes a)))))))))"
   by auto
-termination (in tie_breakingDAG) 
-proof(relation "measure (\<lambda> (V, a, b, c). card (verts V))") 
-  show  "wf (measure (\<lambda>(V, a, b, c). card (verts V)))" by simp
-next 
 
 export_code tie_breakingDAG.vote_Spectre in Haskell module_name SPECTRE
 
