@@ -11,6 +11,11 @@ section \<open>blockDAG\<close>
 
 
 
+lemma not_reachable_subgraph:
+  assumes "subgraph H G"
+  shows " \<not> u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v \<longrightarrow> \<not> u \<rightarrow>\<^sup>*\<^bsub>H\<^esub> v"
+  by (meson assms pre_digraph.reachable_mono)
+
 locale DAG = digraph +
   assumes cycle_free: "\<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)"
   
@@ -39,9 +44,16 @@ fun (in blockDAG) future_nodes:: "'a \<Rightarrow> 'a set"
 fun (in blockDAG) past_nodes:: "'a \<Rightarrow> 'a set"
   where "past_nodes a = {b. (b \<in> verts G \<and> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) }"
 
+fun (in blockDAG) past_nodes_refl :: "'a \<Rightarrow> 'a set"
+  where "past_nodes_refl a = {b. (b \<in> verts G \<and> a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b)}"
+
 fun (in blockDAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
   "reduce_past a = induce_subgraph G (past_nodes a)"
+
+fun (in blockDAG) reduce_past_refl:: "'a \<Rightarrow> ('a,'b) pre_digraph"
+  where 
+  "reduce_past_refl a = induce_subgraph G (past_nodes_refl a)"
                                           
 fun (in blockDAG) is_tip:: " 'a \<Rightarrow> bool"
   where "is_tip a = ((a \<in> verts G) \<and>  (ALL x. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a))"
@@ -81,7 +93,10 @@ qed
 
 lemma (in blockDAG) unidirectional:
 "u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
-using cycle_free reachable1_reachable_trans by auto
+  using cycle_free reachable1_reachable_trans by auto
+
+
+subsection \<open>past_nodes\<close>
 
 lemma (in blockDAG) past_nodes_ex:
   assumes "a \<in> verts G"
@@ -92,6 +107,17 @@ lemma (in blockDAG) past_nodes_verts:
   shows "past_nodes a \<subseteq> verts G"
   using past_nodes.simps by auto
 
+lemma (in blockDAG) past_nodes_refl_ex:
+  assumes "a \<in> verts G"
+  shows "a \<in> past_nodes_refl a"
+  using past_nodes_refl.simps reachable_refl assms
+  by simp
+
+lemma (in blockDAG) past_nodes_refl_verts: 
+  shows "past_nodes_refl a \<subseteq> verts G"
+  using past_nodes.simps by auto
+  
+subsection \<open>reduce_past\<close>
 
 lemma (in blockDAG) reduce_past_arcs: 
   shows "arcs (reduce_past a) \<subseteq> arcs G"
@@ -142,10 +168,7 @@ lemma (in blockDAG) reduce_past_pathr:
   shows " u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v"
   by (meson assms induced_subgraph_altdef reachable_mono reduce_past_induced_subgraph)
 
-lemma not_reachable_subgraph:
-  assumes "subgraph H G"
-  shows " \<not> u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v \<longrightarrow> \<not> u \<rightarrow>\<^sup>*\<^bsub>H\<^esub> v"
-  by (meson assms pre_digraph.reachable_mono)
+
 
 lemma (in blockDAG) reduce_past_not_empty:
   assumes " a \<in> verts G"
@@ -283,7 +306,7 @@ proof safe
 
 
 lemma (in blockDAG) reduce_less:
-  assumes " a \<in> verts G"
+  assumes "a \<in> verts G"
   and "\<not>is_genesis_node a"
   shows "card (verts (reduce_past a)) < card (verts G)"
 proof -
@@ -292,27 +315,38 @@ proof -
   then show ?thesis
     by (simp add: psubset_card_mono)
 qed 
+                                  
+fun (in blockDAG) gen_graph::"('a,'b) pre_digraph \<Rightarrow>('a,'b) pre_digraph" where 
+"gen_graph V =
+\<lparr>verts = {genesis_node V}, arcs = {}, tail=tail V, head=head V\<rparr>"
 
-lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
-  assumes major: "DAGbased H" and sub: "induced_subgraph H G"
-    and cases: "u \<in> verts G \<Longrightarrow> P u"
-       "\<And>x y. \<lbrakk>u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x; x \<rightarrow>\<^bsub>G\<^esub> y; P x\<rbrakk> \<Longrightarrow> P y"
-  shows "P G"
-  oops  
-                                           
-fun (in blockDAG) gen_graph::"'a \<Rightarrow>('a,'b) pre_digraph" where "gen_graph a =  
-\<lparr>verts = {a}, arcs = {}, tail=tail G, head = head G\<rparr>"
+lemma (in blockDAG) gen_gen :"verts (gen_graph G) = {genesis_node G}" 
+  by simp
 
-lemma (in blockDAG) gen_gen :"verts (gen_graph a) = {a}" by simp
-  
 lemma (in blockDAG) gen_graph_sound:
-  assumes "blockDAG (gen_graph a)"
-  shows "blockDAG.is_genesis_node (gen_graph a) a"
+  assumes "blockDAG (gen_graph V)"
+  shows "blockDAG.is_genesis_node (gen_graph V) (genesis_node V)"
   using assms blockDAG.past_nodes_ex blockDAG.past_nodes_verts blockDAG.reduce_past.simps
     blockDAG.reduce_past_not_empty by fastforce
+
+
+lemma graph_nat_induct[consumes 1, case_names base step]: 
+  assumes base: "\<forall>V. (digraph V \<longrightarrow> card (verts V) = 0 \<longrightarrow> P V)"
+  and step: "\<forall>V c. ((digraph V \<longrightarrow> card (verts V) = c \<longrightarrow> P V) 
+  \<longrightarrow> (digraph V \<longrightarrow> card (verts V) = (Suc c) \<longrightarrow> P V))"
+shows  "\<forall>Z. (digraph Z \<longrightarrow> P Z)" 
+  by (metis (full_types) list_decode.cases
+      local.base local.step n_not_Suc_n) 
   
+lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
+  assumes b: "\<And>a. blockDAG (gen_graph a)"
+    and cases: "\<And>a. P (gen_graph a)"
+       "\<And>b. (blockDAG (pre_digraph.add_arc H b) \<and> P H \<Longrightarrow> P (pre_digraph.add_arc H b))"
+     shows "P G"
+
 lemma (in blockDAG) exist_sub: 
   shows "\<exists>a. induced_subgraph (gen_graph a) G"
+  using reduce_less 
   
 subsection \<open>Spectre\<close>
 
