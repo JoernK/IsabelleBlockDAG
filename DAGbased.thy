@@ -76,10 +76,10 @@ fun (in blockDAG) future_nodes:: "'a \<Rightarrow> 'a set"
   where "future_nodes a = {b. (b \<in> verts G \<and> b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) }"
 
 fun (in blockDAG) past_nodes:: "'a \<Rightarrow> 'a set"
-  where "past_nodes a = {b. (b \<in> verts G \<and> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) }"
+  where "past_nodes a = {b. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
 
 fun (in blockDAG) past_nodes_refl :: "'a \<Rightarrow> 'a set"
-  where "past_nodes_refl a = {b. (b \<in> verts G \<and> a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b)}"
+  where "past_nodes_refl a = {b. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
 
 fun (in blockDAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
@@ -95,14 +95,14 @@ fun (in blockDAG) is_tip:: " 'a \<Rightarrow> bool"
 fun (in blockDAG) tips:: "('a,'b) pre_digraph \<Rightarrow>'a set"
   where "tips V = {v. blockDAG.is_tip V v}"
 
-fun (in blockDAG) is_genesis_node:: "'a \<Rightarrow> bool" where
+fun (in blockDAG) is_genesis_node :: "'a \<Rightarrow> bool" where
 "is_genesis_node v = ((v \<in> verts G) \<and> (ALL x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
 
 definition (in blockDAG) genesis_node:: "'a"
   where "genesis_node = (SOME x. is_genesis_node x)"
 
 
-section \<open>Lemmas\<close>
+subsection \<open>Lemmas\<close>
 
 
 lemma (in blockDAG) unidirectional:
@@ -154,11 +154,11 @@ subsection \<open>past_nodes\<close>
 lemma (in blockDAG) past_nodes_ex:
   assumes "a \<in> verts G"
   shows "a \<notin> past_nodes a"
-  using cycle_free past_nodes.simps by auto
+  using cycle_free past_nodes.simps reachable_def by auto
 
 lemma (in blockDAG) past_nodes_verts: 
   shows "past_nodes a \<subseteq> verts G"
-  using past_nodes.simps by auto
+  using past_nodes.simps reachable1_in_verts by auto
 
 lemma (in blockDAG) past_nodes_refl_ex:
   assumes "a \<in> verts G"
@@ -168,7 +168,7 @@ lemma (in blockDAG) past_nodes_refl_ex:
 
 lemma (in blockDAG) past_nodes_refl_verts: 
   shows "past_nodes_refl a \<subseteq> verts G"
-  using past_nodes.simps by auto
+  using past_nodes.simps reachable_in_verts by auto
   
 subsection \<open>reduce_past\<close>
 
@@ -301,7 +301,7 @@ next
       "\<exists>p. p \<in> verts (reduce_past a) \<and> (\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p)"
       proof -
         obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
-        have p: "p \<in> verts (reduce_past a) \<and> (\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p)"
+        have pe: "p \<in> verts (reduce_past a) \<and> (\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p)"
         proof 
           show "p \<in> verts (reduce_past a)" using genesisAlt induce_reachable_preserves_paths
             reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts assms(2)
@@ -313,11 +313,11 @@ next
           proof safe
             fix r a
             assume in_past: "r \<in> verts (reduce_past a)"
-            then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt by simp  
+            then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt past_nodes_verts by auto  
             then show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p"
             proof -
             have f1: "r \<in> verts G \<and> a \<rightarrow>\<^sup>+ r"
-            using in_past by force
+            using in_past past_nodes_verts by force
             obtain aaa :: "'a set \<Rightarrow> 'a set \<Rightarrow> 'a" where
             f2: "\<forall>x0 x1. (\<exists>v2. v2 \<in> x1 \<and> v2 \<notin> x0) = (aaa x0 x1 \<in> x1 \<and> aaa x0 x1 \<notin> x0)"
               by moura
@@ -337,7 +337,7 @@ next
         qed
         show 
         "\<exists>p. p \<in> verts (reduce_past a) \<and> (\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p)"
-          using p by auto
+          using pe by auto
       qed
     qed
   qed
@@ -352,7 +352,103 @@ proof safe
   show "is_genesis_node b \<Longrightarrow> blockDAG.is_genesis_node (reduce_past a) b"
 *)
 
+subsection \<open>reduce_past_refl\<close>
 
+lemma (in blockDAG) reduce_past_refl_induced_subgraph:
+  shows "induced_subgraph (reduce_past_refl a) G"
+  using  induced_induce past_nodes_refl_verts by auto
+
+lemma (in blockDAG) reduce_past_refl_arcs2:
+  "e \<in> arcs (reduce_past_refl a) \<Longrightarrow> e \<in> arcs G"
+  using reduce_past_arcs by auto
+
+lemma (in blockDAG) reduce_past_refl_digraph:
+  assumes "a \<in> verts G"
+  shows "digraph (reduce_past_refl a)"
+  using digraphI_induced reduce_past_refl_induced_subgraph reachable_mono by simp
+
+lemma (in blockDAG) reduce_past_refl_dagbased:
+  assumes "a \<in> verts G"
+  shows "blockDAG (reduce_past_refl a)"
+  unfolding blockDAG_def DAG_def
+proof safe
+  show "digraph (reduce_past_refl a)"
+    using reduce_past_refl_digraph assms(1) by simp
+next
+  show "DAG_axioms (reduce_past_refl a)"
+    unfolding DAG_axioms_def
+    using cycle_free reduce_past_refl_induced_subgraph reachable_mono
+    by (meson arcs_ends_mono induced_subgraph_altdef trancl_mono) 
+next
+  show "blockDAG_axioms (reduce_past_refl a)"
+    unfolding blockDAG_axioms
+  proof
+    fix u v 
+    show "\<forall>e. wf_digraph.arc (reduce_past_refl a) e (u, v) \<longrightarrow>
+               \<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl a) e\<^esub> v"
+    proof safe
+      fix e 
+      assume a: " wf_digraph.arc (reduce_past_refl a) e (u, v)"
+      and b: "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl a) e\<^esub> v"
+      have edge: "wf_digraph.arc G e (u, v)"
+          using assms reduce_past_arcs2 induced_subgraph_def arc_def 
+        proof -
+          have "wf_digraph (reduce_past_refl a)"
+            using reduce_past_refl_digraph digraph_def by auto
+          then have "e \<in> arcs (reduce_past_refl a) \<and> tail (reduce_past_refl a) e = u
+                     \<and> head (reduce_past_refl a) e = v"
+            using wf_digraph.arcE arc_def a
+            by (metis (no_types)) 
+          then show "arc e (u, v)"
+            using arc_def reduce_past_refl.simps by auto
+        qed
+      have "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc G e\<^esub> v"
+        using a b reduce_past_refl_digraph del_arc_subgraph digraph_axioms not_reachable_subgraph
+        by (metis digraphI_induced past_nodes_refl_verts reduce_past_refl.simps
+            reduce_past_refl_induced_subgraph subgraph_induce_subgraphI)
+      then show False
+        using edge only_new by simp
+    qed
+  next
+    show "\<exists>p. p \<in> verts (reduce_past_refl a) \<and> (\<forall>r. r \<in> verts (reduce_past_refl a)
+         \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl a\<^esub> p)"
+      proof -
+        obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
+        have pe: "p \<in> verts (reduce_past_refl a)"
+        using genesisAlt induce_reachable_preserves_paths
+            reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts
+            gen mem_Collect_eq reachable_neq_reachable1
+            assms by force    
+        have reaches: "(\<forall>r. r \<in> verts (reduce_past_refl a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl a\<^esub> p)" 
+          proof safe
+            fix r
+            assume in_past: "r \<in> verts (reduce_past_refl a)"
+            then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt reachable_in_verts by simp
+            have "a \<rightarrow>\<^sup>* r" using in_past by auto
+            then have reach: "r \<rightarrow>\<^sup>*\<^bsub>G \<restriction> {w. a \<rightarrow>\<^sup>* w}\<^esub> p"
+            proof(induction)
+              case base
+              then show ?case
+                by (simp add: con induce_reachable_preserves_paths) 
+            next
+              case (step x y)
+              then show ?case
+              proof -
+                have "Collect (reachable G y) \<subseteq> Collect (reachable G x)"
+                  using adj_reachable_trans step.hyps(1) by force
+                then show ?thesis
+                  using reachable_induce_ss step.IH by blast
+              qed 
+            qed
+            show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl a\<^esub> p" using reach reduce_past_refl.simps 
+            past_nodes_refl.simps by simp
+          qed
+          show "?thesis" using pe reaches by auto
+        qed
+      qed
+    qed
+
+subsection \<open>gen_graph\<close>
 
                                   
 definition (in blockDAG) gen_graph::"('a,'b) pre_digraph" where 
@@ -430,7 +526,7 @@ lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
 proof - 
   oops
   
-subsection \<open>Spectre\<close>
+section \<open>Spectre\<close>
 
 
 subsection \<open>Spectre_Definition\<close>
@@ -455,32 +551,30 @@ proof (rule ccontr)
 qed
 
 lemma (in blockDAG) finite_past: "finite (past_nodes a)"
-  by (metis (full_types) Collect_subset digraphI_induced digraph_def fin_digraph.finite_verts 
-past_nodes.simps induce_subgraph_verts induced_induce)
+  by (meson finite_verts rev_finite_subset
+ fin_digraph.finite_verts past_nodes.simps reachable_def past_nodes_verts)
 
 lemma (in blockDAG) finite_future: "finite (future_nodes a)"
   by (metis (full_types) Collect_subset digraphI_induced digraph_def fin_digraph.finite_verts 
 future_nodes.simps induce_subgraph_verts induced_induce)
 
 function (in tie_breakingDAG) vote_Spectre:: " ('a,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> int" 
- where
- "vote_Spectre V a b c = 
-  (if (a=b) then 1 else 
-  (if (a=c) then -1  else
-  (if (b=c) then 1 else 
-  (if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 1  else 
-  (if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1  else 
-  (if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
+  where
+"vote_Spectre V a b c = 
+  (if (a=b \<and> b=c) then 1 else 
+  (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)) then 1  else 
+  (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)) then -1  else 
+  (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)) then 
    sumlist b c (map (\<lambda>i.
  (vote_Spectre (blockDAG.reduce_past V a) i  b c)) (set_to_list ((direct_past a)))) 
   else sumlist b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (set_to_list (future_nodes a)))))))))"
+   (vote_Spectre V i b c)) (set_to_list (future_nodes a)))))))"
   by auto
 termination (in tie_breakingDAG) 
 proof(relation "measure (\<lambda> (V, a, b, c). card (verts V))") 
   show  "wf (measure (\<lambda>(V, a, b, c). card (verts V)))" by simp
 next 
 
-export_code tie_breakingDAG.vote_Spectre in Haskell module_name SPECTRE
+export_code pre_digraph.del_arc in Haskell module_name SPECTRE
 
 end
