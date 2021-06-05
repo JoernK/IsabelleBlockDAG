@@ -9,6 +9,14 @@ begin
 
 section \<open>Digraph.Components\<close>
 
+lemma graph_equality:
+  assumes "digraph A \<and> digraph B"
+  shows "(A = B) \<longleftrightarrow>
+ (verts A = verts B) \<and> (arcs A = arcs B) \<and>
+ (tail A = tail B) \<and> (head A = head B)"
+  by auto
+
+
 lemma not_reachable_subgraph:
   assumes "subgraph H G"
   shows " \<not> u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v \<longrightarrow> \<not> u \<rightarrow>\<^sup>*\<^bsub>H\<^esub> v"
@@ -467,7 +475,7 @@ subsection \<open>gen_graph\<close>
 
                                   
 definition (in blockDAG) gen_graph::"('a,'b) pre_digraph" where 
-"gen_graph = induce_subgraph G {genesis_node}"
+"gen_graph = induce_subgraph G {blockDAG.genesis_node G}"
 
 lemma (in blockDAG) gen_gen :"verts (gen_graph) = {genesis_node}" 
   unfolding genesis_node_def gen_graph_def by simp
@@ -533,13 +541,80 @@ next
         (\<forall>r. r \<in> verts gen_graph \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>gen_graph\<^esub> p)"
     by (simp add: gen_gen)
 qed 
+
+lemma (in blockDAG) no_empty_blockDAG:
+  shows "card (verts G) > 0"
+proof -
+  have "\<exists>p. p \<in> verts G"
+    using genesis_in_verts by auto 
+  then show "card (verts G) > 0"
+    using card_gt_0_iff finite_verts by blast
+qed
+
+  
+lemma blockDAG_nat_induct[consumes 1, case_names base step]: 
+  assumes
+ graph: "blockDAG Z" and
+ cases: "\<forall>V. (blockDAG V \<longrightarrow> card (verts V) = 1 \<longrightarrow> P V)"
+  "\<forall>V c. ((blockDAG V \<longrightarrow> card (verts V) = c \<longrightarrow> P V) 
+  \<longrightarrow> (blockDAG V \<longrightarrow> card (verts V) = (Suc c) \<longrightarrow> P V))"
+shows "P Z"
+  using blockDAG.no_empty_blockDAG list_decode.cases
+  cases(1) cases(2) graph n_not_Suc_n
+  by (metis neq0_conv) 
+
+lemma (in blockDAG) blockDAG_cases:
+  shows "(G = gen_graph) \<or> (\<exists>b H. (blockDAG H \<and> (pre_digraph.add_arc H b = G)))"
+proof(induct_tac G rule:blockDAG_nat_induct)
+  show "blockDAG G" using blockDAG_axioms by simp
+next 
+  fix V
+  assume bD: "blockDAG V"
+  and one: "card (verts V) = 1"
+  then have "blockDAG.genesis_node V \<in> verts V"
+    by (simp add: blockDAG.genesis_in_verts)
+  then have only: "verts V = {blockDAG.genesis_node V}"
+    by (metis one  card_1_singletonE insert_absorb singleton_insert_inj_eq')
+  then have verts_equal: "verts V = verts (blockDAG.gen_graph V)"
+    using  bD one blockDAG.gen_graph_def induce_subgraph_def
+      induced_induce blockDAG.genesis_in_verts
+    by (simp add: blockDAG.gen_graph_def) 
+  have "arcs V ={}" 
+  proof (rule ccontr)
+    assume not_empty: "arcs V \<noteq>{}" 
+    then obtain z where part_of: "z \<in> arcs V"
+      by auto
+    then have tail: "tail V z \<in> verts V"
+      using wf_digraph_def blockDAG_def DAG_def 
+        digraph_def bD nomulti_digraph.axioms(1)
+      by metis
+    also have head: "head V z \<in> verts V" 
+    proof -
+      show ?thesis
+        by (metis (no_types) DAG_def bD blockDAG_def digraph_def
+            nomulti_digraph.axioms(1) part_of wf_digraph_def)
+    qed
+    then have "tail V z = head V z"
+    using tail only by simp
+  then have "\<not> loopfree_digraph_axioms V"
+    unfolding loopfree_digraph_axioms_def
+      using  part_of only  DAG_def digraph_def
+      by auto
+    then show "False"
+      using bD blockDAG_def DAG_def digraph_def loopfree_digraph_def by auto
+  qed                                                                          
+  then have "arcs V = arcs (blockDAG.gen_graph V)"
+    by (simp add: bD blockDAG.gen_graph_empty_arcs)
+  then have "V = blockDAG.gen_graph V"
+    unfolding  blockDAG.gen_graph_def
+    using verts_equal bD  induce_subgraph_def graph_equality gen_graph_sound
+    blockDAG.gen_graph_def by fastforce 
     
 lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
   assumes cases: "P (gen_graph)"
        "\<And>b H. (blockDAG (pre_digraph.add_arc H b) \<and> P H \<Longrightarrow> P (pre_digraph.add_arc H b))"
      shows "P G"
-proof - 
-  oops
+proof -
   
 section \<open>Spectre\<close>
 
@@ -560,9 +635,12 @@ fun (in tie_breakingDAG) sumlist :: "'c \<Rightarrow>'c \<Rightarrow> int list \
   where "sumlist a b [] = 0"
   | "sumlist a b (x # xs) = sumlist_acc a b 0 (x # xs)"
   
+datatype Spectre_cases = LeftR | RightR | BothR | NeitherR | Malformed  
 
+fun vote_Spectre_calc_cases :" ('c,'b) pre_digraph \<Rightarrow>'c \<Rightarrow> 'c \<Rightarrow> 'c \<Rightarrow> Spectre_cases"
+  where "vote_Spectre_calc_cases V a b c = "
 
-function (in tie_breakingDAG) vote_Spectre:: " ('c,'b) pre_digraph \<Rightarrow>'c \<Rightarrow> 'c \<Rightarrow> 'c \<Rightarrow> int" 
+function vote_Spectre:: " ('c::linorder,'b) pre_digraph \<Rightarrow>'c \<Rightarrow> 'c \<Rightarrow> 'c \<Rightarrow> int" 
   where
 "vote_Spectre V a b c = 
   (if (\<not> (tie_breakingDAG V) \<or> (a \<notin> (verts V)) \<or> b \<notin> verts V \<or> c \<notin> verts V) then undefined else 
@@ -590,7 +668,6 @@ next
   then show " ((blockDAG.reduce_past V a, x, b, c), V, a, b, c)
        \<in> measure (\<lambda>(V, a, b, c). card (verts V))"
     using reduce_less reduce_past_dagbased direct_past.simps
-   
     oops
 lemma del_arc_code [code]: "pre_digraph.del_arc G a =
  \<lparr> verts = verts G, arcs = arcs G - {a}, tail = tail G, head = head G \<rparr>"
