@@ -7,14 +7,12 @@ theory DAGbased
   imports Main Graph_Theory.Graph_Theory PSL.PSL
 begin
 
-
 section \<open>Digraph.Components\<close>
 
 lemma not_reachable_subgraph:
   assumes "subgraph H G"
   shows " \<not> u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v \<longrightarrow> \<not> u \<rightarrow>\<^sup>*\<^bsub>H\<^esub> v"
   by (meson assms pre_digraph.reachable_mono)
-
 
 lemma del_arc_subgraph:
   assumes "subgraph H G"
@@ -33,21 +31,24 @@ proof -
 qed
 
 lemma graph_nat_induct[consumes 1, case_names base step]: 
-  assumes cases: "\<forall>V. (digraph V \<longrightarrow> card (verts V) = 0 \<longrightarrow> P V)"
+  assumes
+ graph: "digraph Z" and
+ cases: "\<forall>V. (digraph V \<longrightarrow> card (verts V) = 0 \<longrightarrow> P V)"
   "\<forall>V c. ((digraph V \<longrightarrow> card (verts V) = c \<longrightarrow> P V) 
   \<longrightarrow> (digraph V \<longrightarrow> card (verts V) = (Suc c) \<longrightarrow> P V))"
-shows  "\<forall>Z. (digraph Z \<longrightarrow> P Z)" 
+shows "P Z"
   by (metis (full_types) list_decode.cases
-  cases(1) cases(2) n_not_Suc_n) 
+  cases(1) cases(2) graph n_not_Suc_n) 
 
 section \<open>Utils\<close>
 
+(**
 fun set_to_list :: "'a set \<Rightarrow> 'a list"
   where "set_to_list s = (SOME l. set l = s)"
 lemma  set_set_to_list:
    "finite s \<Longrightarrow> set (set_to_list s) = s"
   unfolding set_to_list.simps by (metis (mono_tags) finite_list some_eq_ex)
-
+**)
 section \<open>blockDAGs\<close>
 
 subsection  \<open>Definitions\<close>
@@ -59,13 +60,11 @@ locale blockDAG = DAG  +
   assumes only_new: "\<forall>e. arc e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v)"
   and genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))"       
 
-locale tie_breakingDAG = blockDAG +
-  fixes r 
-  assumes "linear_order_on (verts G) r"
+locale tie_breakingDAG = 
+  fixes G::"('c::linorder,'b) pre_digraph"
+  assumes "blockDAG G"
+  
 
-definition (in tie_breakingDAG) tie_breakingDAGs :: 
-  "('a,'b) pre_digraph  \<Rightarrow> bool"
-where "tie_breakingDAGs V = tie_breakingDAG V r"
 
 subsection  \<open>Functions\<close>
 
@@ -169,7 +168,23 @@ lemma (in blockDAG) past_nodes_refl_ex:
 lemma (in blockDAG) past_nodes_refl_verts: 
   shows "past_nodes_refl a \<subseteq> verts G"
   using past_nodes.simps reachable_in_verts by auto
-  
+
+lemma (in blockDAG) finite_past: "finite (past_nodes a)"
+  by (meson finite_verts rev_finite_subset
+ fin_digraph.finite_verts past_nodes.simps reachable_def past_nodes_verts)
+
+lemma (in blockDAG) finite_future: "finite (future_nodes a)"
+  by (metis (full_types) Collect_subset digraphI_induced digraph_def fin_digraph.finite_verts 
+future_nodes.simps induce_subgraph_verts induced_induce)
+
+
+lemma (in blockDAG) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a = {}"
+proof (rule ccontr)
+  assume "\<not> past_nodes a \<inter> future_nodes a = {}"
+  then show False
+    using past_nodes.simps future_nodes.simps unidirectional reachable1_reachable by blast
+qed
+
 subsection \<open>reduce_past\<close>
 
 lemma (in blockDAG) reduce_past_arcs: 
@@ -531,49 +546,55 @@ section \<open>Spectre\<close>
 
 subsection \<open>Spectre_Definition\<close>
 
-definition (in tie_breakingDAG) tie_break_int:: "'a \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> int"
+
+definition (in tie_breakingDAG) tie_break_int:: "'c \<Rightarrow> 'c \<Rightarrow> int \<Rightarrow> int"
   where "tie_break_int a b i =
- (if i=0 then (if (a,b) \<in> r then 1 else -1) else 
+ (if i=0 then (if (a \<le> b) then 1 else -1) else 
               (if i > 0 then 1 else -1))"
 
-fun (in tie_breakingDAG) sumlist_acc :: "'a \<Rightarrow>'a \<Rightarrow> int \<Rightarrow> int list \<Rightarrow> int"
+fun (in tie_breakingDAG) sumlist_acc :: "'c \<Rightarrow>'c \<Rightarrow> int \<Rightarrow> int list \<Rightarrow> int"
   where "sumlist_acc a b s [] = tie_break_int a b s"
   | "sumlist_acc a b s (x#xs) = sumlist_acc a b (s + x) xs"
 
-fun (in tie_breakingDAG) sumlist :: "'a \<Rightarrow>'a \<Rightarrow> int list \<Rightarrow> int"
-  where "sumlist a b s = sumlist_acc a b 0 s"
+fun (in tie_breakingDAG) sumlist :: "'c \<Rightarrow>'c \<Rightarrow> int list \<Rightarrow> int"
+  where "sumlist a b [] = 0"
+  | "sumlist a b (x # xs) = sumlist_acc a b 0 (x # xs)"
+  
 
-lemma (in blockDAG) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a = {}"
-proof (rule ccontr)
-  assume "\<not> past_nodes a \<inter> future_nodes a = {}"
-  then show False
-    using past_nodes.simps future_nodes.simps unidirectional reachable1_reachable by blast
-qed
 
-lemma (in blockDAG) finite_past: "finite (past_nodes a)"
-  by (meson finite_verts rev_finite_subset
- fin_digraph.finite_verts past_nodes.simps reachable_def past_nodes_verts)
-
-lemma (in blockDAG) finite_future: "finite (future_nodes a)"
-  by (metis (full_types) Collect_subset digraphI_induced digraph_def fin_digraph.finite_verts 
-future_nodes.simps induce_subgraph_verts induced_induce)
-
-function (in tie_breakingDAG) vote_Spectre:: " ('a,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> int" 
+function (in tie_breakingDAG) vote_Spectre:: " ('c,'b) pre_digraph \<Rightarrow>'c \<Rightarrow> 'c \<Rightarrow> 'c \<Rightarrow> int" 
   where
 "vote_Spectre V a b c = 
-  (if (a=b \<and> b=c) then 1 else 
+  (if (\<not> (tie_breakingDAG V) \<or> (a \<notin> (verts V)) \<or> b \<notin> verts V \<or> c \<notin> verts V) then undefined else 
+  (if (b=c) then 1 else 
   (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)) then 1  else 
   (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)) then -1  else 
-  (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)) then 
-   sumlist b c (map (\<lambda>i.
- (vote_Spectre (blockDAG.reduce_past V a) i  b c)) (set_to_list ((direct_past a)))) 
-  else sumlist b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (set_to_list (future_nodes a)))))))"
+  (if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
+   tie_breakingDAG.sumlist b c (map (\<lambda>i.
+ (vote_Spectre (blockDAG.reduce_past V a) i b c)) (sorted_list_of_set ((blockDAG.past_nodes V a)))) 
+  else tie_breakingDAG.sumlist b c (map (\<lambda>i.
+   (vote_Spectre V i b c)) (sorted_list_of_set (blockDAG.future_nodes V a))))))))"
   by auto
 termination (in tie_breakingDAG) 
 proof(relation "measure (\<lambda> (V, a, b, c). card (verts V))") 
-  show  "wf (measure (\<lambda>(V, a, b, c). card (verts V)))" by simp
+  show  "wf (measure (\<lambda>(V, a, b, c). card (verts V)))"
+    by auto
 next 
+  fix V a b c x
+  assume "\<not> (\<not> (tie_breakingDAG V) \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
+  and "\<not> (b = c)"
+  and " \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> \<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)"
+  and "\<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> \<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)"
+  and " a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> \<not> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c"
+  and "x \<in> set (sorted_list_of_set (blockDAG.direct_past V a))"
+  then show " ((blockDAG.reduce_past V a, x, b, c), V, a, b, c)
+       \<in> measure (\<lambda>(V, a, b, c). card (verts V))"
+    using reduce_less reduce_past_dagbased direct_past.simps
+   
+    oops
+lemma del_arc_code [code]: "pre_digraph.del_arc G a =
+ \<lparr> verts = verts G, arcs = arcs G - {a}, tail = tail G, head = head G \<rparr>"
+  by (simp add: pre_digraph.del_arc_def)
 
 export_code pre_digraph.del_arc in Haskell module_name SPECTRE
 
