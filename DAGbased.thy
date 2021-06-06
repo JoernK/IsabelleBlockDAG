@@ -755,8 +755,8 @@ lemma (in blockDAG) blockDAG_size_cases:
   using no_empty_blockDAG
   by linarith 
 
-lemma (in blockDAG) blockDAG_cases:
-  shows "(G = gen_graph) \<or> (\<exists>b H. (blockDAG H \<and> (pre_digraph.add_arc H b = G)))"
+lemma (in blockDAG) blockDAG_cases_int:
+  shows "(G = gen_graph) \<or> (\<exists>b H. (blockDAG H \<and> del_vert b = H))"
 proof(rule blockDAG_size_cases)
   assume one: "card (verts G) = 1"
   then have "blockDAG.genesis_node G \<in> verts G"
@@ -791,7 +791,7 @@ proof(rule blockDAG_size_cases)
   qed                                                                          
   then have "arcs G = arcs (blockDAG.gen_graph G)"
     by (simp add: blockDAG_axioms blockDAG.gen_graph_empty_arcs)
-  then show "G = gen_graph \<or> (\<exists>b H. blockDAG H \<and> pre_digraph.add_arc H b = G)"
+  then show "G = gen_graph \<or> (\<exists>b H. blockDAG H \<and> del_vert b = H)"
     unfolding  blockDAG.gen_graph_def
     using verts_equal blockDAG_axioms  induce_subgraph_def graph_equality gen_graph_sound
     blockDAG.gen_graph_def by fastforce
@@ -817,16 +817,36 @@ next
     then show False using uneq by simp
   qed
   then have "blockDAG (del_vert z)" using del_tips_bDAG z_def by simp
-  obtain es where "es = {a \<in> arcs G. tail G a = z \<or> head G a = z}" by auto
-  then have "finite es" using finite_arcs by auto
-  
-  
+  then have "(\<exists>b H. blockDAG H \<and> del_vert b = H)" using z_def by auto
+  then show "G = gen_graph \<or> (\<exists>b H. blockDAG H \<and> del_vert b = H)" by simp
+qed
+
+lemma (in blockDAG) blockDAG_cases:
+  obtains (base) "(G = gen_graph)"
+  | (more) "(\<exists>b H. (blockDAG H \<and> del_vert b = H))"
+  using blockDAG_cases_int by auto
+
 lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
   assumes cases: "P (gen_graph)"
-       "\<And>b H. (blockDAG (pre_digraph.add_arc H b) \<and> P H \<Longrightarrow> P (pre_digraph.add_arc H b))"
+       "\<And>b H. 
+   (blockDAG (pre_digraph.del_vert H b) \<Longrightarrow> P(pre_digraph.del_vert H b))
+  \<Longrightarrow> (blockDAG H \<Longrightarrow> P H)"
      shows "P G"
-proof -
-  
+proof(induct_tac G rule:blockDAG_nat_induct) 
+  show "blockDAG G" using blockDAG_axioms by simp
+next
+  fix V
+  assume "blockDAG V" 
+  and "card (verts V) = 1"
+  then have "V = blockDAG.gen_graph V"
+    using genesis gen_graph
+  then show "P V" using cases(1) by simp
+next 
+  assume "\<exists>b H. blockDAG H \<and> del_vert b = H"
+  then obtain b where "\<exists>H. blockDAG H \<and> pre_digraph.del_vert G b = H" by auto
+  then obtain H where "blockDAG H \<and> pre_digraph.del_vert G b = H" by auto
+  then have "blockDAG (pre_digraph.del_vert G b)" by auto
+  then show "P G" using cases(2) blockDAG_axioms 
 section \<open>Spectre\<close>
 
 
