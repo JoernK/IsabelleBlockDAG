@@ -9,18 +9,24 @@ begin
 
 section \<open>Digraph.Components\<close>
 
-lemma graph_equality:
-  assumes "digraph A \<and> digraph B"
-  shows "(A = B) \<longleftrightarrow>
- (verts A = verts B) \<and> (arcs A = arcs B) \<and>
- (tail A = tail B) \<and> (head A = head B)"
-  by auto
 
-
-lemma not_reachable_subgraph:
-  assumes "subgraph H G"
-  shows " \<not> u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v \<longrightarrow> \<not> u \<rightarrow>\<^sup>*\<^bsub>H\<^esub> v"
-  by (meson assms pre_digraph.reachable_mono)
+lemma (in digraph) del_vert_not_in_graph:
+  assumes "b \<notin> verts G"
+  shows "(pre_digraph.del_vert G b) = G"
+      proof -
+        have v: "verts (pre_digraph.del_vert G b) = verts G"
+          using assms(1)
+          by (simp add: pre_digraph.verts_del_vert) 
+        have "\<forall>e \<in> arcs G. tail G e \<noteq> b \<and> head G e \<noteq> b " using digraph_axioms
+         assms digraph.axioms(2) loopfree_digraph.axioms(1)
+          by auto 
+        then have " arcs G \<subseteq> arcs (pre_digraph.del_vert G b)"
+          using assms
+          by (simp add: pre_digraph.arcs_del_vert subsetI) 
+        then have e: "arcs G = arcs (pre_digraph.del_vert G b)"
+        by (simp add: pre_digraph.arcs_del_vert subset_antisym)
+        then show ?thesis using v by (simp add: pre_digraph.del_vert_simps)
+      qed 
 
 lemma del_arc_subgraph:
   assumes "subgraph H G"
@@ -38,15 +44,30 @@ proof -
     using f1 assms(1) by (simp add: compatible_def pre_digraph.del_arc_simps wf_digraph.wf_digraph_del_arc)
 qed
 
-lemma graph_nat_induct[consumes 1, case_names base step]: 
+lemma graph_nat_induct[consumes 0, case_names base step]: 
   assumes
- major: "digraph Z" and
+
  cases: "\<And>V. (digraph V \<Longrightarrow> card (verts V) = 0 \<Longrightarrow> P V)"
-  "\<And>V c. ((digraph V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V) 
-  \<Longrightarrow> (digraph V \<Longrightarrow> card (verts V) = (Suc c) \<Longrightarrow> P V))"
-shows "P Z"
-  by (metis (full_types) list_decode.cases
-  cases(1) cases(2) major n_not_Suc_n) 
+  "\<And>W c. (\<And>V. (digraph V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V)) 
+  \<Longrightarrow> (digraph W \<Longrightarrow> card (verts W) = (Suc c) \<Longrightarrow> P W)"
+shows "\<And>Z. digraph Z \<Longrightarrow> P Z"
+proof - 
+  fix Z:: "('a,'b) pre_digraph"
+  assume major: "digraph Z"
+  then show "P Z"
+  proof (induction "card (verts Z)" arbitrary: Z)
+    case 0
+    then show ?case
+      by (simp add: local.cases(1) major) 
+  next
+    case su: (Suc x)
+    assume "(\<And>Z. x = card (verts Z) \<Longrightarrow> digraph Z \<Longrightarrow> P Z)"
+    show ?case
+      by (metis local.cases(2) su.hyps(1) su.hyps(2) su.prems)   
+  qed   
+qed 
+
+  
 
 section \<open>Utils\<close>
 
@@ -68,9 +89,11 @@ locale blockDAG = DAG  +
   assumes only_new: "\<forall>e. arc e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v)"
   and genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))"       
 
-locale tie_breakingDAG = 
-  fixes G::"('c::linorder,'b) pre_digraph"
+class tie_breakingDAG = 
+  fixes G::"('a::linorder,('a\<times>'a)) pre_digraph"
   assumes "blockDAG G"
+  assumes "head G = snd "
+  assumes "tail G = fst "
   
 
 
@@ -81,7 +104,7 @@ blockDAG) direct_past:: "'a \<Rightarrow> 'a set"
   where "direct_past a = {b. (b \<in> verts G \<and> (a,b) \<in> arcs_ends G)}"
 
 fun (in blockDAG) future_nodes:: "'a \<Rightarrow> 'a set"
-  where "future_nodes a = {b. (b \<in> verts G \<and> b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) }"
+  where "future_nodes a = {b.  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
 
 fun (in blockDAG) past_nodes:: "'a \<Rightarrow> 'a set"
   where "past_nodes a = {b. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
@@ -128,33 +151,18 @@ lemma (in blockDAG) genesis_existAlt:
   using genesis genesisAlt blockDAG_axioms_def by presburger 
 
 lemma (in blockDAG) unique_genesis: "is_genesis_node a \<and> is_genesis_node b \<longrightarrow> a = b"
-proof(rule ccontr)
-  assume c: "\<not>?thesis"
-  then show "False"
-  proof -
-    have "\<exists> a b. is_genesis_node a \<and> is_genesis_node b \<and> \<not>a = b"
-      using c by auto
-    then have "\<exists>a. a \<rightarrow>\<^sup>+ a"
-      using genesisAlt reachable_trans 
+      using genesisAlt reachable_trans cycle_free
             reachable_refl reachable_reachable1_trans reachable_neq_reachable1
       by (metis (full_types)) 
-    then show False
-      using cycle_free by auto
-  qed
-qed
+
 lemma (in blockDAG) genesis_unique_exists:
   "\<exists>!a. is_genesis_node a"
   using genesis_existAlt unique_genesis by auto  
 
 lemma (in blockDAG) genesis_in_verts:
   "genesis_node \<in> verts G"
-proof -
-  have "\<forall>a. (is_genesis_node a \<longrightarrow> a \<in> verts G)"
-    using is_genesis_node.simps by simp
-  then show ?thesis
-    using genesis_node_def genesis_existAlt someI2_ex
+    using is_genesis_node.simps genesis_node_def genesis_existAlt someI2_ex
     by metis 
-qed
 
 
 
@@ -166,15 +174,10 @@ lemma (in blockDAG) tips_exist:
 proof (rule ccontr)
   assume "\<nexists>x. x \<in> verts G \<and> (\<forall>y. \<not> y\<rightarrow>\<^sup>+x)"
   then have contr: "\<forall>x. x \<in> verts G \<longrightarrow> (\<exists>y. y\<rightarrow>\<^sup>+x)"
-    by auto
-  also 
-  have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow> (\<forall> z. x \<rightarrow>\<^sup>+ z \<longrightarrow> \<not> z \<rightarrow>\<^sup>* y)"
-    using unidirectional reachable1_reachable reachable1_reachable_trans
-    by meson 
-  then have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow> (\<forall> z. x \<rightarrow>\<^sup>+ z \<longrightarrow> y \<rightarrow>\<^sup>+ z)"
-    by (meson trancl_trans)    
-  then have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subseteq> {z. y \<rightarrow>\<^sup>+ z}"
-    by (meson Collect_mono) 
+    by auto  
+  have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subseteq> {z. y \<rightarrow>\<^sup>+ z}"
+    using  Collect_mono trancl_trans
+    by metis
   then have sub: "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subset> {z. y \<rightarrow>\<^sup>+ z}"
     using cycle_free by auto
   have part: "\<forall> x. {z. x \<rightarrow>\<^sup>+ z} \<subseteq> verts G" 
@@ -188,7 +191,7 @@ proof (rule ccontr)
    using fin contr genesis past_nodes.simps psubsetI
      psubset_card_mono reachable1_in_verts(1)
    by (metis Collect_mem_eq Collect_mono)
-  have all: "\<forall>k. \<exists>x. card  {z. x \<rightarrow>\<^sup>+ z} > k"
+  have all: "\<forall>k. \<exists>x. card  {z. x \<rightarrow>\<^sup>+ z} > k" 
   proof 
     fix k 
     show "\<exists>x. k < card {z. x \<rightarrow>\<^sup>+ z}"
@@ -202,14 +205,13 @@ proof (rule ccontr)
         by (metis Suc_lessI inf) 
     qed
   qed
-  then have "\<exists>x.  card (verts G) < card {z. x \<rightarrow>\<^sup>+ z}" using all by simp
-  then have less: "\<exists> x. \<not> card (verts G) \<ge> card {z. x \<rightarrow>\<^sup>+ z}"
-    by (simp add: not_le)
-  have "\<forall>x. card  {z. x \<rightarrow>\<^sup>+ z} \<le> card (verts G)" 
-    using fin part finite_verts
+  then have less: "\<exists>x.  card (verts G) < card {z. x \<rightarrow>\<^sup>+ z}" by simp
+  also
+  have "\<forall>x. card  {z. x \<rightarrow>\<^sup>+ z} \<le> card (verts G)"
+    using fin part finite_verts not_le
     by (simp add: card_mono) 
   then show False
-    using less by auto
+    using less not_le by auto
 qed
 
 lemma (in blockDAG) del_tips_dag:
@@ -234,6 +236,34 @@ next show "DAG_axioms (del_vert t)"
 qed
 
 
+lemma (in blockDAG) tips_unequal_gen:
+  assumes "card( verts G) > 1"
+  shows "\<exists>p. p \<in> verts G \<and> is_tip p \<and> \<not>is_genesis_node p "
+proof -
+  have b1: "1 < card (verts G)" using assms by linarith
+  obtain x where x_in: "x \<in> (verts G) \<and> is_genesis_node x" 
+    using genesis genesisAlt genesis_node_def  by blast
+  then have "0 < card ((verts G) - {x})" using card_Suc_Diff1 x_in finite_verts b1 by auto
+  then have "((verts G) - {x}) \<noteq> {}" using card_gt_0_iff by blast
+  then obtain y where y_def:"y \<in> (verts G) - {x}" by auto
+  then have uneq: "y \<noteq> x" by auto
+  have y_in: "y \<in> (verts G)" using y_def by simp
+  then have "reachable1 G y x" using is_genesis_node.simps x_in
+      reachable_neq_reachable1 uneq by simp
+  then have "\<not> is_tip x" by auto
+  then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip z" using tips_exist
+  is_tip.simps by auto
+  then have uneq: "z \<noteq> x" by auto
+  have z_in: "z \<in> verts G" using z_def by simp
+  have "\<not> is_genesis_node z"
+  proof (rule ccontr, safe)
+    assume "is_genesis_node z"
+    then have "x = z" using unique_genesis x_in by auto
+    then show False using uneq by simp
+  qed
+  then show "?thesis" using z_def by auto
+qed
+
 lemma (in blockDAG)  del_tips_bDAG:
   assumes "is_tip t"
 and " \<not>is_genesis_node t"
@@ -250,7 +280,7 @@ next
   assume "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (del_vert t) e\<^esub> v" 
   then have path: "u \<rightarrow>\<^sup>*\<^bsub>del_arc e\<^esub> v"
     by (meson del_arc_subgraph subgraph_del_vert digraph_axioms
-        digraph_subgraph not_reachable_subgraph) 
+        digraph_subgraph pre_digraph.reachable_mono) 
   show False using arc path only_new by simp
 next
   obtain g where gen: "is_genesis_node g" using genesisAlt genesis by auto
@@ -364,13 +394,16 @@ lemma (in blockDAG) past_nodes_refl_verts:
   using past_nodes.simps reachable_in_verts by auto
 
 lemma (in blockDAG) finite_past: "finite (past_nodes a)"
-  by (meson finite_verts rev_finite_subset
- fin_digraph.finite_verts past_nodes.simps reachable_def past_nodes_verts)
+  by (metis finite_verts rev_finite_subset past_nodes_verts)
+
+subsection \<open>past_nodes\<close>
+
+lemma (in blockDAG) future_nodes_verts: 
+  shows "future_nodes a \<subseteq> verts G"
+  using future_nodes.simps reachable1_in_verts by auto
 
 lemma (in blockDAG) finite_future: "finite (future_nodes a)"
-  by (metis (full_types) Collect_subset digraphI_induced digraph_def fin_digraph.finite_verts 
-future_nodes.simps induce_subgraph_verts induced_induce)
-
+  by (metis finite_verts rev_finite_subset future_nodes_verts)
 
 lemma (in blockDAG) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a = {}"
 proof (rule ccontr)
@@ -502,7 +535,7 @@ next
         then show "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v \<Longrightarrow> False"
           using blockDAG.past_nodes_verts blockDAG.reduce_past.simps blockDAG_axioms
                del_arc_subgraph digraph.digraph_subgraph digraph_axioms 
-               not_reachable_subgraph subgraph_induce_subgraphI
+               pre_digraph.reachable_mono subgraph_induce_subgraphI
           by metis
       qed
     next 
@@ -612,7 +645,8 @@ next
             using arc_def reduce_past_refl.simps by auto
         qed
       have "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc G e\<^esub> v"
-        using a b reduce_past_refl_digraph del_arc_subgraph digraph_axioms not_reachable_subgraph
+        using a b reduce_past_refl_digraph del_arc_subgraph digraph_axioms
+         pre_digraph.reachable_mono
         by (metis digraphI_induced past_nodes_refl_verts reduce_past_refl.simps
             reduce_past_refl_induced_subgraph subgraph_induce_subgraphI)
       then show False
@@ -740,14 +774,26 @@ qed
   
 lemma blockDAG_nat_induct[consumes 1, case_names base step]: 
   assumes
- major: "blockDAG Z" and
  cases: "\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = 1 \<Longrightarrow> P V)"
-  "\<And>V c. ((blockDAG V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V) 
-  \<Longrightarrow> (blockDAG V \<Longrightarrow> card (verts V) = (Suc c) \<Longrightarrow> P V))"
-shows "P Z"
-  using blockDAG.no_empty_blockDAG list_decode.cases
-  cases(1) cases(2) major  n_not_Suc_n
-  by (metis neq0_conv) 
+  "\<And>W c. (\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V)) 
+  \<Longrightarrow> (blockDAG W \<Longrightarrow> card (verts W) = (Suc c) \<Longrightarrow> P W)"
+shows "\<And>Z. blockDAG Z \<Longrightarrow> P Z"
+proof - 
+  fix Z:: "('a,'b) pre_digraph"
+  assume bD: "blockDAG Z"
+  then have bG: "card (verts Z) > 0" using blockDAG.no_empty_blockDAG by auto 
+  show "P Z"
+    using bG bD
+  proof (induction "card (verts Z)"  arbitrary: Z rule: Nat.nat_induct_non_zero)
+    case 1
+    then show ?case using cases(1) by auto
+next
+  case su: (Suc n)
+  show ?case 
+    by (metis local.cases(2) su.hyps(2) su.hyps(3) su.prems)   
+  qed   
+qed 
+
 
 lemma (in blockDAG) blockDAG_size_cases:
   obtains (one) "card (verts G) = 1" 
@@ -755,9 +801,9 @@ lemma (in blockDAG) blockDAG_size_cases:
   using no_empty_blockDAG
   by linarith 
 
-lemma (in blockDAG) blockDAG_cases_int:
-  shows "(G = gen_graph) \<or> (\<exists>b H. (blockDAG H \<and> del_vert b = H))"
-proof(rule blockDAG_size_cases)
+lemma (in blockDAG) blockDAG_cases_one:
+  shows "card (verts G) = 1 \<longrightarrow> (G = gen_graph)"
+proof (safe)
   assume one: "card (verts G) = 1"
   then have "blockDAG.genesis_node G \<in> verts G"
     by (simp add: genesis_in_verts)
@@ -791,12 +837,17 @@ proof(rule blockDAG_size_cases)
   qed                                                                          
   then have "arcs G = arcs (blockDAG.gen_graph G)"
     by (simp add: blockDAG_axioms blockDAG.gen_graph_empty_arcs)
-  then show "G = gen_graph \<or> (\<exists>b H. blockDAG H \<and> del_vert b = H)"
+  then show "G = gen_graph"
     unfolding  blockDAG.gen_graph_def
-    using verts_equal blockDAG_axioms  induce_subgraph_def graph_equality gen_graph_sound
+    using verts_equal blockDAG_axioms  induce_subgraph_def
     blockDAG.gen_graph_def by fastforce
-next 
-  assume b1: "1 < card (verts G)"
+qed
+
+lemma (in blockDAG) blockDAG_cases_more:
+  shows "card (verts G) > 1 \<longleftrightarrow> (\<exists>b H. (blockDAG H \<and> b \<in> verts G \<and> del_vert b = H))"
+proof safe
+  assume "card (verts G) > 1"
+  then have b1: "1 < card (verts G)" using no_empty_blockDAG by linarith
   obtain x where x_in: "x \<in> (verts G) \<and> is_genesis_node x" 
     using genesis genesisAlt genesis_node_def  by blast
   then have "0 < card ((verts G) - {x})" using card_Suc_Diff1 x_in finite_verts b1 by auto
@@ -810,6 +861,7 @@ next
   then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip z" using tips_exist
   is_tip.simps by auto
   then have uneq: "z \<noteq> x" by auto
+  have z_in: "z \<in> verts G" using z_def by simp
   have "\<not> is_genesis_node z"
   proof (rule ccontr, safe)
     assume "is_genesis_node z"
@@ -817,64 +869,99 @@ next
     then show False using uneq by simp
   qed
   then have "blockDAG (del_vert z)" using del_tips_bDAG z_def by simp
-  then have "(\<exists>b H. blockDAG H \<and> del_vert b = H)" using z_def by auto
-  then show "G = gen_graph \<or> (\<exists>b H. blockDAG H \<and> del_vert b = H)" by simp
+  then show "(\<exists>b H. blockDAG H \<and> b \<in> verts G \<and> del_vert b = H)" using z_def by auto
+next 
+  fix b and  H::"('a,'b) pre_digraph"
+  assume bD: "blockDAG (del_vert b)"
+  assume b_in: "b \<in> verts G"
+  show  "card (verts G) > 1"
+  proof (rule ccontr)
+    assume "\<not> 1 < card (verts G)"
+    then have "1 = card (verts G)" using no_empty_blockDAG by linarith
+  then have "card ( verts ( del_vert b)) = 0" using b_in del_vert_def by auto
+  then have "\<not> blockDAG (del_vert b)" using bD blockDAG.no_empty_blockDAG
+    by (metis less_nat_zero_code) 
+  then show "False" using bD by simp
+  qed
 qed
 
 lemma (in blockDAG) blockDAG_cases:
   obtains (base) "(G = gen_graph)"
-  | (more) "(\<exists>b H. (blockDAG H \<and> del_vert b = H))"
-  using blockDAG_cases_int by auto
+  | (more) "(\<exists>b H. (blockDAG H \<and> b \<in> verts G \<and> del_vert b = H))"
+  using blockDAG_cases_one blockDAG_cases_more
+    blockDAG_size_cases by auto
 
 lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
-  assumes cases: "P (gen_graph)"
-       "\<And>b H. 
-   (blockDAG (pre_digraph.del_vert H b) \<Longrightarrow> P(pre_digraph.del_vert H b))
+  assumes cases: "\<And>V. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
+       "\<And>H. 
+   (\<And>b. blockDAG (pre_digraph.del_vert H b) \<Longrightarrow> b \<in> verts H \<Longrightarrow> P(pre_digraph.del_vert H b))
   \<Longrightarrow> (blockDAG H \<Longrightarrow> P H)"
      shows "P G"
 proof(induct_tac G rule:blockDAG_nat_induct) 
   show "blockDAG G" using blockDAG_axioms by simp
 next
-  fix V
-  assume "blockDAG V" 
+  fix V::"('a,'b) pre_digraph"
+  assume bD: "blockDAG V" 
   and "card (verts V) = 1"
   then have "V = blockDAG.gen_graph V"
-    using genesis gen_graph
-  then show "P V" using cases(1) by simp
+    using blockDAG.blockDAG_cases_one equal_refl  by auto
+  then show "P V" using bD cases(1)
+    by metis  
 next 
-  assume "\<exists>b H. blockDAG H \<and> del_vert b = H"
-  then obtain b where "\<exists>H. blockDAG H \<and> pre_digraph.del_vert G b = H" by auto
-  then obtain H where "blockDAG H \<and> pre_digraph.del_vert G b = H" by auto
-  then have "blockDAG (pre_digraph.del_vert G b)" by auto
-  then show "P G" using cases(2) blockDAG_axioms 
+  fix c and W::"('a,'b) pre_digraph"
+  show "(\<And>V. blockDAG V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V) \<Longrightarrow>
+           blockDAG W \<Longrightarrow> card (verts W) = Suc c \<Longrightarrow> P W"
+  proof -
+    assume ind: "\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V)"
+    and bD: "blockDAG W"
+    and  size: "card (verts W) = Suc c"
+    have  assm2: "\<And>b. blockDAG (pre_digraph.del_vert W b) 
+            \<Longrightarrow> b \<in> verts W \<Longrightarrow> P(pre_digraph.del_vert W b)"
+    proof -
+      fix b
+      assume bD2: "blockDAG (pre_digraph.del_vert W b)"
+      assume in_verts: "b \<in> verts W"
+      have "verts (pre_digraph.del_vert W b) = verts W - {b}"
+        by (simp add: pre_digraph.verts_del_vert) 
+      then have "card ( verts (pre_digraph.del_vert W b)) = c" 
+        using in_verts fin_digraph.finite_verts bD fin_digraph_del_vert 
+         size
+        by (simp add: fin_digraph.finite_verts
+            DAG.axioms(1) blockDAG.axioms(1) digraph.axioms(1)) 
+      then show "P (pre_digraph.del_vert W b)" using ind bD2 by auto
+    qed
+    show "?thesis" using cases(2)
+      by (metis assm2 bD) 
+  qed
+
 section \<open>Spectre\<close>
 
 
 subsection \<open>Spectre_Definition\<close>
 
 
-definition (in tie_breakingDAG) tie_break_int:: "'c \<Rightarrow> 'c \<Rightarrow> int \<Rightarrow> int"
+definition (in tie_breakingDAG) tie_break_int:: "'a::linorder \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> int"
   where "tie_break_int a b i =
  (if i=0 then (if (a \<le> b) then 1 else -1) else 
               (if i > 0 then 1 else -1))"
 
-fun (in tie_breakingDAG) sumlist_acc :: "'c \<Rightarrow>'c \<Rightarrow> int \<Rightarrow> int list \<Rightarrow> int"
+fun (in tie_breakingDAG) sumlist_acc :: "'a::linorder \<Rightarrow>'a \<Rightarrow> int \<Rightarrow> int list \<Rightarrow> int"
   where "sumlist_acc a b s [] = tie_break_int a b s"
   | "sumlist_acc a b s (x#xs) = sumlist_acc a b (s + x) xs"
 
-fun (in tie_breakingDAG) sumlist :: "'c \<Rightarrow>'c \<Rightarrow> int list \<Rightarrow> int"
+fun (in tie_breakingDAG) sumlist :: "'a::linorder \<Rightarrow>'a \<Rightarrow> int list \<Rightarrow> int"
   where "sumlist a b [] = 0"
   | "sumlist a b (x # xs) = sumlist_acc a b 0 (x # xs)"
   
 datatype Spectre_cases = LeftR | RightR | BothR | NeitherR | Malformed  
 
-fun vote_Spectre_calc_cases ::" ('c,'b) pre_digraph \<Rightarrow>'c \<Rightarrow> 'c \<Rightarrow> 'c \<Rightarrow> Spectre_cases"
+fun vote_Spectre_calc_cases ::"('a::linorder, ('a \<times> 'a)) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> Spectre_cases"
   where "vote_Spectre_calc_cases V a b c = LeftR"
 
-function vote_Spectre:: " ('c::linorder,'b) pre_digraph \<Rightarrow>'c \<Rightarrow> 'c \<Rightarrow> 'c \<Rightarrow> int" 
+function vote_Spectre:: "('a::linorder, ('a \<times> 'a)) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> int" 
   where
 "vote_Spectre V a b c = 
-  (if (\<not> (tie_breakingDAG V) \<or> (a \<notin> (verts V)) \<or> b \<notin> verts V \<or> c \<notin> verts V) then undefined else 
+  (if ((a \<notin> (verts V)) \<or> b \<notin> verts V \<or> c \<notin> verts V) then undefined else 
   (if (b=c) then 1 else 
   (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)) then 1  else 
   (if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)) then -1  else 
@@ -884,22 +971,19 @@ function vote_Spectre:: " ('c::linorder,'b) pre_digraph \<Rightarrow>'c \<Righta
   else tie_breakingDAG.sumlist b c (map (\<lambda>i.
    (vote_Spectre V i b c)) (sorted_list_of_set (blockDAG.future_nodes V a))))))))"
   by auto
-termination (in tie_breakingDAG) 
-proof(relation "measure (\<lambda> (V, a, b, c). card (verts V))") 
-  show  "wf (measure (\<lambda>(V, a, b, c). card (verts V)))"
-    by auto
-next 
-  fix V a b c x
-  assume "\<not> (\<not> (tie_breakingDAG V) \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
-  and "\<not> (b = c)"
-  and " \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> \<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c)"
-  and "\<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> \<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)"
-  and " a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> \<not> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c"
-  and "x \<in> set (sorted_list_of_set (blockDAG.direct_past V a))"
-  then show " ((blockDAG.reduce_past V a, x, b, c), V, a, b, c)
-       \<in> measure (\<lambda>(V, a, b, c). card (verts V))"
-    using reduce_less reduce_past_dagbased direct_past.simps
-    oops
+termination
+proof safe
+  fix V ::"('a::linorder, 'a\<times>'a) pre_digraph"  
+  fix a b c 
+  show "vote_Spectre_dom (V, a, b, c)"
+  proof 
+    fix y 
+    assume "vote_Spectre_rel y (V, a, b, c)"
+    then show "vote_Spectre_dom y"
+    proof
+     
+
+
 lemma del_arc_code [code]: "pre_digraph.del_arc G a =
  \<lparr> verts = verts G, arcs = arcs G - {a}, tail = tail G, head = head G \<rparr>"
   by (simp add: pre_digraph.del_arc_def)
