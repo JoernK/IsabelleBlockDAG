@@ -85,10 +85,10 @@ subsection  \<open>Definitions\<close>
 locale DAG = digraph +
   assumes cycle_free: "\<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)"
 
-locale DAGbased = DAG + 
-  assumes only_new: "\<forall>e. arc e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v)"
+locale antitransitive_DAG = DAG + 
+  assumes only_new: "\<forall>e. (u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
 
-locale blockDAG = DAGbased  +
+locale blockDAG = antitransitive_DAG  +
   assumes genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))"       
 
 locale tie_breakingDAG = 
@@ -98,32 +98,31 @@ locale tie_breakingDAG =
 
 subsection  \<open>Functions\<close>
 
-fun (in                                                 
-blockDAG) direct_past:: "'a \<Rightarrow> 'a set"
+fun (in DAG) direct_past:: "'a \<Rightarrow> 'a set"
   where "direct_past a = {b. (b \<in> verts G \<and> (a,b) \<in> arcs_ends G)}"
 
-fun (in blockDAG) future_nodes:: "'a \<Rightarrow> 'a set"
+fun (in DAG) future_nodes:: "'a \<Rightarrow> 'a set"
   where "future_nodes a = {b.  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
 
-fun (in blockDAG) past_nodes:: "'a \<Rightarrow> 'a set"
+fun (in DAG) past_nodes:: "'a \<Rightarrow> 'a set"
   where "past_nodes a = {b. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
 
-fun (in blockDAG) past_nodes_refl :: "'a \<Rightarrow> 'a set"
+fun (in DAG) past_nodes_refl :: "'a \<Rightarrow> 'a set"
   where "past_nodes_refl a = {b. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
 
-fun (in blockDAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
+fun (in DAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
   "reduce_past a = induce_subgraph G (past_nodes a)"
 
-fun (in blockDAG) reduce_past_refl:: "'a \<Rightarrow> ('a,'b) pre_digraph"
+fun (in DAG) reduce_past_refl:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
   "reduce_past_refl a = induce_subgraph G (past_nodes_refl a)"
                                           
-fun (in blockDAG) is_tip:: " 'a \<Rightarrow> bool"
+fun (in DAG) is_tip:: " 'a \<Rightarrow> bool"
   where "is_tip a = ((a \<in> verts G) \<and>  (ALL x. \<not> x \<rightarrow>\<^sup>+ a))"
 
-fun (in blockDAG) tips:: "('a,'b) pre_digraph \<Rightarrow>'a set"
-  where "tips V = {v. blockDAG.is_tip V v}"
+definition (in DAG) tips:: "'a set"
+  where "tips = {v. is_tip v}"
 
 fun (in blockDAG) is_genesis_node :: "'a \<Rightarrow> bool" where
 "is_genesis_node v = ((v \<in> verts G) \<and> (ALL x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
@@ -135,10 +134,10 @@ definition (in blockDAG) genesis_node:: "'a"
 subsection \<open>Lemmas\<close>
 lemma subs:
   assumes "blockDAG G"
-  shows "DAGbased G \<and> DAG G \<and> digraph G \<and> fin_digraph G \<and> wf_digraph G"
-  using assms blockDAG_def DAGbased_def DAG_def digraph_def fin_digraph_def by blast
+  shows "antitransitive_DAG G \<and> DAG G \<and> digraph G \<and> fin_digraph G \<and> wf_digraph G"
+  using assms blockDAG_def antitransitive_DAG_def DAG_def digraph_def fin_digraph_def by blast
   
-lemma (in DAGbased) unidirectional:
+lemma (in DAG) unidirectional:
 "u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
   using cycle_free reachable1_reachable_trans by auto
 
@@ -269,7 +268,7 @@ lemma (in blockDAG)  del_tips_bDAG:
   assumes "is_tip t"
 and " \<not>is_genesis_node t"
 shows "blockDAG (del_vert t)"
-  unfolding blockDAG_def blockDAG_axioms_def DAGbased_def DAGbased_axioms_def
+  unfolding blockDAG_def blockDAG_axioms_def antitransitive_DAG_def antitransitive_DAG_axioms_def
 proof safe
   show "DAG(del_vert t)"
     using del_tips_dag assms by simp
@@ -381,37 +380,37 @@ lemma (in blockDAG) future_nodes_ex:
 
 subsection \<open>past_nodes\<close>
 
-lemma (in blockDAG) past_nodes_ex:
+lemma (in DAG) past_nodes_ex:
   assumes "a \<in> verts G"
   shows "a \<notin> past_nodes a"
   using cycle_free past_nodes.simps reachable_def by auto
 
-lemma (in blockDAG) past_nodes_verts: 
+lemma (in DAG) past_nodes_verts: 
   shows "past_nodes a \<subseteq> verts G"
   using past_nodes.simps reachable1_in_verts by auto
 
-lemma (in blockDAG) past_nodes_refl_ex:
+lemma (in DAG) past_nodes_refl_ex:
   assumes "a \<in> verts G"
   shows "a \<in> past_nodes_refl a"
   using past_nodes_refl.simps reachable_refl assms
   by simp
 
-lemma (in blockDAG) past_nodes_refl_verts: 
+lemma (in DAG) past_nodes_refl_verts: 
   shows "past_nodes_refl a \<subseteq> verts G"
   using past_nodes.simps reachable_in_verts by auto
 
-lemma (in blockDAG) finite_past: "finite (past_nodes a)"
+lemma (in DAG) finite_past: "finite (past_nodes a)"
   by (metis finite_verts rev_finite_subset past_nodes_verts)
 
 
-lemma (in blockDAG) future_nodes_verts: 
+lemma (in DAG) future_nodes_verts: 
   shows "future_nodes a \<subseteq> verts G"
   using future_nodes.simps reachable1_in_verts by auto
 
-lemma (in blockDAG) finite_future: "finite (future_nodes a)"
+lemma (in DAG) finite_future: "finite (future_nodes a)"
   by (metis finite_verts rev_finite_subset future_nodes_verts)
 
-lemma (in blockDAG) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a = {}"
+lemma (in DAG) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a = {}"
 proof (rule ccontr)
   assume "\<not> past_nodes a \<inter> future_nodes a = {}"
   then show False
@@ -420,19 +419,19 @@ qed
 
 subsection \<open>reduce_past\<close>
 
-lemma (in blockDAG) reduce_past_arcs: 
+lemma (in DAG) reduce_past_arcs: 
   shows "arcs (reduce_past a) \<subseteq> arcs G"
   using induce_subgraph_arcs past_nodes.simps by auto
 
-lemma (in blockDAG) reduce_past_arcs2:
+lemma (in DAG) reduce_past_arcs2:
   "e \<in> arcs (reduce_past a) \<Longrightarrow> e \<in> arcs G"
   using reduce_past_arcs by auto
 
-lemma (in blockDAG) reduce_past_induced_subgraph:
+lemma (in DAG) reduce_past_induced_subgraph:
   shows "induced_subgraph (reduce_past a) G"
   using  induced_induce past_nodes_verts by auto
 
-lemma (in blockDAG) reduce_past_path:
+lemma (in DAG) reduce_past_path:
   assumes "u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v" 
   shows " u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v"
   using assms
@@ -447,7 +446,7 @@ next case (step u v) show ?case
 qed
 
 
-lemma (in blockDAG) reduce_past_pathr:
+lemma (in DAG) reduce_past_pathr:
   assumes "u \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> v" 
   shows " u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v"
   by (meson assms induced_subgraph_altdef reachable_mono reduce_past_induced_subgraph)
@@ -504,7 +503,7 @@ lemma (in blockDAG) reduce_past_dagbased:
   assumes " a \<in> verts G"
   and "\<not>is_genesis_node a"
   shows "blockDAG (reduce_past a)"
-  unfolding blockDAG_def DAG_def DAGbased_def blockDAG_def
+  unfolding blockDAG_def DAG_def antitransitive_DAG_def blockDAG_def
   
 proof safe
   show "digraph (reduce_past a)"
@@ -514,8 +513,8 @@ next
     unfolding DAG_axioms_def
     using cycle_free reduce_past_path by metis 
 next
-  show "DAGbased_axioms (reduce_past a)"
-  unfolding DAGbased_axioms_def
+  show "antitransitive_DAG_axioms (reduce_past a)"
+  unfolding antitransitive_DAG_axioms_def
   proof safe
     fix u v e 
     assume arc: "wf_digraph.arc (reduce_past a) e (u, v)"
@@ -538,7 +537,7 @@ next
         then have "\<not> u \<rightarrow>\<^sup>*\<^bsub>del_arc e\<^esub> v"
           using only_new by auto        
         then show "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v \<Longrightarrow> False"
-          using blockDAG.past_nodes_verts blockDAG.reduce_past.simps blockDAG_axioms
+          using DAG.past_nodes_verts reduce_past.simps blockDAG_axioms subs
                del_arc_subgraph digraph.digraph_subgraph digraph_axioms 
                pre_digraph.reachable_mono subgraph_induce_subgraphI
           by metis
@@ -618,7 +617,7 @@ lemma (in blockDAG) reduce_past_refl_digraph:
 lemma (in blockDAG) reduce_past_refl_dagbased:
   assumes "a \<in> verts G"
   shows "blockDAG (reduce_past_refl a)"
-  unfolding blockDAG_def DAG_def DAGbased_def 
+  unfolding blockDAG_def DAG_def antitransitive_DAG_def 
 proof safe
   show "digraph (reduce_past_refl a)"
     using reduce_past_refl_digraph assms(1) by simp
@@ -628,12 +627,11 @@ next
     using cycle_free reduce_past_refl_induced_subgraph reachable_mono
     by (meson arcs_ends_mono induced_subgraph_altdef trancl_mono) 
 next
-  show "DAGbased_axioms (reduce_past_refl a)"
+  show "antitransitive_DAG_axioms (reduce_past_refl a)"
     unfolding blockDAG_axioms
   proof
     fix u v 
-    show "\<forall>e. wf_digraph.arc (reduce_past_refl a) e (u, v) \<longrightarrow>
-               \<not> u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl a) e\<^esub> v"
+    show "\<forall>e. u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl a) e\<^esub> v \<longrightarrow> \<not> wf_digraph.arc (reduce_past_refl a) e (u, v)"
     proof safe
       fix e 
       assume a: " wf_digraph.arc (reduce_past_refl a) e (u, v)"
@@ -733,7 +731,7 @@ lemma (in blockDAG) gen_graph_empty_arcs:
 
 lemma (in blockDAG) gen_graph_sound: 
   "blockDAG (gen_graph)"
-  unfolding blockDAG_def DAG_def blockDAG_axioms_def DAGbased_def DAGbased_axioms_def
+  unfolding blockDAG_def DAG_def blockDAG_axioms_def antitransitive_DAG_def antitransitive_DAG_axioms_def
 proof safe
    show "digraph gen_graph" using gen_graph_digraph by simp     
  next
@@ -824,11 +822,11 @@ proof (safe)
     then obtain z where part_of: "z \<in> arcs G"
       by auto
     then have tail: "tail G z \<in> verts G"
-      using wf_digraph_def blockDAG_def DAG_def DAGbased_def
+      using wf_digraph_def blockDAG_def DAG_def antitransitive_DAG_def
         digraph_def blockDAG_axioms nomulti_digraph.axioms(1)
       by metis
     also have head: "head G z \<in> verts G" 
-        by (metis (no_types) DAG_def DAGbased_def blockDAG_axioms blockDAG_def digraph_def
+        by (metis (no_types) DAG_def antitransitive_DAG_def blockDAG_axioms blockDAG_def digraph_def
             nomulti_digraph.axioms(1) part_of wf_digraph_def)
     then have "tail G z = head G z"
     using tail only by simp
@@ -837,7 +835,7 @@ proof (safe)
       using  part_of only  DAG_def digraph_def
       by auto
     then show False
-      using DAGbased_axioms DAGbased_def DAG_def digraph_def
+      using antitransitive_DAG_axioms antitransitive_DAG_def DAG_def digraph_def
         loopfree_digraph_def by metis
   qed                                                                          
   then have "arcs G = arcs (blockDAG.gen_graph G)"
@@ -932,7 +930,7 @@ next
         using in_verts fin_digraph.finite_verts bD fin_digraph_del_vert 
          size
         by (simp add: fin_digraph.finite_verts
-            DAG.axioms blockDAG.axioms DAGbased.axioms digraph.axioms) 
+            DAG.axioms blockDAG.axioms antitransitive_DAG.axioms digraph.axioms) 
       then show "P (pre_digraph.del_vert W b)" using ind bD2 by auto
     qed
     show "?thesis" using cases(2)
@@ -966,10 +964,10 @@ function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Righta
   if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1 else
   if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
    (sumlist b c (map (\<lambda>i.
- (vote_Spectre (blockDAG.reduce_past V a) i b c)) (sorted_list_of_set ((blockDAG.past_nodes V a)))))
+ (vote_Spectre (DAG.reduce_past V a) i b c)) (sorted_list_of_set ((DAG.past_nodes V a)))))
  else 
    sumlist b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (blockDAG.future_nodes V a))))"
+   (vote_Spectre V i b c)) (sorted_list_of_set (DAG.future_nodes V a))))"
   by auto
 termination
 proof
@@ -981,10 +979,10 @@ next
   fix x a b c
   assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
   then have "a \<in> verts V"  by simp
-  then have "card (verts (blockDAG.reduce_past V a)) < card (verts V)"   
+  then have "card (verts (DAG.reduce_past V a)) < card (verts V)"   
     using bD blockDAG.reduce_less
     by metis
-  then show "((blockDAG.reduce_past V a, x, b, c), V, a, b, c)
+  then show "((DAG.reduce_past V a, x, b, c), V, a, b, c)
        \<in> measures
            [\<lambda>(V, a, b, c). card (verts V),
             \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]"
@@ -994,13 +992,13 @@ next
   fix x a b c
   assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
   then have a_in: "a \<in> verts V" using bD by simp
-  assume "x \<in> set (sorted_list_of_set (blockDAG.future_nodes V a))"
-  then have "x \<in> blockDAG.future_nodes V a" using blockDAG.finite_future
-    set_sorted_list_of_set bD
+  assume "x \<in> set (sorted_list_of_set (DAG.future_nodes V a))"
+  then have "x \<in> DAG.future_nodes V a" using DAG.finite_future
+    set_sorted_list_of_set bD subs
     by metis
-  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using blockDAG.future_nodes.simps bD mem_Collect_eq
+  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using DAG.future_nodes.simps bD subs mem_Collect_eq
     by metis
-  then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x" using bD DAGbased.unidirectional subs by metis
+  then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x" using bD DAG.unidirectional subs by metis
   have bD2: "blockDAG V" using bD by simp
   have "\<forall>x. {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} \<subseteq> verts V" using subs bD2  subsetI
       wf_digraph.reachable_in_verts(1) mem_Collect_eq
@@ -1022,11 +1020,11 @@ next
     by simp
 qed
 
-lemma [code]: "blockDAG G = ((\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))) \<and> DAGbased G)"
+lemma [code]: "blockDAG G = ((\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))) \<and> antitransitive_DAG G)"
   unfolding blockDAG_axioms_def blockDAG_def by auto 
 
-lemma [code]: "DAGbased G = (DAG G \<and> (\<forall>e u v. wf_digraph.arc G e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(pre_digraph.del_arc G  e)\<^esub> v)))"
-  unfolding DAGbased_axioms_def DAGbased_def by auto
+lemma [code]: "antitransitive_DAG G = (DAG G \<and> (\<forall>e u v. wf_digraph.arc G e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(pre_digraph.del_arc G  e)\<^esub> v)))"
+  unfolding antitransitive_DAG_axioms_def antitransitive_DAG_def by auto
 
 lemma [code]: "DAG G = (digraph G \<and> (\<forall>v. \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)))"
   unfolding DAG_axioms_def DAG_def by auto
