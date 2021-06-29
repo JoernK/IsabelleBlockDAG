@@ -2,19 +2,18 @@
     Author:     Joern Kussmaul
 *)
 
-chapter \<open>blockDAG\<close>
-theory blockDAG
-  imports Main Graph_Theory.Graph_Theory DAGs DigraphUtils
+theory blockDAG      
+  imports DAGs DigraphUtils
 begin
 
-section  \<open>Definitions\<close>
+section  \<open>blockDAGs\<close>
  
 locale blockDAG = DAG  +
   assumes genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))"       
   and only_new: "\<forall>e. (u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
 
 
-section  \<open>Functions\<close>
+subsection  \<open>Functions and Definitions\<close>
 
 fun (in blockDAG) is_genesis_node :: "'a \<Rightarrow> bool" where
 "is_genesis_node v = ((v \<in> verts G) \<and> (ALL x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
@@ -23,13 +22,13 @@ definition (in blockDAG) genesis_node:: "'a"
   where "genesis_node = (SOME x. is_genesis_node x)"
 
 
-section \<open>Lemmas\<close>
+subsection \<open>Lemmas\<close>
 lemma subs:
   assumes "blockDAG G"
   shows "DAG G \<and> digraph G \<and> fin_digraph G \<and> wf_digraph G"
   using assms blockDAG_def DAG_def digraph_def fin_digraph_def by blast
 
-subsection \<open>Genesis\<close>
+subsubsection \<open>Genesis\<close>
 
 lemma (in blockDAG) genesisAlt :
  "(is_genesis_node a) \<longleftrightarrow> ((a \<in> verts G) \<and> (\<forall>r.  (r \<in> verts G) \<longrightarrow> r \<rightarrow>\<^sup>* a))"
@@ -54,7 +53,7 @@ lemma (in blockDAG) genesis_in_verts:
     by metis 
 
 
-subsection \<open>Tips\<close>
+subsubsection \<open>Tips\<close>
 
 lemma (in blockDAG) tips_exist: 
 "\<exists>x. is_tip x"
@@ -239,13 +238,13 @@ qed
     using gen genp by auto
 qed
 
-section \<open>Future Nodes\<close>
+subsection \<open>Future Nodes\<close>
 lemma (in blockDAG) future_nodes_ex:
   assumes "a \<in> verts G"
   shows "a \<notin> future_nodes a"
   using cycle_free future_nodes.simps reachable_def by auto
 
-subsection \<open>Reduce Past\<close>
+subsubsection \<open>Reduce Past\<close>
 
 lemma (in blockDAG) reduce_past_not_empty:
   assumes " a \<in> verts G"
@@ -389,7 +388,7 @@ proof safe
   show "is_genesis_node b \<Longrightarrow> blockDAG.is_genesis_node (reduce_past a) b"
 *)
 
-subsection \<open>Reduce Past Reflexiv\<close>
+subsubsection \<open>Reduce Past Reflexiv\<close>
 
 lemma (in blockDAG) reduce_past_refl_induced_subgraph:
   shows "induced_subgraph (reduce_past_refl a) G"
@@ -482,7 +481,7 @@ next
         qed
       qed 
 
-subsection \<open>Genesis Graph\<close>
+subsubsection \<open>Genesis Graph\<close>
 
                                   
 definition (in blockDAG) gen_graph::"('a,'b) pre_digraph" where 

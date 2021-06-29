@@ -2,18 +2,18 @@
     Author:     Joern Kussmaul
 *)
 
-chapter \<open>DAGs\<close>
+
 theory DAGs
-  imports Main Graph_Theory.Graph_Theory
+  imports Main "Graph_Theory.Graph_Theory"
 begin
 
+section \<open>DAG\<close>
 
-section  \<open>Definitions\<close>
- 
+
 locale DAG = digraph +
   assumes cycle_free: "\<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)" 
 
-section  \<open>Functions\<close>
+subsection  \<open>Functions and Definitions\<close>
 
 fun (in DAG) direct_past:: "'a \<Rightarrow> 'a set"
   where "direct_past a = {b. (b \<in> verts G \<and> (a,b) \<in> arcs_ends G)}"
@@ -42,13 +42,13 @@ definition (in DAG) tips:: "'a set"
   where "tips = {v. is_tip v}"
 
 
-section \<open>Lemmas\<close>
+subsection \<open>Lemmas\<close>
   
 lemma (in DAG) unidirectional:
 "u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
   using cycle_free reachable1_reachable_trans by auto
 
-subsection \<open>Tips\<close>
+subsubsection \<open>Tips\<close>
 
 lemma (in DAG) del_tips_dag:
 assumes "is_tip t"
@@ -68,14 +68,14 @@ next
       by (simp add: cycle_free)
   qed
 
-subsection \<open>Future Nodes\<close>
+subsubsection \<open>Future Nodes\<close>
 
 lemma (in DAG) future_nodes_not_refl:
   assumes "a \<in> verts G"
   shows "a \<notin> future_nodes a"
   using cycle_free future_nodes.simps reachable_def by auto
 
-subsection \<open>Past Nodes\<close>
+subsubsection \<open>Past Nodes\<close>
 
 lemma (in DAG) past_nodes_not_refl:
   assumes "a \<in> verts G"
@@ -113,7 +113,7 @@ proof (rule ccontr)
     using past_nodes.simps future_nodes.simps unidirectional reachable1_reachable by blast
 qed
 
-subsection \<open>Reduce Past\<close>
+subsubsection \<open>Reduce Past\<close>
 
 lemma (in DAG) reduce_past_arcs: 
   shows "arcs (reduce_past a) \<subseteq> arcs G"
@@ -148,7 +148,7 @@ lemma (in DAG) reduce_past_pathr:
   by (meson assms induced_subgraph_altdef reachable_mono reduce_past_induced_subgraph)
 
 
-subsection \<open>Reduce Past Reflexiv\<close>
+subsubsection \<open>Reduce Past Reflexiv\<close>
 
 lemma (in DAG) reduce_past_refl_induced_subgraph:
   shows "induced_subgraph (reduce_past_refl a) G"

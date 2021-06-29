@@ -4,7 +4,7 @@
 
 
 theory DAGs
-  imports Main Graph_Theory.Graph_Theory
+  imports Main "Graph_Theory.Graph_Theory"
 begin
 
 section \<open>DAG\<close>

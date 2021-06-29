@@ -4,10 +4,18 @@
 
 
 theory DigraphUtils
-  imports Main Graph_Theory.Graph_Theory
+  imports Main "Graph_Theory.Graph_Theory"
 begin
 
 section \<open>Digraph Utilities\<close>
+
+lemma graph_equality:
+  assumes "digraph G \<and> digraph C"
+  assumes "verts G = verts C \<and> arcs G = arcs C \<and> head G = head C \<and> tail G = tail C"
+  shows "G = C"
+  by (simp add: assms(2)) 
+
+
 
 lemma (in digraph) del_vert_not_in_graph:
   assumes "b \<notin> verts G"

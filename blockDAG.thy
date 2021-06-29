@@ -2,8 +2,8 @@
     Author:     Joern Kussmaul
 *)
 
-theory blockDAG
-  imports Main Graph_Theory.Graph_Theory DAGs DigraphUtils
+theory blockDAG      
+  imports DAGs DigraphUtils
 begin
 
 section  \<open>blockDAGs\<close>
