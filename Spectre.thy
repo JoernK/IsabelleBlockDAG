@@ -141,7 +141,7 @@ lemma Spectre_theo:
 shows "P (vote_Spectre V a b c)"
   using assms vote_Spectre.simps
   by auto 
-
+(**
 lemma domain_Spectre:
   shows "vote_Spectre V a b c \<in> {-1, 0, 1}"
 proof(rule Spectre_theo)
@@ -181,5 +181,5 @@ proof safe
   proof
     oops
 
-
+**)
 end

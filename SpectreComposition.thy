@@ -1,4 +1,4 @@
-theory SpectreComposition
+theory SpectreComposition                             
   imports Main Graph_Theory.Graph_Theory blockDAG Composition Spectre
 begin
 
@@ -85,8 +85,5 @@ next
     by simp
 qed
 
-
-lemma compeq: 
-  shows "vote_Spectre G a b c = vote_SpectreComp G' {a} {b} {c}" 
-  sorry
-
+end
+end
