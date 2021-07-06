@@ -4,13 +4,22 @@
 
 
 theory Codegen
-  imports blockDAG
+  imports blockDAG Spectre
 begin
 
 section \<open>Code Generation\<close>
+
+fun arcAlt::  "('a,'b) pre_digraph \<Rightarrow> 'b \<Rightarrow> 'a \<times> 'a \<Rightarrow> bool"
+  where "arcAlt G e uv = (e \<in> arcs G \<and> tail G e = fst uv \<and> head G e = snd uv)"
+
+lemma (in DAG) arcAlt_eq:
+  shows "arcAlt G e uv = wf_digraph.arc G e uv"
+  unfolding arc_def arcAlt.simps by simp
+  
 lemma [code]: "blockDAG G = ((\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))) \<and>
- (\<forall>e u v. wf_digraph.arc G e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(pre_digraph.del_arc G  e)\<^esub> v)) \<and> DAG G)"
-  unfolding blockDAG_axioms_def blockDAG_def by auto 
+ (\<forall>e u v. arcAlt G e (u,v) \<longrightarrow> \<not>(u \<rightarrow>\<^sup>*\<^bsub>(pre_digraph.del_arc G  e)\<^esub> v)) \<and> DAG G)"
+  unfolding blockDAG_axioms_def blockDAG_def
+  using DAG.arcAlt_eq by metis
 
 lemma [code]: "DAG G = (digraph G \<and> (\<forall>v. \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)))"
   unfolding DAG_axioms_def DAG_def by auto
@@ -33,5 +42,18 @@ lemma [code]: "nomulti_digraph G = (wf_digraph G \<and>
 
 lemma [code]: "loopfree_digraph G = (wf_digraph G \<and> (\<forall>e.  e \<in> arcs G \<longrightarrow> tail G e \<noteq> head G e))"
   unfolding loopfree_digraph_def loopfree_digraph_axioms_def by auto
-  
+
+lemma [code]: "pre_digraph.del_arc G a =
+ \<lparr> verts = verts G, arcs = arcs G - {a}, tail = tail G, head = head G \<rparr>"
+  by (simp add: pre_digraph.del_arc_def)
+
+fun rtSimp:: "'a set \<Rightarrow> ('a\<times>'a) set \<Rightarrow> ('a\<times>'a) set \<Rightarrow> bool "
+  where "rtSimp S A B = (if(B = (rtrancl A)) then  True else False)"
+
+(**DAG.future_nodes, DAG.reduce_past, DAG.past_nodes
+**)
+
+lemma [code]: "rtrancl_on = rtSimp"
+
+export_code vote_Spectre in Haskell module_name Spectre
 end
