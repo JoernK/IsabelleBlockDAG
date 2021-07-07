@@ -16,7 +16,7 @@ subsection  \<open>Functions and Definitions\<close>
 
 fun tie_break_int:: "'a::linorder \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> int"
   where "tie_break_int a b i =
- (if i=0 then (if (a \<le> b) then 1 else -1) else 
+ (if i=0 then (if (b < a) then -1 else 1) else 
               (if i > 0 then 1 else -1))"
 
 fun sumlist_break_acc :: "'a::linorder \<Rightarrow>'a \<Rightarrow> int \<Rightarrow> int list \<Rightarrow> int"
@@ -141,7 +141,7 @@ lemma Spectre_theo:
 shows "P (vote_Spectre V a b c)"
   using assms vote_Spectre.simps
   by auto 
-(**
+
 lemma domain_Spectre:
   shows "vote_Spectre V a b c \<in> {-1, 0, 1}"
 proof(rule Spectre_theo)
@@ -155,31 +155,33 @@ proof(rule Spectre_theo)
   (sorted_list_of_set (DAG.future_nodes V a))) \<in> {- 1, 0, 1}" using domain_sumlist by simp 
 qed
 
-lemma Spectre_antisymmetric: "b\<noteq>c \<Longrightarrow> (vote_Spectre V a b c) = - (vote_Spectre V a c b)"
-proof(rule Spectre_casesAlt)
-  let ?V = V
-  let ?a = a 
-  let ?b = b
-  let ?c = c
-  assume "\<not> blockDAG ?V \<or> ?a \<notin> verts ?V \<or> ?b \<notin> verts ?V \<or> ?c \<notin> verts ?V"
-  then show "(vote_Spectre V a b c) = - (vote_Spectre V a c b)" using vote_Spectre.simps by auto
+
+lemma antisymmetric_tie_break:
+  shows "b\<noteq>c \<and> i = 0 \<Longrightarrow> tie_break_int b c i = - tie_break_int c b i"
+  unfolding  tie_break_int.simps using less_not_sym by auto
+
+
+lemma antisymmetric_sumlist_acc:
+  shows "b \<noteq> c  \<Longrightarrow> sumlist_break_acc b c s l1 = - sumlist_break_acc c b (-s) ( map (\<lambda>x. -x) l1)"
+proof(induction l1 arbitrary:  b c s)
+  case Nil
+  then show ?case using sumlist_break_acc.simps(1) antisymmetric_tie_break by auto
 next
-  show "b \<noteq> c \<Longrightarrow> (blockDAG V \<and> a \<in> verts V \<or> b \<in> verts V \<or> c \<in> verts V) \<and> b = c \<Longrightarrow>
-    vote_Spectre V a b c = - vote_Spectre V a c b" by auto
+  case (Cons a l)
+  then show ?case unfolding list.simps(9) sumlist_break_acc.simps(2) by auto  
+qed
+  
+
+lemma antisymmetric_sumlist:
+  shows "b \<noteq> c \<and> l \<noteq>[] \<Longrightarrow> sumlist_break b c l = - sumlist_break c b (map (\<lambda>x. -x) l) "
+  using antisymmetric_sumlist_acc sumlist_break.simps(2) by (cases l) auto
+  
+
+lemma Spectre_antisymmetric: "b\<noteq>c \<Longrightarrow> (vote_Spectre V a b c) = - (vote_Spectre V a c b)"
   oops
   
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"
   unfolding total_on_def SpectreOrder 
- 
-proof safe
-  fix x y
-  assume x_in: "x \<in> verts G"
-  assume y_in: "y \<in> verts G"
-  assume "x \<noteq> y"
-  assume "sumlist_break y x (map (\<lambda>i. vote_Spectre G i y x) (sorted_list_of_set (verts G))) \<noteq> 1"
-  then show "sumlist_break x y (map (\<lambda>i. vote_Spectre G i x y) (sorted_list_of_set (verts G))) = 1"
-  proof
-    oops
+  oops
 
-**)
 end

@@ -179,7 +179,7 @@ lemma antisymmetric_sumlist:
 
 lemma Spectre_antisymmetric: "b\<noteq>c \<Longrightarrow> (vote_Spectre V a b c) = - (vote_Spectre V a c b)"
 proof simp
-
+  nitpick
 proof(induction V rule: blockDAG.blockDAG_induct)
   
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"
