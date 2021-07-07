@@ -23,14 +23,14 @@ function vote_SpectreComp :: "('a set,'b) pre_digraph \<Rightarrow>'a set\<Right
   where
   "vote_SpectreComp V a b c = (
   if (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) then 0 else 
-  if (b=c)  then 1 else 
+  if (b=c)  then card a else 
   if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then card a else
-  if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then card a else
+  if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then - card a else
   if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
-   (sumlist_break_comp b c (map (\<lambda>i.
+   (card a) * (sumlist_break_comp b c (map (\<lambda>i.
  (vote_SpectreComp (DAG.reduce_past V a) i b c)) (linorder.sorted_list_of_set le ((DAG.past_nodes V a)))))
  else 
-   sumlist_break_comp b c (map (\<lambda>i.
+   (card a) * sumlist_break_comp b c (map (\<lambda>i.
    (vote_SpectreComp V i b c)) (linorder.sorted_list_of_set le (DAG.future_nodes V a))))"
   by auto
 termination

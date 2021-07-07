@@ -59,7 +59,7 @@
 \isacommand{fun}\isamarkupfalse%
 \ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ int\ {\isasymRightarrow}\ int{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\ {\isachardoublequoteopen}tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ a\ b\ i\ {\isacharequal}{\kern0pt}\isanewline
-\ {\isacharparenleft}{\kern0pt}if\ i{\isacharequal}{\kern0pt}{\isadigit{0}}\ then\ {\isacharparenleft}{\kern0pt}if\ {\isacharparenleft}{\kern0pt}a\ {\isasymle}\ b{\isacharparenright}{\kern0pt}\ then\ {\isadigit{1}}\ else\ {\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ else\ \isanewline
+\ {\isacharparenleft}{\kern0pt}if\ i{\isacharequal}{\kern0pt}{\isadigit{0}}\ then\ {\isacharparenleft}{\kern0pt}if\ {\isacharparenleft}{\kern0pt}b\ {\isacharless}{\kern0pt}\ a{\isacharparenright}{\kern0pt}\ then\ {\isacharminus}{\kern0pt}{\isadigit{1}}\ else\ {\isadigit{1}}{\isacharparenright}{\kern0pt}\ else\ \isanewline
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}if\ i\ {\isachargreater}{\kern0pt}\ {\isadigit{0}}\ then\ {\isadigit{1}}\ else\ {\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{fun}\isamarkupfalse%
@@ -386,6 +386,167 @@
 \ \isanewline
 %
 \endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ domain{\isacharunderscore}{\kern0pt}Spectre{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+{\isacharparenleft}{\kern0pt}rule\ Spectre{\isacharunderscore}{\kern0pt}theo{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isadigit{0}}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}\ {\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isadigit{1}}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}\ {\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}\ {\isacharminus}{\kern0pt}\ {\isadigit{1}}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}\ {\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\isanewline
+\ \ \ \ \ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}DAG{\isachardot}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}DAG{\isachardot}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}\ {\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
+\ domain{\isacharunderscore}{\kern0pt}sumlist\ \isacommand{by}\isamarkupfalse%
+\ simp\ \isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}\isanewline
+\ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}DAG{\isachardot}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}\ {\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
+\ domain{\isacharunderscore}{\kern0pt}sumlist\ \isacommand{by}\isamarkupfalse%
+\ simp\ \isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ antisymmetric{\isacharunderscore}{\kern0pt}tie{\isacharunderscore}{\kern0pt}break{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}b{\isasymnoteq}c\ {\isasymand}\ i\ {\isacharequal}{\kern0pt}\ {\isadigit{0}}\ {\isasymLongrightarrow}\ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ b\ c\ i\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ c\ b\ i{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ \ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int{\isachardot}{\kern0pt}simps\ \isacommand{using}\isamarkupfalse%
+\ less{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}sym\ \isacommand{by}\isamarkupfalse%
+\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ antisymmetric{\isacharunderscore}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}acc{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}b\ {\isasymnoteq}\ c\ \ {\isasymLongrightarrow}\ sumlist{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}acc\ b\ c\ s\ l{\isadigit{1}}\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ sumlist{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}acc\ c\ b\ {\isacharparenleft}{\kern0pt}{\isacharminus}{\kern0pt}s{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}\ map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}x{\isachardot}{\kern0pt}\ {\isacharminus}{\kern0pt}x{\isacharparenright}{\kern0pt}\ l{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+{\isacharparenleft}{\kern0pt}induction\ l{\isadigit{1}}\ arbitrary{\isacharcolon}{\kern0pt}\ \ b\ c\ s{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ Nil\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\ \isacommand{using}\isamarkupfalse%
+\ sumlist{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}acc{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ antisymmetric{\isacharunderscore}{\kern0pt}tie{\isacharunderscore}{\kern0pt}break\ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}Cons\ a\ l{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\ \isacommand{unfolding}\isamarkupfalse%
+\ list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{9}}{\isacharparenright}{\kern0pt}\ sumlist{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}acc{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ \isacommand{by}\isamarkupfalse%
+\ auto\ \ \isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\ \ \isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ antisymmetric{\isacharunderscore}{\kern0pt}sumlist{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}b\ {\isasymnoteq}\ c\ {\isasymand}\ l\ {\isasymnoteq}{\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}\ {\isasymLongrightarrow}\ sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ l\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ sumlist{\isacharunderscore}{\kern0pt}break\ c\ b\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}x{\isachardot}{\kern0pt}\ {\isacharminus}{\kern0pt}x{\isacharparenright}{\kern0pt}\ l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ antisymmetric{\isacharunderscore}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}acc\ sumlist{\isacharunderscore}{\kern0pt}break{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}cases\ l{\isacharparenright}{\kern0pt}\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\ \ \isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ Spectre{\isacharunderscore}{\kern0pt}antisymmetric{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}b{\isasymnoteq}c\ {\isasymLongrightarrow}\ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ c\ b{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{oops}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\ \ \isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ tie{\isacharunderscore}{\kern0pt}breakingDAG{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}total{\isacharunderscore}{\kern0pt}on\ {\isacharparenleft}{\kern0pt}verts\ G{\isacharparenright}{\kern0pt}\ SpectreOrder{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ total{\isacharunderscore}{\kern0pt}on{\isacharunderscore}{\kern0pt}def\ SpectreOrder\ \isanewline
+\ \ \isacommand{oops}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
 %
 \isadelimtheory
 \isanewline
@@ -637,5 +798,93 @@
 %:%380=143%:%
 %:%381=143%:%
 %:%386=143%:%
-%:%391=184%:%
-%:%396=185%:%
+%:%389=144%:%
+%:%390=145%:%
+%:%391=145%:%
+%:%392=146%:%
+%:%399=147%:%
+%:%400=147%:%
+%:%401=148%:%
+%:%402=148%:%
+%:%403=148%:%
+%:%404=149%:%
+%:%405=149%:%
+%:%406=149%:%
+%:%407=150%:%
+%:%408=150%:%
+%:%409=150%:%
+%:%410=151%:%
+%:%411=151%:%
+%:%413=153%:%
+%:%414=153%:%
+%:%415=153%:%
+%:%416=154%:%
+%:%417=154%:%
+%:%418=155%:%
+%:%419=155%:%
+%:%420=155%:%
+%:%421=156%:%
+%:%427=156%:%
+%:%430=157%:%
+%:%431=158%:%
+%:%432=159%:%
+%:%433=159%:%
+%:%434=160%:%
+%:%437=161%:%
+%:%441=161%:%
+%:%442=161%:%
+%:%443=161%:%
+%:%444=161%:%
+%:%449=161%:%
+%:%452=162%:%
+%:%453=163%:%
+%:%454=164%:%
+%:%455=164%:%
+%:%456=165%:%
+%:%463=166%:%
+%:%464=166%:%
+%:%465=167%:%
+%:%466=167%:%
+%:%467=168%:%
+%:%468=168%:%
+%:%469=168%:%
+%:%470=168%:%
+%:%471=168%:%
+%:%472=169%:%
+%:%473=169%:%
+%:%474=170%:%
+%:%475=170%:%
+%:%476=171%:%
+%:%477=171%:%
+%:%478=171%:%
+%:%479=171%:%
+%:%480=171%:%
+%:%481=172%:%
+%:%487=172%:%
+%:%490=173%:%
+%:%491=174%:%
+%:%492=175%:%
+%:%493=175%:%
+%:%494=176%:%
+%:%497=177%:%
+%:%501=177%:%
+%:%502=177%:%
+%:%503=177%:%
+%:%508=177%:%
+%:%511=178%:%
+%:%512=179%:%
+%:%513=180%:%
+%:%514=180%:%
+%:%517=181%:%
+%:%521=181%:%
+%:%527=181%:%
+%:%530=182%:%
+%:%531=183%:%
+%:%532=183%:%
+%:%535=184%:%
+%:%539=184%:%
+%:%540=184%:%
+%:%541=185%:%
+%:%547=185%:%
+%:%552=186%:%
+%:%557=187%:%
