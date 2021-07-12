@@ -118,16 +118,18 @@ lemma domain_sumlist:
   by (metis insertCI sumlist_break.elims) 
 
 lemma Spectre_casesAlt:
+  fixes V:: "('a::linorder,'b) pre_digraph"
+  and a :: "'a::linorder" and  b::  "'a::linorder" and c ::  "'a::linorder"
   obtains (no_bD) "(\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
-  | (equal) "(blockDAG V \<and> a \<in> verts V \<or> b \<in> verts V \<or> c \<in> verts V) \<and> b = c" 
-  | (one) "(blockDAG V \<and> a \<in> verts V \<or> b \<in> verts V \<or> c \<in> verts V) \<and>
-         b \<noteq> c  \<and> ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))" 
-  | (two) "(blockDAG V \<and> a \<in> verts V \<or> b \<in> verts V \<or> c \<in> verts V) \<and> b \<noteq> c  \<and> 
-  \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))\<and> ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b))"
-  | (three) "(blockDAG V \<and> a \<in> verts V \<or> b \<in> verts V \<or> c \<in> verts V) \<and> b \<noteq> c  \<and> 
-  \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))\<and> \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) \<and> ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))"
-  | (four) "(blockDAG V \<and> a \<in> verts V \<or> b \<in> verts V \<or> c \<in> verts V) \<and> b \<noteq> c  \<and> 
-  \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))\<and> \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) \<and> \<not>((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))"
+  | (equal) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b = c" 
+  | (one) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and>
+         b \<noteq> c  \<and> ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c))" 
+  | (two) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b \<noteq> c  \<and> 
+  \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c))\<and> ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b))"
+  | (three) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b \<noteq> c  \<and> 
+  \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c))\<and> \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)) \<and> ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))"
+  | (four) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b \<noteq> c  \<and> 
+  \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c))\<and> \<not>((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b)) \<and> \<not>((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))"
   by auto
 
 lemma Spectre_theo:
@@ -173,15 +175,44 @@ qed
   
 
 lemma antisymmetric_sumlist:
-  shows "b \<noteq> c \<and> l \<noteq>[] \<Longrightarrow> sumlist_break b c l = - sumlist_break c b (map (\<lambda>x. -x) l) "
+  shows "b \<noteq> c \<Longrightarrow> sumlist_break b c l = - sumlist_break c b (map (\<lambda>x. -x) l) "
   using antisymmetric_sumlist_acc sumlist_break.simps(2) by (cases l) auto
-  
 
-lemma Spectre_antisymmetric: "b\<noteq>c \<Longrightarrow> (vote_Spectre V a b c) = - (vote_Spectre V a c b)"
-proof simp
 
-proof(induction V rule: blockDAG.blockDAG_induct)
-  
+lemma Spectre_antisymmetric: 
+  shows "b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b"
+proof -  
+  consider (nbD) "\<not> blockDAG V" | (bD) "blockDAG V " by auto
+  then show ?thesis
+  proof( cases)
+    case nbD
+    then show ?thesis by auto
+  next
+    case bD
+    then show ?thesis 
+    proof(induct V a b c  rule:vote_Spectre.induct)
+      fix V a b c
+      assume "(\<And>x. \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) \<Longrightarrow>
+             b \<noteq> c \<Longrightarrow>
+             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
+             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
+             a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c \<Longrightarrow>
+             x \<in> set (sorted_list_of_set (DAG.past_nodes V a)) \<Longrightarrow>
+             blockDAG (DAG.reduce_past V a) \<Longrightarrow>
+             b \<noteq> c \<longrightarrow>
+             vote_Spectre (DAG.reduce_past V a) x b c = - vote_Spectre (DAG.reduce_past V a) x c b)
+        "
+        and
+       "(\<And>x. \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) \<Longrightarrow>
+             b \<noteq> c \<Longrightarrow>
+             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
+             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
+             \<not> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<Longrightarrow>
+             x \<in> set (sorted_list_of_set (DAG.future_nodes V a)) \<Longrightarrow>
+             blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V x b c = - vote_Spectre V x c b)"
+      show "blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b "
+        nitpick
+                                 
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"
   unfolding total_on_def SpectreOrder 
   oops
