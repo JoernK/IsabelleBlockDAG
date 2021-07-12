@@ -1,0 +1,16 @@
+
+theory GHOSTDAG  
+  imports blockDAG Spectre
+begin
+
+function OrderDAG :: "('a::linorder,'b) pre_digraph \<Rightarrow> int \<Rightarrow> ('a list, 'a list)" 
+  where
+  "OrderDAG G k =  
+  if (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) then 0 else 0"
+  
+
+
+
+
+
+end

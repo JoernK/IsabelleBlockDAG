@@ -36,10 +36,10 @@ function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Righta
   if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1 else
   if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
    (sumlist_break b c (map (\<lambda>i.
- (vote_Spectre (DAG.reduce_past V a) i b c)) (sorted_list_of_set ((DAG.past_nodes V a)))))
+ (vote_Spectre (DAG.reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))
  else 
    sumlist_break b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (DAG.future_nodes V a))))"
+   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))"
   by auto
 termination
 proof
@@ -64,11 +64,11 @@ next
   fix x a b c
   assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
   then have a_in: "a \<in> verts V" using bD by simp
-  assume "x \<in> set (sorted_list_of_set (DAG.future_nodes V a))"
-  then have "x \<in> DAG.future_nodes V a" using DAG.finite_future
+  assume "x \<in> set (sorted_list_of_set (future_nodes V a))"
+  then have "x \<in> future_nodes V a" using DAG.finite_future
     set_sorted_list_of_set bD subs
     by metis
-  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using DAG.future_nodes.simps bD subs mem_Collect_eq
+  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using future_nodes.simps bD mem_Collect_eq
     by metis
   then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x" using bD DAG.unidirectional subs by metis
   have bD2: "blockDAG V" using bD by simp
@@ -137,9 +137,9 @@ lemma Spectre_theo:
   and "P 1"
   and "P (-1)" 
   and "P (sumlist_break b c (map (\<lambda>i.
- (vote_Spectre (DAG.reduce_past V a) i b c)) (sorted_list_of_set ((DAG.past_nodes V a)))))"
+ (vote_Spectre (DAG.reduce_past V a) i b c)) (sorted_list_of_set ((past_nodes V a)))))"
   and "P (sumlist_break b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (DAG.future_nodes V a))))"
+   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))"
 shows "P (vote_Spectre V a b c)"
   using assms vote_Spectre.simps
   by auto 
@@ -151,10 +151,10 @@ proof(rule Spectre_theo)
   show "1 \<in> {- 1, 0, 1}" by simp
   show " - 1 \<in> {- 1, 0, 1}" by simp
   show "sumlist_break b c
-     (map (\<lambda>i. vote_Spectre (DAG.reduce_past V a) i b c) (sorted_list_of_set (DAG.past_nodes V a)))
+     (map (\<lambda>i. vote_Spectre (DAG.reduce_past V a) i b c) (sorted_list_of_set (past_nodes V a)))
     \<in> {- 1, 0, 1}" using domain_sumlist by simp 
   show "sumlist_break b c (map (\<lambda>i. vote_Spectre V i b c)
-  (sorted_list_of_set (DAG.future_nodes V a))) \<in> {- 1, 0, 1}" using domain_sumlist by simp 
+  (sorted_list_of_set (future_nodes V a))) \<in> {- 1, 0, 1}" using domain_sumlist by simp 
 qed
 
 
@@ -197,7 +197,7 @@ proof -
              \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
              \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
              a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c \<Longrightarrow>
-             x \<in> set (sorted_list_of_set (DAG.past_nodes V a)) \<Longrightarrow>
+             x \<in> set (sorted_list_of_set (past_nodes V a)) \<Longrightarrow>
              blockDAG (DAG.reduce_past V a) \<Longrightarrow>
              b \<noteq> c \<longrightarrow>
              vote_Spectre (DAG.reduce_past V a) x b c = - vote_Spectre (DAG.reduce_past V a) x c b)
@@ -208,10 +208,10 @@ proof -
              \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
              \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
              \<not> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<Longrightarrow>
-             x \<in> set (sorted_list_of_set (DAG.future_nodes V a)) \<Longrightarrow>
+             x \<in> set (sorted_list_of_set (future_nodes V a)) \<Longrightarrow>
              blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V x b c = - vote_Spectre V x c b)"
       show "blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b "
-        nitpick
+        oops
                                  
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"
   unfolding total_on_def SpectreOrder 

@@ -15,31 +15,31 @@ locale DAG = digraph +
 
 subsection  \<open>Functions and Definitions\<close>
 
-fun (in DAG) direct_past:: "'a \<Rightarrow> 'a set"
-  where "direct_past a = {b. (b \<in> verts G \<and> (a,b) \<in> arcs_ends G)}"
+fun  direct_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
+  where "direct_past G  a = {b. (b \<in> verts G \<and> (a,b) \<in> arcs_ends G)}"
 
-fun (in DAG) future_nodes:: "'a \<Rightarrow> 'a set"
-  where "future_nodes a = {b.  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
+fun future_nodes:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
+  where "future_nodes G a = {b.  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
 
-fun (in DAG) past_nodes:: "'a \<Rightarrow> 'a set"
-  where "past_nodes a = {b. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
+fun past_nodes:: "('a,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a set"
+  where "past_nodes G a = {b. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
 
-fun (in DAG) past_nodes_refl :: "'a \<Rightarrow> 'a set"
-  where "past_nodes_refl a = {b. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
+fun past_nodes_refl :: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
+  where "past_nodes_refl G a = {b. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
 
 fun (in DAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
-  "reduce_past a = induce_subgraph G (past_nodes a)"
+  "reduce_past a = induce_subgraph G (past_nodes G a)"
 
-fun (in DAG) reduce_past_refl:: "'a \<Rightarrow> ('a,'b) pre_digraph"
+fun reduce_past_refl:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
-  "reduce_past_refl a = induce_subgraph G (past_nodes_refl a)"
+  "reduce_past_refl G a = induce_subgraph G (past_nodes_refl G a)"
                                           
-fun (in DAG) is_tip:: " 'a \<Rightarrow> bool"
-  where "is_tip a = ((a \<in> verts G) \<and>  (ALL x. \<not> x \<rightarrow>\<^sup>+ a))"
+fun is_tip:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> bool"
+  where "is_tip G a = ((a \<in> verts G) \<and>  (ALL x. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a))"
 
-definition (in DAG) tips:: "'a set"
-  where "tips = {v. is_tip v}"
+definition tips:: "('a,'b) pre_digraph \<Rightarrow> 'a set"
+  where "tips G = {v. is_tip G v}"
 
 
 subsection \<open>Lemmas\<close>
@@ -51,7 +51,7 @@ lemma (in DAG) unidirectional:
 subsubsection \<open>Tips\<close>
 
 lemma (in DAG) del_tips_dag:
-assumes "is_tip t"
+assumes "is_tip G t"
 shows "DAG (del_vert t)"
   unfolding DAG_def DAG_axioms_def
 proof safe
@@ -72,45 +72,45 @@ subsubsection \<open>Future Nodes\<close>
 
 lemma (in DAG) future_nodes_not_refl:
   assumes "a \<in> verts G"
-  shows "a \<notin> future_nodes a"
+  shows "a \<notin> future_nodes G a"
   using cycle_free future_nodes.simps reachable_def by auto
 
 subsubsection \<open>Past Nodes\<close>
 
 lemma (in DAG) past_nodes_not_refl:
   assumes "a \<in> verts G"
-  shows "a \<notin> past_nodes a"
+  shows "a \<notin> past_nodes G a"
   using cycle_free past_nodes.simps reachable_def by auto
 
 lemma (in DAG) past_nodes_verts: 
-  shows "past_nodes a \<subseteq> verts G"
+  shows "past_nodes G a \<subseteq> verts G"
   using past_nodes.simps reachable1_in_verts by auto
 
 lemma (in DAG) past_nodes_refl_ex:
   assumes "a \<in> verts G"
-  shows "a \<in> past_nodes_refl a"
+  shows "a \<in> past_nodes_refl G a"
   using past_nodes_refl.simps reachable_refl assms
   by simp
 
 lemma (in DAG) past_nodes_refl_verts: 
-  shows "past_nodes_refl a \<subseteq> verts G"
+  shows "past_nodes_refl G a \<subseteq> verts G"
   using past_nodes.simps reachable_in_verts by auto
 
-lemma (in DAG) finite_past: "finite (past_nodes a)"
+lemma (in DAG) finite_past: "finite (past_nodes G a)"
   by (metis finite_verts rev_finite_subset past_nodes_verts)
 
 lemma (in DAG) future_nodes_verts: 
-  shows "future_nodes a \<subseteq> verts G"
+  shows "future_nodes G a \<subseteq> verts G"
   using future_nodes.simps reachable1_in_verts by auto
 
-lemma (in DAG) finite_future: "finite (future_nodes a)"
+lemma (in DAG) finite_future: "finite (future_nodes G a)"
   by (metis finite_verts rev_finite_subset future_nodes_verts)
 
-lemma (in DAG) past_future_dis[simp]: "past_nodes a \<inter> future_nodes a = {}"
+lemma (in DAG) past_future_dis[simp]: "past_nodes G a \<inter> future_nodes G a = {}"
 proof (rule ccontr)
-  assume "\<not> past_nodes a \<inter> future_nodes a = {}"
+  assume "\<not> past_nodes G a \<inter> future_nodes G a = {}"
   then show False
-    using past_nodes.simps future_nodes.simps unidirectional reachable1_reachable by blast
+    using past_nodes.simps future_nodes.simps unidirectional reachable1_reachable by auto
 qed
 
 subsubsection \<open>Reduce Past\<close>
@@ -151,16 +151,16 @@ lemma (in DAG) reduce_past_pathr:
 subsubsection \<open>Reduce Past Reflexiv\<close>
 
 lemma (in DAG) reduce_past_refl_induced_subgraph:
-  shows "induced_subgraph (reduce_past_refl a) G"
+  shows "induced_subgraph (reduce_past_refl G a) G"
   using  induced_induce past_nodes_refl_verts by auto
 
 lemma (in DAG) reduce_past_refl_arcs2:
-  "e \<in> arcs (reduce_past_refl a) \<Longrightarrow> e \<in> arcs G"
+  "e \<in> arcs (reduce_past_refl G a) \<Longrightarrow> e \<in> arcs G"
   using reduce_past_arcs by auto
 
 lemma (in DAG) reduce_past_refl_digraph:
   assumes "a \<in> verts G"
-  shows "digraph (reduce_past_refl a)"
+  shows "digraph (reduce_past_refl G a)"
   using digraphI_induced reduce_past_refl_induced_subgraph reachable_mono by simp
 
 end

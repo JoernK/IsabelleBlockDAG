@@ -56,7 +56,7 @@ lemma (in blockDAG) genesis_in_verts:
 subsubsection \<open>Tips\<close>
 
 lemma (in blockDAG) tips_exist: 
-"\<exists>x. is_tip x"
+"\<exists>x. is_tip G x"
   unfolding is_tip.simps
 proof (rule ccontr)
   assume "\<nexists>x. x \<in> verts G \<and> (\<forall>y. \<not> y\<rightarrow>\<^sup>+x)"
@@ -104,7 +104,7 @@ qed
 
 lemma (in blockDAG) tips_unequal_gen:
   assumes "card( verts G) > 1"
-  shows "\<exists>p. p \<in> verts G \<and> is_tip p \<and> \<not>is_genesis_node p "
+  shows "\<exists>p. p \<in> verts G \<and> is_tip G p \<and> \<not>is_genesis_node p "
 proof -
   have b1: "1 < card (verts G)" using assms by linarith
   obtain x where x_in: "x \<in> (verts G) \<and> is_genesis_node x" 
@@ -116,8 +116,8 @@ proof -
   have y_in: "y \<in> (verts G)" using y_def by simp
   then have "reachable1 G y x" using is_genesis_node.simps x_in
       reachable_neq_reachable1 uneq by simp
-  then have "\<not> is_tip x" by auto
-  then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip z" using tips_exist
+  then have "\<not> is_tip G x" by auto
+  then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip G z" using tips_exist
   is_tip.simps by auto
   then have uneq: "z \<noteq> x" by auto
   have z_in: "z \<in> verts G" using z_def by simp
@@ -131,7 +131,7 @@ proof -
 qed
 
 lemma (in blockDAG)  del_tips_bDAG:
-  assumes "is_tip t"
+  assumes "is_tip G t"
 and " \<not>is_genesis_node t"
 shows "blockDAG (del_vert t)"
   unfolding blockDAG_def blockDAG_axioms_def
@@ -168,7 +168,7 @@ next
     then obtain u where hd: "u = (tail G e) \<and> u \<in> verts G"
       using wf_digraph_def tl by auto
     have "t \<in> verts G"
-      using assms(1) is_tip.simps by blast 
+      using assms(1) is_tip.simps by auto 
     then have "arc_to_ends G e = (u, t)" using tl 
       by (simp add: arc_to_ends_def hd) 
     then have "reachable1 G u t"
@@ -241,7 +241,7 @@ qed
 subsection \<open>Future Nodes\<close>
 lemma (in blockDAG) future_nodes_ex:
   assumes "a \<in> verts G"
-  shows "a \<notin> future_nodes a"
+  shows "a \<notin> future_nodes G a"
   using cycle_free future_nodes.simps reachable_def by auto
 
 subsubsection \<open>Reduce Past\<close>
@@ -262,7 +262,7 @@ lemma (in blockDAG) reduce_less:
   assumes "a \<in> verts G"
   shows "card (verts (reduce_past a)) < card (verts G)"
 proof -
-  have "past_nodes a \<subset> verts G"
+  have "past_nodes G a \<subset> verts G"
     using assms(1) past_nodes_not_refl past_nodes_verts by blast
   then show ?thesis
     by (simp add: psubset_card_mono)
@@ -357,13 +357,13 @@ next
             obtain aaa :: "'a set \<Rightarrow> 'a set \<Rightarrow> 'a" where
             f2: "\<forall>x0 x1. (\<exists>v2. v2 \<in> x1 \<and> v2 \<notin> x0) = (aaa x0 x1 \<in> x1 \<and> aaa x0 x1 \<notin> x0)"
               by moura
-            have "r \<rightarrow>\<^sup>* aaa (past_nodes a) (Collect (reachable G r))
-                  \<longrightarrow> a \<rightarrow>\<^sup>+ aaa (past_nodes a) (Collect (reachable G r))"
+            have "r \<rightarrow>\<^sup>* aaa (past_nodes G a) (Collect (reachable G r))
+                  \<longrightarrow> a \<rightarrow>\<^sup>+ aaa (past_nodes G a) (Collect (reachable G r))"
                 using f1 by (meson reachable1_reachable_trans)
-              then have "aaa (past_nodes a) (Collect (reachable G r)) \<notin> Collect (reachable G r)
-                         \<or> aaa (past_nodes a) (Collect (reachable G r)) \<in> past_nodes a"
+              then have "aaa (past_nodes G a) (Collect (reachable G r)) \<notin> Collect (reachable G r)
+                         \<or> aaa (past_nodes G a) (Collect (reachable G r)) \<in> past_nodes G a"
                 by (simp add: reachable_in_verts(2))
-              then have "Collect (reachable G r) \<subseteq> past_nodes a"
+              then have "Collect (reachable G r) \<subseteq> past_nodes G a"
                 using f2 by (meson subsetI)
               then show ?thesis
                 using con  induce_reachable_preserves_paths reachable_induce_ss reduce_past.simps
@@ -391,47 +391,48 @@ proof safe
 subsubsection \<open>Reduce Past Reflexiv\<close>
 
 lemma (in blockDAG) reduce_past_refl_induced_subgraph:
-  shows "induced_subgraph (reduce_past_refl a) G"
+  shows "induced_subgraph (reduce_past_refl G a) G"
   using  induced_induce past_nodes_refl_verts by auto
 
 lemma (in blockDAG) reduce_past_refl_arcs2:
-  "e \<in> arcs (reduce_past_refl a) \<Longrightarrow> e \<in> arcs G"
+  "e \<in> arcs (reduce_past_refl G a) \<Longrightarrow> e \<in> arcs G"
   using reduce_past_arcs by auto
 
 lemma (in blockDAG) reduce_past_refl_digraph:
   assumes "a \<in> verts G"
-  shows "digraph (reduce_past_refl a)"
+  shows "digraph (reduce_past_refl G a)"
   using digraphI_induced reduce_past_refl_induced_subgraph reachable_mono by simp
 
 lemma (in blockDAG) reduce_past_refl_dagbased:
   assumes "a \<in> verts G"
-  shows "blockDAG (reduce_past_refl a)"
+  shows "blockDAG (reduce_past_refl G a)"
   unfolding blockDAG_def DAG_def 
 proof safe
-  show "digraph (reduce_past_refl a)"
+  show "digraph (reduce_past_refl G a)"
     using reduce_past_refl_digraph assms(1) by simp
 next
-  show "DAG_axioms (reduce_past_refl a)"
+  show "DAG_axioms (reduce_past_refl G a)"
     unfolding DAG_axioms_def
     using cycle_free reduce_past_refl_induced_subgraph reachable_mono
     by (meson arcs_ends_mono induced_subgraph_altdef trancl_mono) 
 next
-  show "blockDAG_axioms (reduce_past_refl a)"
+  show "blockDAG_axioms (reduce_past_refl G a)"
     unfolding blockDAG_axioms
   proof
     fix u v 
-    show "\<forall>e. u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl a) e\<^esub> v \<longrightarrow> \<not> wf_digraph.arc (reduce_past_refl a) e (u, v)"
+    show "\<forall>e. u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v
+         \<longrightarrow> \<not> wf_digraph.arc (reduce_past_refl G a) e (u, v)"
     proof safe
       fix e 
-      assume a: " wf_digraph.arc (reduce_past_refl a) e (u, v)"
-      and b: "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl a) e\<^esub> v"
+      assume a: " wf_digraph.arc (reduce_past_refl G a) e (u, v)"
+      and b: "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v"
       have edge: "wf_digraph.arc G e (u, v)"
           using assms reduce_past_arcs2 induced_subgraph_def arc_def 
         proof -
-          have "wf_digraph (reduce_past_refl a)"
+          have "wf_digraph (reduce_past_refl G a)"
             using reduce_past_refl_digraph digraph_def by auto
-          then have "e \<in> arcs (reduce_past_refl a) \<and> tail (reduce_past_refl a) e = u
-                     \<and> head (reduce_past_refl a) e = v"
+          then have "e \<in> arcs (reduce_past_refl G a) \<and> tail (reduce_past_refl G a) e = u
+                     \<and> head (reduce_past_refl G a) e = v"
             using wf_digraph.arcE arc_def a
             by (metis (no_types)) 
           then show "arc e (u, v)"
@@ -447,15 +448,15 @@ next
     qed
 next
         obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
-        have pe: "p \<in> verts (reduce_past_refl a)"
+        have pe: "p \<in> verts (reduce_past_refl G a)"
         using genesisAlt induce_reachable_preserves_paths
             reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts
             gen mem_Collect_eq reachable_neq_reachable1
             assms by force    
-        have reaches: "(\<forall>r. r \<in> verts (reduce_past_refl a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl a\<^esub> p)" 
+        have reaches: "(\<forall>r. r \<in> verts (reduce_past_refl G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl G a\<^esub> p)" 
           proof safe
             fix r
-            assume in_past: "r \<in> verts (reduce_past_refl a)"
+            assume in_past: "r \<in> verts (reduce_past_refl G a)"
             then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt reachable_in_verts by simp
             have "a \<rightarrow>\<^sup>* r" using in_past by auto
             then have reach: "r \<rightarrow>\<^sup>*\<^bsub>G \<restriction> {w. a \<rightarrow>\<^sup>* w}\<^esub> p"
@@ -473,11 +474,11 @@ next
                   using reachable_induce_ss step.IH by blast
               qed 
             qed
-            show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl a\<^esub> p" using reach reduce_past_refl.simps 
+            show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl G a\<^esub> p" using reach reduce_past_refl.simps 
             past_nodes_refl.simps by simp
           qed
-          then show "\<exists>p. p \<in> verts (reduce_past_refl a) \<and> (\<forall>r. r \<in> verts (reduce_past_refl a) 
-        \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl a\<^esub> p)" unfolding blockDAG_axioms_def using pe reaches by auto
+          then show "\<exists>p. p \<in> verts (reduce_past_refl G a) \<and> (\<forall>r. r \<in> verts (reduce_past_refl G a) 
+        \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl G a\<^esub> p)" unfolding blockDAG_axioms_def using pe reaches by auto
         qed
       qed 
 
@@ -647,8 +648,8 @@ proof safe
   have y_in: "y \<in> (verts G)" using y_def by simp
   then have "reachable1 G y x" using is_genesis_node.simps x_in
       reachable_neq_reachable1 uneq by simp
-  then have "\<not> is_tip x" by auto
-  then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip z" using tips_exist
+  then have "\<not> is_tip G x" by auto
+  then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip G z" using tips_exist
   is_tip.simps by auto
   then have uneq: "z \<noteq> x" by auto
   have z_in: "z \<in> verts G" using z_def by simp
