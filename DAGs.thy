@@ -27,9 +27,9 @@ fun past_nodes:: "('a,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a set"
 fun past_nodes_refl :: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
   where "past_nodes_refl G a = {b. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
 
-fun (in DAG) reduce_past:: "'a \<Rightarrow> ('a,'b) pre_digraph"
+fun reduce_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
-  "reduce_past a = induce_subgraph G (past_nodes G a)"
+  "reduce_past G a = induce_subgraph G (past_nodes G a)"
 
 fun reduce_past_refl:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
@@ -116,19 +116,19 @@ qed
 subsubsection \<open>Reduce Past\<close>
 
 lemma (in DAG) reduce_past_arcs: 
-  shows "arcs (reduce_past a) \<subseteq> arcs G"
+  shows "arcs (reduce_past G a) \<subseteq> arcs G"
   using induce_subgraph_arcs past_nodes.simps by auto
 
 lemma (in DAG) reduce_past_arcs2:
-  "e \<in> arcs (reduce_past a) \<Longrightarrow> e \<in> arcs G"
+  "e \<in> arcs (reduce_past G a) \<Longrightarrow> e \<in> arcs G"
   using reduce_past_arcs by auto
 
 lemma (in DAG) reduce_past_induced_subgraph:
-  shows "induced_subgraph (reduce_past a) G"
+  shows "induced_subgraph (reduce_past G a) G"
   using  induced_induce past_nodes_verts by auto
 
 lemma (in DAG) reduce_past_path:
-  assumes "u \<rightarrow>\<^sup>+\<^bsub>reduce_past a\<^esub> v" 
+  assumes "u \<rightarrow>\<^sup>+\<^bsub>reduce_past G a\<^esub> v" 
   shows " u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v"
   using assms
 proof induct
@@ -143,7 +143,7 @@ qed
 
 
 lemma (in DAG) reduce_past_pathr:
-  assumes "u \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> v" 
+  assumes "u \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> v" 
   shows " u \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v"
   by (meson assms induced_subgraph_altdef reachable_mono reduce_past_induced_subgraph)
 

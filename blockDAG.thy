@@ -249,18 +249,18 @@ subsubsection \<open>Reduce Past\<close>
 lemma (in blockDAG) reduce_past_not_empty:
   assumes " a \<in> verts G"
   and  "\<not>is_genesis_node a"
-shows "(verts (reduce_past a)) \<noteq> {}"
+shows "(verts (reduce_past G a)) \<noteq> {}"
 proof -
   obtain g
     where gen: "is_genesis_node g" using genesis_existAlt by auto
-  have ex: "g \<in> verts (reduce_past a)" using reduce_past.simps past_nodes.simps 
+  have ex: "g \<in> verts (reduce_past G a)" using reduce_past.simps past_nodes.simps 
 genesisAlt reachable_neq_reachable1 reachable_reachable1_trans gen assms(1) assms(2) by auto 
-  then show "(verts (reduce_past a)) \<noteq> {}" using ex by auto                                                                                           
+  then show "(verts (reduce_past G a)) \<noteq> {}" using ex by auto                                                                                           
 qed
 
 lemma (in blockDAG) reduce_less:
   assumes "a \<in> verts G"
-  shows "card (verts (reduce_past a)) < card (verts G)"
+  shows "card (verts (reduce_past G a)) < card (verts G)"
 proof -
   have "past_nodes G a \<subset> verts G"
     using assms(1) past_nodes_not_refl past_nodes_verts by blast
@@ -295,33 +295,33 @@ lemma (in blockDAG) reduce_past_dagbased:
   assumes "blockDAG G"
   assumes " a \<in> verts G"
   and "\<not>is_genesis_node a"
-  shows "blockDAG (reduce_past a)"
+  shows "blockDAG (reduce_past G a)"
   unfolding blockDAG_def DAG_def blockDAG_def
   
 proof safe
-  show "digraph (reduce_past a)"
+  show "digraph (reduce_past G a)"
     using digraphI_induced reduce_past_induced_subgraph by auto  
 next
-  show "DAG_axioms (reduce_past a)"
+  show "DAG_axioms (reduce_past G a)"
     unfolding DAG_axioms_def
     using cycle_free reduce_past_path by metis 
 next
-  show "blockDAG_axioms (reduce_past a)"
+  show "blockDAG_axioms (reduce_past G a)"
   unfolding blockDAG_axioms_def
   proof safe
     fix u v e 
-    assume arc: "wf_digraph.arc (reduce_past a) e (u, v)"
-    then show " u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v \<Longrightarrow> False "
+    assume arc: "wf_digraph.arc (reduce_past G a) e (u, v)"
+    then show " u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False "
     proof -
-        assume e_in: "(wf_digraph.arc (reduce_past a) e (u, v))" 
+        assume e_in: "(wf_digraph.arc (reduce_past G a) e (u, v))" 
         then have "(wf_digraph.arc G e (u, v))"
           using assms reduce_past_arcs2 induced_subgraph_def arc_def 
         proof -
-          have "wf_digraph (reduce_past a)"
+          have "wf_digraph (reduce_past G a)"
             using reduce_past.simps subgraph_def subgraph_refl wf_digraph.wellformed_induce_subgraph
             by metis
-          then have "e \<in> arcs (reduce_past a) \<and> tail (reduce_past a) e = u
-                     \<and> head (reduce_past a) e = v"
+          then have "e \<in> arcs (reduce_past G a) \<and> tail (reduce_past G a) e = u
+                     \<and> head (reduce_past G a) e = v"
             using  arc wf_digraph.arcE
             by metis 
           then show ?thesis
@@ -329,7 +329,7 @@ next
         qed    
         then have "\<not> u \<rightarrow>\<^sup>*\<^bsub>del_arc e\<^esub> v"
           using only_new by auto        
-        then show "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past a) e\<^esub> v \<Longrightarrow> False"
+        then show "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False"
           using DAG.past_nodes_verts reduce_past.simps blockDAG_axioms subs
                del_arc_subgraph digraph.digraph_subgraph digraph_axioms 
                pre_digraph.reachable_mono subgraph_induce_subgraphI
@@ -337,20 +337,20 @@ next
       qed
     next  
         obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
-        have pe: "p \<in> verts (reduce_past a) \<and> (\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p)"
+        have pe: "p \<in> verts (reduce_past G a) \<and> (\<forall>r. r \<in> verts (reduce_past G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> p)"
         proof 
-          show "p \<in> verts (reduce_past a)" using genesisAlt induce_reachable_preserves_paths
+          show "p \<in> verts (reduce_past G a)" using genesisAlt induce_reachable_preserves_paths
             reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts assms(2)
             assms(3) gen mem_Collect_eq reachable_neq_reachable1
             by (metis (no_types, lifting)) 
             
         next    
-          show "\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p" 
+          show "\<forall>r. r \<in> verts (reduce_past G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> p" 
           proof safe
             fix r a
-            assume in_past: "r \<in> verts (reduce_past a)"
+            assume in_past: "r \<in> verts (reduce_past G a)"
             then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt past_nodes_verts by auto  
-            then show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p"
+            then show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> p"
             proof -
             have f1: "r \<in> verts G \<and> a \<rightarrow>\<^sup>+ r"
             using in_past past_nodes_verts by force
@@ -372,7 +372,7 @@ next
           qed
         qed
         show 
-        "\<exists>p. p \<in> verts (reduce_past a) \<and> (\<forall>r. r \<in> verts (reduce_past a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past a\<^esub> p)"
+        "\<exists>p. p \<in> verts (reduce_past G a) \<and> (\<forall>r. r \<in> verts (reduce_past G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> p)"
           using pe by auto
       qed
     qed
@@ -382,10 +382,10 @@ next
 lemma (in blockDAG) reduce_past_gen:
   assumes "\<not>is_genesis_node a" 
   and "a \<in> verts G"
-shows "blockDAG.is_genesis_node G b \<longleftrightarrow> blockDAG.is_genesis_node (reduce_past a) b"
+shows "blockDAG.is_genesis_node G b \<longleftrightarrow> blockDAG.is_genesis_node (reduce_past G a) b"
 proof safe
   fix a b
-  show "is_genesis_node b \<Longrightarrow> blockDAG.is_genesis_node (reduce_past a) b"
+  show "is_genesis_node b \<Longrightarrow> blockDAG.is_genesis_node (reduce_past G a) b"
 *)
 
 subsubsection \<open>Reduce Past Reflexiv\<close>

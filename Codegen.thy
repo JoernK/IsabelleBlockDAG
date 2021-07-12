@@ -47,13 +47,14 @@ lemma [code]: "pre_digraph.del_arc G a =
  \<lparr> verts = verts G, arcs = arcs G - {a}, tail = tail G, head = head G \<rparr>"
   by (simp add: pre_digraph.del_arc_def)
 
-fun rtSimp:: "'a set \<Rightarrow> ('a\<times>'a) set \<Rightarrow> ('a\<times>'a) set \<Rightarrow> bool "
-  where "rtSimp S A B = (if(B = (rtrancl A)) then  True else False)"
-
 (**DAG.future_nodes, DAG.reduce_past, DAG.past_nodes
 **)
 
-lemma [code]: "rtrancl_on = rtSimp"
+fun future_nodesAlt:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set" 
+  where "future_nodesAlt G a = {b. b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
+
+declare rtrancl_on_def [code]
+declare rtrancl_onp.simps [code]
 
 export_code vote_Spectre in Haskell module_name Spectre
 end
