@@ -32,8 +32,8 @@ function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Righta
   "vote_Spectre V a b c = (
   if (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) then 0 else 
   if (b=c)  then 1 else 
-  if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 1  else
-  if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1 else
+  if (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 1  else
+  if (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1 else
   if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
    (sumlist_break b c (map (\<lambda>i.
  (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))
@@ -69,7 +69,7 @@ next
     set_sorted_list_of_set bD subs
     by metis
   then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using future_nodes.simps bD mem_Collect_eq
-    by metis
+    by simp  
   then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x" using bD DAG.unidirectional subs by metis
   have bD2: "blockDAG V" using bD by simp
   have "\<forall>x. {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} \<subseteq> verts V" using subs bD2  subsetI
@@ -211,7 +211,7 @@ proof -
              \<not> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<Longrightarrow>
              x \<in> set (sorted_list_of_set (future_nodes V a)) \<Longrightarrow>
              blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V x b c = - vote_Spectre V x c b)"
-      show "blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b "
+     
         oops
                                  
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"

@@ -9,8 +9,8 @@ begin
 section  \<open>blockDAGs\<close>
  
 locale blockDAG = DAG  +
-  assumes genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>G\<^esub> p))"       
-  and only_new: "\<forall>e. (u \<rightarrow>\<^sup>*\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
+  assumes genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p \<or> r = p)))"       
+  and only_new: "\<forall>e. (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
 
 
 subsection  \<open>Functions and Definitions\<close>
@@ -36,7 +36,8 @@ lemma (in blockDAG) genesisAlt :
   
 lemma (in blockDAG) genesis_existAlt:
   "\<exists>a. is_genesis_node a"
-  using genesis genesisAlt blockDAG_axioms_def by presburger 
+  using genesis genesisAlt blockDAG_axioms_def subs wf_digraph_def
+  by (metis reachable1_reachable reachable_refl)  
 
 lemma (in blockDAG) unique_genesis: "is_genesis_node a \<and> is_genesis_node b \<longrightarrow> a = b"
       using genesisAlt reachable_trans cycle_free
@@ -74,25 +75,27 @@ proof (rule ccontr)
     by metis 
   then have trans: "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  card {z. x \<rightarrow>\<^sup>+ z} < card {z. y \<rightarrow>\<^sup>+ z}"
     using sub psubset_card_mono by metis
-  then have inf: "\<forall>y. \<exists>x. card  {z. x \<rightarrow>\<^sup>+ z} > card {z. y \<rightarrow>\<^sup>+ z}"
-   using fin contr genesis past_nodes.simps psubsetI
-     psubset_card_mono reachable1_in_verts(1)
-   by (metis Collect_mem_eq Collect_mono)
-  have all: "\<forall>k. \<exists>x. card  {z. x \<rightarrow>\<^sup>+ z} > k" 
+  then have inf: "\<forall>y \<in> verts G. \<exists>x. card  {z. x \<rightarrow>\<^sup>+ z} > card {z. y \<rightarrow>\<^sup>+ z}"
+   using fin contr genesis 
+      reachable1_in_verts(1)
+   by (metis (mono_tags, lifting)) 
+  have all: "\<forall>k. \<exists>x \<in> verts G. card  {z. x \<rightarrow>\<^sup>+ z} > k" 
   proof 
     fix k 
-    show "\<exists>x. k < card {z. x \<rightarrow>\<^sup>+ z}"
+    show "\<exists>x \<in> verts G. k < card {z. x \<rightarrow>\<^sup>+ z}"
     proof(induct k)
       case 0
       then show ?case
-        by (metis inf neq0_conv) 
+        using inf neq0_conv
+        by (metis contr genesis_in_verts local.trans reachable1_in_verts(1)) 
     next
       case (Suc k)
       then show ?case
-        by (metis Suc_lessI inf) 
+        using Suc_lessI inf
+        by (metis contr local.trans reachable1_in_verts(1)) 
     qed
   qed
-  then have less: "\<exists>x.  card (verts G) < card {z. x \<rightarrow>\<^sup>+ z}" by simp
+  then have less: "\<exists>x \<in> verts G.  card (verts G) < card {z. x \<rightarrow>\<^sup>+ z}" by simp
   also
   have "\<forall>x. card  {z. x \<rightarrow>\<^sup>+ z} \<le> card (verts G)"
     using fin part finite_verts not_le
@@ -143,10 +146,11 @@ next
   assume "wf_digraph.arc (del_vert t) e (u, v)"
   then have arc: "arc e (u,v)" using del_vert_simps wf_digraph.arc_def arc_def
     by (metis (no_types, lifting) mem_Collect_eq wf_digraph_del_vert)
-  assume "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (del_vert t) e\<^esub> v" 
-  then have path: "u \<rightarrow>\<^sup>*\<^bsub>del_arc e\<^esub> v"
-    by (meson del_arc_subgraph subgraph_del_vert digraph_axioms
-        digraph_subgraph pre_digraph.reachable_mono) 
+  assume "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (del_vert t) e\<^esub> v" 
+  then have path: "u \<rightarrow>\<^sup>+\<^bsub>del_arc e\<^esub> v"
+    using  del_arc_subgraph subgraph_del_vert digraph_axioms
+        digraph_subgraph 
+    by (metis arcs_ends_mono trancl_mono) 
   show False using arc path only_new by simp
 next
   obtain g where gen: "is_genesis_node g" using genesisAlt genesis by auto
@@ -234,8 +238,9 @@ next
   del_tips_dag assms(1) DAG_def digraph_def fin_digraph_def)
 qed
   then show " \<exists>p. p \<in> verts (del_vert t) \<and>
-        (\<forall>r. r \<in> verts (del_vert t) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>del_vert t\<^esub> p)"
-    using gen genp by auto
+        (\<forall>r. r \<in> verts (del_vert t) \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>del_vert t\<^esub> p \<or> r = p))"
+    using gen genp
+    by (metis reachable_rtranclI rtranclD) 
 qed
 
 subsection \<open>Future Nodes\<close>
@@ -311,7 +316,7 @@ next
   proof safe
     fix u v e 
     assume arc: "wf_digraph.arc (reduce_past G a) e (u, v)"
-    then show " u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False "
+    then show " u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False "
     proof -
         assume e_in: "(wf_digraph.arc (reduce_past G a) e (u, v))" 
         then have "(wf_digraph.arc G e (u, v))"
@@ -327,13 +332,13 @@ next
           then show ?thesis
             using arc_def reduce_past.simps by auto
         qed    
-        then have "\<not> u \<rightarrow>\<^sup>*\<^bsub>del_arc e\<^esub> v"
+        then have "\<not> u \<rightarrow>\<^sup>+\<^bsub>del_arc e\<^esub> v"
           using only_new by auto        
-        then show "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False"
+        then show "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False"
           using DAG.past_nodes_verts reduce_past.simps blockDAG_axioms subs
                del_arc_subgraph digraph.digraph_subgraph digraph_axioms 
-               pre_digraph.reachable_mono subgraph_induce_subgraphI
-          by metis
+               subgraph_induce_subgraphI
+          by (metis arcs_ends_mono trancl_mono)
       qed
     next  
         obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
@@ -372,8 +377,10 @@ next
           qed
         qed
         show 
-        "\<exists>p. p \<in> verts (reduce_past G a) \<and> (\<forall>r. r \<in> verts (reduce_past G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> p)"
-          using pe by auto
+        "\<exists>p. p \<in> verts (reduce_past G a) \<and> (\<forall>r. r \<in> verts (reduce_past G a)
+         \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>reduce_past G a\<^esub> p \<or> r = p))"
+          using pe
+          by (metis reachable_rtranclI rtranclD) 
       qed
     qed
 
@@ -420,12 +427,12 @@ next
     unfolding blockDAG_axioms
   proof
     fix u v 
-    show "\<forall>e. u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v
+    show "\<forall>e. u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v
          \<longrightarrow> \<not> wf_digraph.arc (reduce_past_refl G a) e (u, v)"
     proof safe
       fix e 
       assume a: " wf_digraph.arc (reduce_past_refl G a) e (u, v)"
-      and b: "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v"
+      and b: "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v"
       have edge: "wf_digraph.arc G e (u, v)"
           using assms reduce_past_arcs2 induced_subgraph_def arc_def 
         proof -
@@ -438,11 +445,11 @@ next
           then show "arc e (u, v)"
             using arc_def reduce_past_refl.simps by auto
         qed
-      have "u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc G e\<^esub> v"
+      have "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc G e\<^esub> v"
         using a b reduce_past_refl_digraph del_arc_subgraph digraph_axioms
-         pre_digraph.reachable_mono
-        by (metis digraphI_induced past_nodes_refl_verts reduce_past_refl.simps
-            reduce_past_refl_induced_subgraph subgraph_induce_subgraphI)
+         digraphI_induced past_nodes_refl_verts reduce_past_refl.simps
+            reduce_past_refl_induced_subgraph subgraph_induce_subgraphI arcs_ends_mono trancl_mono
+        by metis
       then show False
         using edge only_new by simp
     qed
@@ -453,17 +460,23 @@ next
             reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts
             gen mem_Collect_eq reachable_neq_reachable1
             assms by force    
-        have reaches: "(\<forall>r. r \<in> verts (reduce_past_refl G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl G a\<^esub> p)" 
+      have reaches: "(\<forall>r. r \<in> verts (reduce_past_refl G a) \<longrightarrow>
+             (r \<rightarrow>\<^sup>+\<^bsub>reduce_past_refl G a\<^esub> p \<or> r = p))" 
           proof safe
             fix r
             assume in_past: "r \<in> verts (reduce_past_refl G a)"
-            then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt reachable_in_verts by simp
+            assume une: "r \<noteq> p"
+            then have con: "r \<rightarrow>\<^sup>* p" using gen genesisAlt reachable_in_verts
+            reachable1_reachable
+              by (metis in_past induce_subgraph_verts
+                  past_nodes_refl_verts reduce_past_refl.simps subsetD)  
             have "a \<rightarrow>\<^sup>* r" using in_past by auto
             then have reach: "r \<rightarrow>\<^sup>*\<^bsub>G \<restriction> {w. a \<rightarrow>\<^sup>* w}\<^esub> p"
             proof(induction)
               case base
               then show ?case
-                by (simp add: con induce_reachable_preserves_paths) 
+                using  con induce_reachable_preserves_paths
+                by (metis) 
             next
               case (step x y)
               then show ?case
@@ -471,14 +484,17 @@ next
                 have "Collect (reachable G y) \<subseteq> Collect (reachable G x)"
                   using adj_reachable_trans step.hyps(1) by force
                 then show ?thesis
-                  using reachable_induce_ss step.IH by blast
+                  using reachable_induce_ss step.IH reachable_neq_reachable1
+                  by metis 
               qed 
-            qed
-            show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl G a\<^esub> p" using reach reduce_past_refl.simps 
-            past_nodes_refl.simps by simp
+            qed   
+            then show "r \<rightarrow>\<^sup>+\<^bsub>reduce_past_refl G a\<^esub> p" unfolding reduce_past_refl.simps
+             past_nodes_refl.simps using reachable_in_verts une wf_digraph.reachable_neq_reachable1
+              by (metis (mono_tags, lifting) Collect_cong wellformed_induce_subgraph)
           qed
           then show "\<exists>p. p \<in> verts (reduce_past_refl G a) \<and> (\<forall>r. r \<in> verts (reduce_past_refl G a) 
-        \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past_refl G a\<^esub> p)" unfolding blockDAG_axioms_def using pe reaches by auto
+        \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>reduce_past_refl G a\<^esub> p \<or> r = p))" unfolding blockDAG_axioms_def 
+            using pe reaches by auto
         qed
       qed 
 
@@ -533,7 +549,7 @@ next
     using wf_digraph.arc_def gen_graph_empty_arcs
     by (simp add: wf_digraph.arc_def wf_digraph_def) 
   then show "wf_digraph.arc gen_graph e (u, v) \<Longrightarrow>
-       u \<rightarrow>\<^sup>*\<^bsub>pre_digraph.del_arc gen_graph e\<^esub> v \<Longrightarrow> False"
+       u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc gen_graph e\<^esub> v \<Longrightarrow> False"
     by simp
 next  
   have refl: "genesis_node \<rightarrow>\<^sup>*\<^bsub>gen_graph\<^esub> genesis_node"
@@ -549,7 +565,7 @@ next
       by (simp add: local.refl)   
   qed
   then show " \<exists>p. p \<in> verts gen_graph \<and>
-        (\<forall>r. r \<in> verts gen_graph \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>gen_graph\<^esub> p)"
+        (\<forall>r. r \<in> verts gen_graph \<longrightarrow> r \<rightarrow>\<^sup>+\<^bsub>gen_graph\<^esub> p \<or> r = p)"
     by (simp add: gen_gen)
 qed 
 

@@ -16,16 +16,16 @@ locale DAG = digraph +
 subsection  \<open>Functions and Definitions\<close>
 
 fun  direct_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
-  where "direct_past G  a = {b. (b \<in> verts G \<and> (a,b) \<in> arcs_ends G)}"
+  where "direct_past G  a = {b \<in> verts G. (a,b) \<in> arcs_ends G}"
 
 fun future_nodes:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
-  where "future_nodes G a = {b.  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
+  where "future_nodes G a = {b \<in> verts G.  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a}"
 
 fun past_nodes:: "('a,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a set"
-  where "past_nodes G a = {b. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
+  where "past_nodes G a = {b \<in> verts G. a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b}"
 
 fun past_nodes_refl :: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
-  where "past_nodes_refl G a = {b. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
+  where "past_nodes_refl G a = {b \<in> verts G. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
 
 fun reduce_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
