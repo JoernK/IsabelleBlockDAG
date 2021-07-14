@@ -1,6 +1,8 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
-module Spectre(Int, Pre_digraph_ext, vote_Spectre_Int) where {
+module
+  Spectre(Int, Set(..), Pre_digraph_ext(..), spectreOrder_Int, vote_Spectre_Int)
+  where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
   (>>=), (>>), (=<<), (&&), (||), (^), (^^), (.), ($), ($!), (++), (!!), Eq,
@@ -478,6 +480,19 @@ vote_Spectre v a b c =
                                 else sumlist_break b c
                                        (map (\ i -> vote_Spectre v i b c)
  (sorted_list_of_set (future_nodes v a))))))));
+
+spectreOrder ::
+  forall a b.
+    (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> a -> a -> Bool;
+spectreOrder g a b =
+  equal_int
+    (sumlist_break a b
+      (map (\ i -> vote_Spectre g i a b) (sorted_list_of_set (verts g))))
+    one_int;
+
+spectreOrder_Int ::
+  Pre_digraph_ext Integer (Integer, Integer) () -> Integer -> Integer -> Bool;
+spectreOrder_Int g = spectreOrder g;
 
 times_num :: Num -> Num -> Num;
 times_num (Bit1 m) (Bit1 n) =

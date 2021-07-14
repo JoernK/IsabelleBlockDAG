@@ -3,17 +3,14 @@ import Spectre
 
 
 
-verts = Spectre.Set [1,2,3]
-edges = Spectre.Set [21,31]
+v = Set [1,2,3,4,5,6]
+e = Set [(2,1),(3,1),(4,2),(4,3),(5,4),(6,1)]
 
-hd 21 = 1
-hd 31 = 1
-hd x = x
+tl = fst
 
-tl 21 = 2
-tl 31 = 3
-tl x = x
+hd = snd
 
+g = Pre_digraph_ext v e tl hd ()
 
 
 

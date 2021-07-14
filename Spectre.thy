@@ -92,9 +92,9 @@ next
     by simp
 qed
 
-definition (in tie_breakingDAG) SpectreOrder:
-  "SpectreOrder \<equiv> {(a,b). sumlist_break a b (map (\<lambda>i.
-   (vote_Spectre G i a b)) (sorted_list_of_set (verts G))) = 1}"
+fun SpectreOrder :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
+  where "SpectreOrder G a b = ( sumlist_break a b (map (\<lambda>i.
+   (vote_Spectre G i a b)) (sorted_list_of_set (verts G))) = 1)" 
 
 subsubsection \<open>Lemmas\<close>
 
@@ -181,41 +181,34 @@ lemma antisymmetric_sumlist:
 
 
 lemma Spectre_antisymmetric: 
-  shows "b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b"
-proof -  
-  consider (nbD) "\<not> blockDAG V" | (bD) "blockDAG V " by auto
-  then show ?thesis
+  shows "\<And> V a b c.  b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b"
+proof -
+  fix V ::"('a::linorder, 'b) pre_digraph"
+  fix a b c
+  consider (nbD) "(\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)" 
+    | (bD) "\<not>(\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)" by auto
+  then show "b \<noteq> c \<longrightarrow> vote_Spectre V a b c = - vote_Spectre V a c b"
   proof( cases)
     case nbD
     then show ?thesis by auto
   next
     case bD
-    then show ?thesis 
-    proof(induct V a b c  rule:vote_Spectre.induct)
-      fix V a b c
-      assume "(\<And>x. \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) \<Longrightarrow>
-             b \<noteq> c \<Longrightarrow>
-             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c \<Longrightarrow>
-             x \<in> set (sorted_list_of_set (past_nodes V a)) \<Longrightarrow>
-             blockDAG (reduce_past V a) \<Longrightarrow>
-             b \<noteq> c \<longrightarrow>
-             vote_Spectre (reduce_past V a) x b c = - vote_Spectre (reduce_past V a) x c b)
-        "
-        and
-       "(\<And>x. \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) \<Longrightarrow>
-             b \<noteq> c \<Longrightarrow>
-             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> b \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             \<not> (a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             \<not> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<Longrightarrow>
-             x \<in> set (sorted_list_of_set (future_nodes V a)) \<Longrightarrow>
-             blockDAG V \<Longrightarrow> b \<noteq> c \<longrightarrow> vote_Spectre V x b c = - vote_Spectre V x c b)"
+    then have "blockDAG V" by auto
+    then show ?thesis using bD
+    proof(induction V rule:blockDAG_nat_less_induct)
+      case (base V)
+      then have "verts V = {blockDAG.genesis_node V}" 
+        using blockDAG.gen_gen blockDAG.gen_graph_all_one
+        by metis 
+      then show ?case by auto 
+    next
+      case (step V)
+      then show ?case 
+    next  
      
-        oops
                                  
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"
   unfolding total_on_def SpectreOrder 
-  oops
+  
 
 end

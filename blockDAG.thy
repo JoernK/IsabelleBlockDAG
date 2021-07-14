@@ -578,18 +578,22 @@ proof -
     using card_gt_0_iff finite_verts by blast
 qed
 
-  
+lemma (in blockDAG) gen_graph_all_one:
+"card (verts (G)) = 1 \<longrightarrow> G = gen_graph"
+  by (metis card_1_singletonE gen_graph_def genesis_in_verts 
+induce_eq_iff_induced induced_subgraph_refl singletonD)
+
 lemma blockDAG_nat_induct[consumes 1, case_names base step]: 
-  assumes
- cases: "\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = 1 \<Longrightarrow> P V)"
+ assumes
+ bD: "blockDAG Z"
+ and
+  cases: "\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = 1 \<Longrightarrow> P V)"
   "\<And>W c. (\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V)) 
-  \<Longrightarrow> (blockDAG W \<Longrightarrow> card (verts W) = (Suc c) \<Longrightarrow> P W)"
-shows "\<And>Z. blockDAG Z \<Longrightarrow> P Z"
+  \<Longrightarrow> (blockDAG W \<Longrightarrow> card (verts W) = Suc c \<Longrightarrow> P W)"
+ shows "P Z"
 proof - 
-  fix Z:: "('a,'b) pre_digraph"
-  assume bD: "blockDAG Z"
-  then have bG: "card (verts Z) > 0" using blockDAG.no_empty_blockDAG by auto 
-  show "P Z"
+  have bG: "card (verts Z) > 0" using bD blockDAG.no_empty_blockDAG by auto 
+  show "?thesis"
     using bG bD
   proof (induction "card (verts Z)"  arbitrary: Z rule: Nat.nat_induct_non_zero)
     case 1
@@ -601,6 +605,28 @@ next
   qed   
 qed 
 
+
+lemma blockDAG_nat_less_induct[consumes 1, case_names base step]: 
+  assumes
+ bD: "blockDAG Z"
+ and
+ cases: "\<And>V. (blockDAG V \<Longrightarrow> card (verts V) = 1 \<Longrightarrow> P V)"
+  "\<And>W c. (\<And>V. (blockDAG V \<Longrightarrow> card (verts V) < c \<Longrightarrow> P V)) 
+  \<Longrightarrow> (blockDAG W \<Longrightarrow> card (verts W) = c \<Longrightarrow> P W)"
+shows "P Z"
+proof - 
+  have bG: "card (verts Z) > 0" using blockDAG.no_empty_blockDAG assms(1) by auto
+  show "P Z"
+    using bD bG
+  proof (induction "card (verts Z)" arbitrary: Z rule: less_induct)
+    fix Z::"('a, 'b) pre_digraph"
+    assume a:
+      "(\<And>Za. card (verts Za) < card (verts Z) \<Longrightarrow> blockDAG Za \<Longrightarrow> 0 < card (verts Za) \<Longrightarrow> P Za)"
+    assume "blockDAG Z"
+    then show "P Z" using a cases
+      by (metis blockDAG.no_empty_blockDAG)
+  qed
+qed
 
 lemma (in blockDAG) blockDAG_size_cases:
   obtains (one) "card (verts G) = 1" 

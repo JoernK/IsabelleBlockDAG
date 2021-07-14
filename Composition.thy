@@ -13,8 +13,8 @@ locale composition = blockDAG  +
   assumes "C \<subseteq> verts G"
   and "blockDAG (G \<restriction> C)"
   and same_rel:  "\<forall>v \<in> ((verts G)- C). 
-  (\<forall>c \<in> C. (c \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v)) \<or> (\<forall>c \<in> C. (v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> c)) 
-   \<or> (\<forall>c \<in> C. \<not>(v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> c) \<and>  \<not>(v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> c)) "       
+  (\<forall>c \<in> C. (c \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)) \<or> (\<forall>c \<in> C. (v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) 
+   \<or> (\<forall>c \<in> C. \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c) \<and>  \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) "       
 
 locale compositionGraph = blockDAG +
   fixes G' ::"('a set, 'b) pre_digraph"
@@ -22,19 +22,12 @@ locale compositionGraph = blockDAG +
   and "\<forall> C1 \<in> (verts G'). \<forall> C2 \<in> (verts G'). C1 \<inter> C2 \<noteq> {} \<longrightarrow> C1 = C2"
   and "\<Union> (verts G') = verts G"
 
-
-locale linorderSet = 
-  fixes le::"'a::linorder set \<Rightarrow> 'a set \<Rightarrow> bool" and l::"'a set \<Rightarrow> 'a set \<Rightarrow> bool"
-  assumes "class.linorder le l"
-
 locale tie_break_compositionGraph = tie_breakingDAG + 
-  fixes G' ::"('a set, 'b) pre_digraph"
-  fixes le::"'a::linorder set \<Rightarrow> 'a set \<Rightarrow> bool" and l::"'a set \<Rightarrow> 'a set \<Rightarrow> bool"
+  fixes G' ::"('a::linorder set, 'b) pre_digraph"
   assumes "\<forall>C \<in> (verts G'). composition G C"
   and "\<forall> C1 \<in> (verts G'). \<forall> C2 \<in> (verts G'). C1 \<inter> C2 \<noteq> {} \<longrightarrow> C1 = C2"
   and "\<Union> (verts G') = verts G"
-  assumes "class.linorder le l"
-
+ 
 subsection  \<open>Functions and Definitions\<close>
 
 subsection \<open>Lemmas\<close>
@@ -53,11 +46,11 @@ proof -
       using induce_eq_iff_induced induced_subgraph_refl assms by auto 
     then have bD: "blockDAG (G \<restriction> C)" using blockDAG_axioms by simp
     have "\<nexists>v. v \<in> (verts G) - C" using assms by simp
-    then have "(\<forall>v\<in>verts G - C. (\<forall>c\<in>C. c \<rightarrow>\<^sup>* v) \<or> (\<forall>c\<in>C. v \<rightarrow>\<^sup>* c) \<or> (\<forall>c\<in>C. \<not> v \<rightarrow>\<^sup>* c \<and> \<not> v \<rightarrow>\<^sup>* c))"
+    then have "(\<forall>v\<in>verts G - C. (\<forall>c\<in>C. c \<rightarrow>\<^sup>+ v) \<or> (\<forall>c\<in>C. v \<rightarrow>\<^sup>+ c) \<or> (\<forall>c\<in>C. \<not> v \<rightarrow>\<^sup>+ c \<and> \<not> v \<rightarrow>\<^sup>+ c))"
       by auto
     then show "C \<subseteq> verts G \<and>
     blockDAG (G \<restriction> C) \<and>
-    (\<forall>v\<in>verts G - C. (\<forall>c\<in>C. c \<rightarrow>\<^sup>* v) \<or> (\<forall>c\<in>C. v \<rightarrow>\<^sup>* c) \<or> (\<forall>c\<in>C. \<not> v \<rightarrow>\<^sup>* c \<and> \<not> v \<rightarrow>\<^sup>* c))" 
+    (\<forall>v\<in>verts G - C. (\<forall>c\<in>C. c \<rightarrow>\<^sup>+ v) \<or> (\<forall>c\<in>C. v \<rightarrow>\<^sup>+ c) \<or> (\<forall>c\<in>C. \<not> v \<rightarrow>\<^sup>+ c \<and> \<not> v \<rightarrow>\<^sup>+ c))" 
         using subset bD by simp
     qed  
   qed

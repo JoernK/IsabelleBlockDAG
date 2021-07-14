@@ -57,7 +57,7 @@ fun finiteAlt :: "'a set \<Rightarrow> bool"
 
 lemma [code]: "fin_digraph G = (wf_digraph G \<and> (card (verts G) > 0 \<or> verts G = {})
    \<and> ((card (arcs G) > 0 \<or> arcs G = {})))" 
-  using card_0_eq card_ge_0_finite fin_digraph_def fin_digraph_axioms_def
+  using card_ge_0_finite fin_digraph_def fin_digraph_axioms_def
   by (metis card_gt_0_iff finite.emptyI)
 
 
@@ -65,8 +65,10 @@ fun vote_Spectre_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarr
  integer \<Rightarrow> integer \<Rightarrow> integer \<Rightarrow> integer"
   where "vote_Spectre_Int V a b c = integer_of_int (vote_Spectre V a b c)"
 
+fun SpectreOrder_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarrow> integer \<Rightarrow> integer \<Rightarrow> bool"
+  where "SpectreOrder_Int G = SpectreOrder G"
 
-export_code snd fst vote_Spectre_Int in Haskell module_name Spectre file "code/"
-
+export_code set pre_digraph_ext snd fst vote_Spectre_Int SpectreOrder_Int
+ in Haskell module_name Spectre file "code/"
 
 end
