@@ -1,7 +1,7 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
 module
-  Spectre(Int, Set(..), Pre_digraph_ext(..), spectreOrder_Int, vote_Spectre_Int)
+  Spectre(Int, Set(..), Pre_digraph_ext(..), blockDAG, spectreOrder_Int, vote_Spectre_Int)
   where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
