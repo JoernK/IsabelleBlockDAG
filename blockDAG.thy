@@ -104,8 +104,27 @@ proof (rule ccontr)
     using less not_le by auto
 qed
 
-
 lemma (in blockDAG) tips_unequal_gen:
+  assumes "card( verts G) > 1"
+  and "is_tip G p"
+  shows "\<not> is_genesis_node p "
+proof (rule ccontr)
+  assume as: "\<not> \<not> is_genesis_node p"
+  have b1: "1 < card (verts G)" using assms by linarith
+  then have "0 < card ((verts G) - {p})" using card_Suc_Diff1 as finite_verts b1 by auto
+  then have "((verts G) - {p}) \<noteq> {}" using card_gt_0_iff by blast
+  then obtain y where y_def:"y \<in> (verts G) - {p}" by auto
+  then have uneq: "y \<noteq> p" by auto
+  then have "reachable1 G y p" using is_genesis_node.simps as
+      reachable_neq_reachable1 Diff_iff y_def
+    by metis 
+  then have "\<not> is_tip G p" by auto
+  then show False using assms by simp
+qed
+
+
+
+lemma (in blockDAG) tips_unequal_gen_exist:
   assumes "card( verts G) > 1"
   shows "\<exists>p. p \<in> verts G \<and> is_tip G p \<and> \<not>is_genesis_node p "
 proof -

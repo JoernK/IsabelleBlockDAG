@@ -27,6 +27,9 @@ fun past_nodes:: "('a,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a set"
 fun past_nodes_refl :: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
   where "past_nodes_refl G a = {b \<in> verts G. a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> b}"
 
+fun anticone:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
+  where "anticone G a = {b \<in> verts G. \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b \<or>  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a \<or> a = b)}" 
+
 fun reduce_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
   "reduce_past G a = induce_subgraph G (past_nodes G a)"
@@ -41,6 +44,10 @@ fun is_tip:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> bool"
 definition tips:: "('a,'b) pre_digraph \<Rightarrow> 'a set"
   where "tips G = {v. is_tip G v}"
 
+fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> 'a set \<Rightarrow> nat \<Rightarrow> bool"
+  where  "kCluster G C k =  (if (C \<subseteq> (verts G))
+   then (\<forall>a \<in> C. card ((anticone G a) \<inter> C) \<le> k) else False)"
+  
 
 subsection \<open>Lemmas\<close>
   

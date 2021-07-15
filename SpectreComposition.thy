@@ -5,14 +5,8 @@ begin
 context tie_break_compositionGraph
 begin
 
-
-fun tie_break_comp_int:: "'a set \<Rightarrow> 'a set \<Rightarrow> int \<Rightarrow> int"
-  where "tie_break_comp_int a b i =
- (if i=0 then (if (le a b) then 1 else -1) else 
-              (if i > 0 then 1 else -1))"
-
 fun sumlist_break_comp_acc :: "'a set \<Rightarrow>'a set \<Rightarrow> int \<Rightarrow> int list \<Rightarrow> int"
-  where "sumlist_break_comp_acc a b s [] = tie_break_comp_int a b s"
+  where "sumlist_break_comp_acc a b s [] = 0"
   | "sumlist_break_comp_acc a b s (x#xs) = sumlist_break_comp_acc a b (s + x) xs"
 
 fun sumlist_break_comp :: "'a set \<Rightarrow>'a set \<Rightarrow> int list \<Rightarrow> int"
@@ -28,10 +22,10 @@ function vote_SpectreComp :: "('a set,'b) pre_digraph \<Rightarrow>'a set\<Right
   if ((a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then - card a else
   if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
    (card a) * (sumlist_break_comp b c (map (\<lambda>i.
- (vote_SpectreComp (DAG.reduce_past V a) i b c)) (linorder.sorted_list_of_set le ((DAG.past_nodes V a)))))
+ (vote_SpectreComp (reduce_past V a) i b c)) (linorder.sorted_list_of_set le ((past_nodes V a)))))
  else 
    (card a) * sumlist_break_comp b c (map (\<lambda>i.
-   (vote_SpectreComp V i b c)) (linorder.sorted_list_of_set le (DAG.future_nodes V a))))"
+   (vote_SpectreComp V i b c)) (linorder.sorted_list_of_set le (future_nodes V a))))"
   by auto
 termination
 proof
@@ -43,10 +37,10 @@ next
   fix x a b c
   assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
   then have "a \<in> verts V"  by simp
-  then have "card (verts (DAG.reduce_past V a)) < card (verts V)"   
+  then have "card (verts (reduce_past V a)) < card (verts V)"   
     using bD blockDAG.reduce_less
     by metis
-  then show "((DAG.reduce_past V a, x, b, c), V, a, b, c)
+  then show "((reduce_past V a, x, b, c), V, a, b, c)
        \<in> measures
            [\<lambda>(V, a, b, c). card (verts V),
             \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]"
@@ -56,13 +50,13 @@ next
   fix x a b c
   assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
   then have a_in: "a \<in> verts V" using bD by simp
-  assume "x \<in> set (linorder.sorted_list_of_set le (DAG.future_nodes V a))"
-  then have "x \<in> DAG.future_nodes V a" using DAG.finite_future
+  assume "x \<in> set (linorder.sorted_list_of_set le (future_nodes V a))"
+  then have "x \<in> future_nodes V a" using DAG.finite_future
     linorder.set_sorted_list_of_set bD subs tie_break_compositionGraph_axioms 
     tie_break_compositionGraph_def tie_break_compositionGraph_axioms_def
     by metis
-  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using DAG.future_nodes.simps bD subs mem_Collect_eq
-    by metis
+  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using future_nodes.simps bD subs mem_Collect_eq
+    by simp
   then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x" using bD DAG.unidirectional subs by metis
   have bD2: "blockDAG V" using bD by simp
   have "\<forall>x. {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} \<subseteq> verts V" using subs bD2  subsetI
@@ -84,6 +78,7 @@ next
            [\<lambda>(V, a, b, c). card (verts V), \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]"
     by simp
 qed
+
 
 end
 end
