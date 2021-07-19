@@ -12,6 +12,8 @@ locale tie_breakingDAG =
   fixes G::"('a::linorder,'b) pre_digraph"
   assumes is_blockDAG: "blockDAG G"
 
+sublocale tie_breakingDAG \<subseteq> blockDAG using tie_breakingDAG_def tie_breakingDAG_axioms by auto 
+
 subsection  \<open>Functions and Definitions\<close>
 
 fun tie_break_int:: "'a::linorder \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> int"
@@ -204,7 +206,6 @@ proof -
     next
       case (step V)
       then show ?case 
-    next  
      
                                  
 lemma (in tie_breakingDAG) "total_on (verts G) SpectreOrder"

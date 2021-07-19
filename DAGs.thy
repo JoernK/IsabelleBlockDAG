@@ -44,8 +44,8 @@ fun is_tip:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> bool"
 definition tips:: "('a,'b) pre_digraph \<Rightarrow> 'a set"
   where "tips G = {v. is_tip G v}"
 
-fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> 'a set \<Rightarrow> nat \<Rightarrow> bool"
-  where  "kCluster G C k =  (if (C \<subseteq> (verts G))
+fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a set  \<Rightarrow> bool"
+  where  "kCluster G k C =  (if (C \<subseteq> (verts G))
    then (\<forall>a \<in> C. card ((anticone G a) \<inter> C) \<le> k) else False)"
   
 
