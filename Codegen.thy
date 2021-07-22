@@ -4,7 +4,7 @@
 
 
 theory Codegen
-  imports blockDAG Spectre 
+  imports blockDAG Spectre Ghostdag
 begin
 
 section \<open>Code Generation\<close>
@@ -66,9 +66,15 @@ fun vote_Spectre_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarr
   where "vote_Spectre_Int V a b c = integer_of_int (vote_Spectre V a b c)"
 
 fun SpectreOrder_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarrow> integer \<Rightarrow> integer \<Rightarrow> bool"
-  where "SpectreOrder_Int G = SpectreOrder G"
+  where "SpectreOrder_Int G = SpectreOrderAlt G"
 
-export_code set pre_digraph_ext snd fst vote_Spectre_Int SpectreOrder_Int
- in Haskell module_name Spectre file "code/"
+declare tie_breakingDAG_def [code]
+
+fun OrderDAG_Int::  "(integer, integer\<times>integer) pre_digraph \<Rightarrow>
+ integer \<Rightarrow> (integer set \<times> integer list)" 
+ where " OrderDAG_Int V a =  (OrderDAG V (nat_of_integer a))"
+
+export_code anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_Int SpectreOrder_Int OrderDAG_Int
+ in Haskell module_name DAGS file "code/" 
 
 end

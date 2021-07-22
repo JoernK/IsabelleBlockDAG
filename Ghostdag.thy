@@ -13,15 +13,11 @@ fun top_less  :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> '
 (b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<or> (\<not>(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> a < b) else 
 a < b)"
 
-fun le_blue_tuple ::
- "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> bool"
-  where "le_blue_tuple ((B1 , C1),a1) ((B2 , C2),a2) = 
-  (True \<longleftrightarrow> (card B1) < (card B2) \<or> (card B1 \<le> card B2 \<and> a1 \<ge> a2))"
-
-fun less_blue_tuple ::
- "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> bool"
-  where "less_blue_tuple ((B1 , C1),a1) ((B2 , C2),a2) = 
-  (True \<longleftrightarrow> (card B1) < (card B2) \<or> (card B1 \<le> card B2 \<and> a1 > a2))"
+fun larger_blue_tuple ::
+ "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
+  where "larger_blue_tuple A B = 
+  (if (card (fst (fst A))) > (card (fst (fst B))) \<or> 
+  (card (fst (fst A)) \<ge> card (fst (fst B)) \<and> snd A \<le> snd B) then A else B)"
 
 
 fun add_set_list_tuple :: "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> ('a::linorder set \<times> 'a list)" 
@@ -33,17 +29,21 @@ fun app_if_blue_else_add_end ::
 where "app_if_blue_else_add_end G k (S,L) a = (if (kCluster G k (S \<union> {a})) 
 then add_set_list_tuple ((S,L),a) else (S,L @ [a]))"
 
+fun choose_max_blue_set :: "(('a::linorder set \<times> 'a list) \<times> 'a) list \<Rightarrow> 'a \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
+  where "choose_max_blue_set L def = foldr (larger_blue_tuple) L (({},[]),def)" 
+
+
 function OrderDAG :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a set \<times> 'a list)" 
   where
   "OrderDAG G k =  
   (if (\<not> tie_breakingDAG G) then ({},[]) else 
-  if (card (verts G) = 1)  then ({blockDAG.genesis_node G},[blockDAG.genesis_node G]) else
- let M = (linorder.Max le_blue_tuple
- (set ((map (\<lambda>i.(((OrderDAG (reduce_past G i) k)) , i)) (sorted_list_of_set (tips G))))))
+  if (card (verts G) = 1)  then ({genesis_nodeAlt G},[genesis_nodeAlt G]) else
+ let M =  choose_max_blue_set 
+  ((map (\<lambda>i.(((OrderDAG (reduce_past G i) k)) , i)) (sorted_list_of_set (tips G))))
+   (genesis_nodeAlt G)
  in let Current = (add_set_list_tuple M, snd M)
  in foldl (app_if_blue_else_add_end G k) (fst Current)
- (linorder.sorted_list_of_set (top_le G) (anticone G (snd M))) 
-  )"
+ (sorted_list_of_set (anticone G (snd M))))"
   by auto
 termination proof 
   let ?R = "measure ( \<lambda>(G, k). (card (verts G)))"
@@ -67,43 +67,6 @@ next
     by fastforce  
 qed
 
-lemma "class.linorder (top_le G)  (top_less G)" 
-proof -
-  fix G::"('a::linorder,'b) pre_digraph"
-  consider (tD) "tie_breakingDAG G"| (ntD) "\<not> tie_breakingDAG G" by auto
-  then show "class.linorder (top_le G) (top_less G)" 
-  proof(cases)
-    case tD  
-    then have bD: "blockDAG G" by using tie_breakingDAG_def by auto
-    show ?thesis 
-    proof
-      show "\<And>x y. top_less G x y = (top_le G x y \<and> \<not> top_le G y x)" using bD subs DAG.unidirectional
-      wf_digraph.reachable1_reachable
-        by (metis dual_order.order_iff_strict not_less_iff_gr_or_eq top_le.elims(1) top_less.elims(1)) 
-    show "\<And>x. top_le G x x" by auto
-    show "\<And>x y z. top_le G x y \<Longrightarrow> top_le G y z \<Longrightarrow> top_le G x z" 
-    proof -
-      fix x y z 
-      assume "top_le G x y" 
-      assume "top_le G y z"
-      then consider "(z \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y)" | "(\<not>(z \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> \<not>(y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> z) \<and> y \<le> z)"
-        by (metis tD top_le.simps)
-      then show "top_le G x z"  
-        oops
-  next
-    case ntD
-    have les: "\<And>a b. top_le G a b \<equiv> a \<le> b" using top_le.simps top_less.simps ntD by auto
-    have lesss: "\<And>a b. top_less G a b \<equiv> a < b"  using top_le.simps top_less.simps ntD by auto
-    show "class.linorder (top_le G) (top_less G)" 
-    proof
-      show "\<And>x y. top_less G x y = (top_le G x y \<and> \<not> top_le G y x)" using les lesss by auto
-      show "\<And>x. top_le G x x" by auto
-      show "\<And>x y z. top_le G x y \<Longrightarrow> top_le G y z \<Longrightarrow> top_le G x z" using les lesss by auto
-      show "\<And>x y. top_le G x y \<Longrightarrow> top_le G y x \<Longrightarrow> x = y" using les lesss by auto
-      show "\<And>x y. top_le G x y \<or> top_le G y x" using les lesss by auto
-  qed
-  oops
-
-
-
+   
+      
 end

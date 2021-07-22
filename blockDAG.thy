@@ -9,7 +9,7 @@ begin
 section  \<open>blockDAGs\<close>
  
 locale blockDAG = DAG  +
-  assumes genesis:  "\<exists>p. (p\<in> verts G \<and> (\<forall>r. r \<in> verts G  \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p \<or> r = p)))"       
+  assumes genesis:  "\<exists>p \<in> verts G. \<forall>r. r \<in> verts G  \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p \<or> r = p)"       
   and only_new: "\<forall>e. (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
 
 
@@ -60,7 +60,7 @@ lemma (in blockDAG) tips_exist:
 "\<exists>x. is_tip G x"
   unfolding is_tip.simps
 proof (rule ccontr)
-  assume "\<nexists>x. x \<in> verts G \<and> (\<forall>y. \<not> y\<rightarrow>\<^sup>+x)"
+  assume "\<nexists>x. x \<in> verts G \<and>(\<forall>xa\<in>verts G. (xa, x) \<notin> (arcs_ends G)\<^sup>+)"
   then have contr: "\<forall>x. x \<in> verts G \<longrightarrow> (\<exists>y. y\<rightarrow>\<^sup>+x)"
     by auto  
   have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subseteq> {z. y \<rightarrow>\<^sup>+ z}"
@@ -118,7 +118,8 @@ proof (rule ccontr)
   then have "reachable1 G y p" using is_genesis_node.simps as
       reachable_neq_reachable1 Diff_iff y_def
     by metis 
-  then have "\<not> is_tip G p" by auto
+  then have "\<not> is_tip G p"
+    by (meson is_tip.elims(2) reachable1_in_verts(1)) 
   then show False using assms by simp
 qed
 
@@ -138,7 +139,8 @@ proof -
   have y_in: "y \<in> (verts G)" using y_def by simp
   then have "reachable1 G y x" using is_genesis_node.simps x_in
       reachable_neq_reachable1 uneq by simp
-  then have "\<not> is_tip G x" by auto
+  then have "\<not> is_tip G x"
+    by (meson is_tip.elims(2) y_in) 
   then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip G z" using tips_exist
   is_tip.simps by auto
   then have uneq: "z \<noteq> x" by auto
@@ -197,7 +199,8 @@ next
     then have "reachable1 G u t"
       using dominatesI tl by blast
     then show False
-      using is_tip.simps assms(1) by auto    
+      using is_tip.simps assms(1)
+      hd by auto  
   qed
   have neither: "r \<noteq> t \<and> g \<noteq> t"
       using del_vert_def assms(2) gen in_del by auto
@@ -256,11 +259,12 @@ next
   then show "r \<rightarrow>\<^sup>*\<^bsub>del_vert t\<^esub> g" by (meson wf_digraph.reachable_awalkI  
   del_tips_dag assms(1) DAG_def digraph_def fin_digraph_def)
 qed
-  then show " \<exists>p. p \<in> verts (del_vert t) \<and>
+  then show " \<exists>p \<in> verts (del_vert t) .
         (\<forall>r. r \<in> verts (del_vert t) \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>del_vert t\<^esub> p \<or> r = p))"
     using gen genp
     by (metis reachable_rtranclI rtranclD) 
 qed
+
 
 subsection \<open>Future Nodes\<close>
 lemma (in blockDAG) future_nodes_ex:
@@ -396,7 +400,7 @@ next
           qed
         qed
         show 
-        "\<exists>p. p \<in> verts (reduce_past G a) \<and> (\<forall>r. r \<in> verts (reduce_past G a)
+        "\<exists>p \<in> verts (reduce_past G a). (\<forall>r. r \<in> verts (reduce_past G a)
          \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>reduce_past G a\<^esub> p \<or> r = p))"
           using pe
           by (metis reachable_rtranclI rtranclD) 
@@ -404,15 +408,73 @@ next
     qed
 
 
-(*
+
 lemma (in blockDAG) reduce_past_gen:
   assumes "\<not>is_genesis_node a" 
   and "a \<in> verts G"
-shows "blockDAG.is_genesis_node G b \<longleftrightarrow> blockDAG.is_genesis_node (reduce_past G a) b"
-proof safe
-  fix a b
-  show "is_genesis_node b \<Longrightarrow> blockDAG.is_genesis_node (reduce_past G a) b"
-*)
+  shows "blockDAG.is_genesis_node G b \<Longrightarrow>  blockDAG.is_genesis_node (reduce_past G a) b"
+proof -
+  assume gen: "blockDAG.is_genesis_node G b"
+  have une: "b \<noteq> a"  using gen assms(1) genesis_unique_exists by auto
+  have "a \<rightarrow>\<^sup>* b" using gen assms(2) by simp 
+  then have "a \<rightarrow>\<^sup>+ b" 
+    using reachable_neq_reachable1 is_genesis_node.simps assms(2) une by auto 
+  then have "b \<in> (past_nodes G  a)" using past_nodes.simps gen by auto
+  then have inv: "b \<in> verts (reduce_past G a)" using reduce_past.simps induce_subgraph_verts 
+    by auto
+  have"\<forall>r. r \<in> verts (reduce_past G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> b" 
+    proof safe
+      fix r a
+      assume in_past: "r \<in> verts (reduce_past G a)"
+      then have con: "r \<rightarrow>\<^sup>* b" using gen genesisAlt past_nodes_verts by auto  
+      then show "r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> b"
+      proof -
+      have f1: "r \<in> verts G \<and> a \<rightarrow>\<^sup>+ r"
+      using in_past past_nodes_verts by force
+      obtain aaa :: "'a set \<Rightarrow> 'a set \<Rightarrow> 'a" where
+      f2: "\<forall>x0 x1. (\<exists>v2. v2 \<in> x1 \<and> v2 \<notin> x0) = (aaa x0 x1 \<in> x1 \<and> aaa x0 x1 \<notin> x0)"
+        by moura
+      have "r \<rightarrow>\<^sup>* aaa (past_nodes G a) (Collect (reachable G r))
+            \<longrightarrow> a \<rightarrow>\<^sup>+ aaa (past_nodes G a) (Collect (reachable G r))"
+          using f1 by (meson reachable1_reachable_trans)
+        then have "aaa (past_nodes G a) (Collect (reachable G r)) \<notin> Collect (reachable G r)
+                   \<or> aaa (past_nodes G a) (Collect (reachable G r)) \<in> past_nodes G a"
+          by (simp add: reachable_in_verts(2))
+        then have "Collect (reachable G r) \<subseteq> past_nodes G a"
+          using f2 by (meson subsetI)
+        then show ?thesis
+          using con  induce_reachable_preserves_paths reachable_induce_ss reduce_past.simps
+      by (metis (no_types))
+      qed
+    qed
+    then show "blockDAG.is_genesis_node (reduce_past G a) b" using inv is_genesis_node.simps
+      by (metis assms(1) assms(2) blockDAG.is_genesis_node.elims(3)
+          blockDAG_axioms reduce_past_dagbased) 
+  qed
+
+
+
+lemma (in blockDAG) reduce_past_gen_rev:
+  assumes "\<not>is_genesis_node a" 
+  and "a \<in> verts G"
+  shows "blockDAG.is_genesis_node (reduce_past G a) b \<Longrightarrow> blockDAG.is_genesis_node G b"
+proof -
+  assume as1: "blockDAG.is_genesis_node (reduce_past G a) b"
+  have bD: "blockDAG (reduce_past G a)" using assms reduce_past_dagbased blockDAG_axioms by simp
+  obtain gen where is_gen: "is_genesis_node gen" using genesis_unique_exists by auto
+  then have "blockDAG.is_genesis_node (reduce_past G a) gen" using reduce_past_gen assms by auto
+  then have "gen = b" using as1 blockDAG.unique_genesis bD by metis
+  then show "blockDAG.is_genesis_node (reduce_past G a) b \<Longrightarrow> blockDAG.is_genesis_node G b"
+    using is_gen by auto
+qed
+
+lemma (in blockDAG) reduce_past_gen_eq:
+  assumes "\<not>is_genesis_node a" 
+  and "a \<in> verts G"
+  shows "blockDAG.is_genesis_node (reduce_past G a) b = blockDAG.is_genesis_node G b"
+  using reduce_past_gen reduce_past_gen_rev assms assms by metis
+
+
 
 subsubsection \<open>Reduce Past Reflexiv\<close>
 
@@ -511,7 +573,7 @@ next
              past_nodes_refl.simps using reachable_in_verts une wf_digraph.reachable_neq_reachable1
               by (metis (mono_tags, lifting) Collect_cong wellformed_induce_subgraph)
           qed
-          then show "\<exists>p. p \<in> verts (reduce_past_refl G a) \<and> (\<forall>r. r \<in> verts (reduce_past_refl G a) 
+          then show "\<exists>p \<in> verts (reduce_past_refl G a). (\<forall>r. r \<in> verts (reduce_past_refl G a) 
         \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>reduce_past_refl G a\<^esub> p \<or> r = p))" unfolding blockDAG_axioms_def 
             using pe reaches by auto
         qed
@@ -583,7 +645,7 @@ next
     then show "r \<rightarrow>\<^sup>*\<^bsub>gen_graph\<^esub> genesis_node"
       by (simp add: local.refl)   
   qed
-  then show " \<exists>p. p \<in> verts gen_graph \<and>
+  then show " \<exists>p \<in> verts gen_graph.
         (\<forall>r. r \<in> verts gen_graph \<longrightarrow> r \<rightarrow>\<^sup>+\<^bsub>gen_graph\<^esub> p \<or> r = p)"
     by (simp add: gen_gen)
 qed 
@@ -709,7 +771,8 @@ proof safe
   have y_in: "y \<in> (verts G)" using y_def by simp
   then have "reachable1 G y x" using is_genesis_node.simps x_in
       reachable_neq_reachable1 uneq by simp
-  then have "\<not> is_tip G x" by auto
+  then have "\<not> is_tip G x"
+    using y_in by force 
   then obtain z where z_def: "z \<in> (verts G) - {x} \<and> is_tip G z" using tips_exist
   is_tip.simps by auto
   then have uneq: "z \<noteq> x" by auto
@@ -785,6 +848,6 @@ next
     show "?thesis" using cases(2)
       by (metis assm2 bD) 
   qed
-qed
+qed 
 
 end

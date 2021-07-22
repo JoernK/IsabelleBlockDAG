@@ -1,7 +1,8 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
 module
-  Spectre(Int, Set(..), Pre_digraph_ext(..), spectreOrder_Int, vote_Spectre_Int)
+  DAGS(Int, Nat, Set(..), Pre_digraph_ext(..), anticone, blockDAG, orderDAG_Int,
+        spectreOrder_Int, vote_Spectre_Int)
   where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
@@ -26,12 +27,85 @@ instance One Int where {
   one = one_int;
 };
 
+plus_num :: Num -> Num -> Num;
+plus_num (Bit1 m) (Bit1 n) = Bit0 (plus_num (plus_num m n) One);
+plus_num (Bit1 m) (Bit0 n) = Bit1 (plus_num m n);
+plus_num (Bit1 m) One = Bit0 (plus_num m One);
+plus_num (Bit0 m) (Bit1 n) = Bit1 (plus_num m n);
+plus_num (Bit0 m) (Bit0 n) = Bit0 (plus_num m n);
+plus_num (Bit0 m) One = Bit1 m;
+plus_num One (Bit1 n) = Bit0 (plus_num n One);
+plus_num One (Bit0 n) = Bit1 n;
+plus_num One One = Bit0 One;
+
+uminus_int :: Int -> Int;
+uminus_int (Neg m) = Pos m;
+uminus_int (Pos m) = Neg m;
+uminus_int Zero_int = Zero_int;
+
+bitM :: Num -> Num;
+bitM One = One;
+bitM (Bit0 n) = Bit1 (bitM n);
+bitM (Bit1 n) = Bit1 (Bit0 n);
+
+dup :: Int -> Int;
+dup (Neg n) = Neg (Bit0 n);
+dup (Pos n) = Pos (Bit0 n);
+dup Zero_int = Zero_int;
+
+plus_int :: Int -> Int -> Int;
+plus_int (Neg m) (Neg n) = Neg (plus_num m n);
+plus_int (Neg m) (Pos n) = sub n m;
+plus_int (Pos m) (Neg n) = sub m n;
+plus_int (Pos m) (Pos n) = Pos (plus_num m n);
+plus_int Zero_int l = l;
+plus_int k Zero_int = k;
+
+sub :: Num -> Num -> Int;
+sub (Bit0 m) (Bit1 n) = minus_int (dup (sub m n)) one_int;
+sub (Bit1 m) (Bit0 n) = plus_int (dup (sub m n)) one_int;
+sub (Bit1 m) (Bit1 n) = dup (sub m n);
+sub (Bit0 m) (Bit0 n) = dup (sub m n);
+sub One (Bit1 n) = Neg (Bit0 n);
+sub One (Bit0 n) = Neg (bitM n);
+sub (Bit1 m) One = Pos (Bit0 m);
+sub (Bit0 m) One = Pos (bitM m);
+sub One One = Zero_int;
+
+minus_int :: Int -> Int -> Int;
+minus_int (Neg m) (Neg n) = sub n m;
+minus_int (Neg m) (Pos n) = Neg (plus_num m n);
+minus_int (Pos m) (Neg n) = Pos (plus_num m n);
+minus_int (Pos m) (Pos n) = sub m n;
+minus_int Zero_int l = uminus_int l;
+minus_int k Zero_int = k;
+
+class Plus a where {
+  plus :: a -> a -> a;
+};
+
+instance Plus Int where {
+  plus = plus_int;
+};
+
 class Zero a where {
   zero :: a;
 };
 
 instance Zero Int where {
   zero = Zero_int;
+};
+
+class (Plus a) => Semigroup_add a where {
+};
+
+class (Semigroup_add a, Zero a) => Monoid_add a where {
+};
+
+instance Semigroup_add Int where {
+};
+
+instance Monoid_add Int where {
 };
 
 class (One a, Zero a) => Zero_neq_one a where {
@@ -74,59 +148,6 @@ data Set a = Set [a] | Coset [a];
 
 data Pre_digraph_ext a b c =
   Pre_digraph_ext (Set a) (Set b) (b -> a) (b -> a) c;
-
-dup :: Int -> Int;
-dup (Neg n) = Neg (Bit0 n);
-dup (Pos n) = Pos (Bit0 n);
-dup Zero_int = Zero_int;
-
-uminus_int :: Int -> Int;
-uminus_int (Neg m) = Pos m;
-uminus_int (Pos m) = Neg m;
-uminus_int Zero_int = Zero_int;
-
-plus_num :: Num -> Num -> Num;
-plus_num (Bit1 m) (Bit1 n) = Bit0 (plus_num (plus_num m n) One);
-plus_num (Bit1 m) (Bit0 n) = Bit1 (plus_num m n);
-plus_num (Bit1 m) One = Bit0 (plus_num m One);
-plus_num (Bit0 m) (Bit1 n) = Bit1 (plus_num m n);
-plus_num (Bit0 m) (Bit0 n) = Bit0 (plus_num m n);
-plus_num (Bit0 m) One = Bit1 m;
-plus_num One (Bit1 n) = Bit0 (plus_num n One);
-plus_num One (Bit0 n) = Bit1 n;
-plus_num One One = Bit0 One;
-
-bitM :: Num -> Num;
-bitM One = One;
-bitM (Bit0 n) = Bit1 (bitM n);
-bitM (Bit1 n) = Bit1 (Bit0 n);
-
-sub :: Num -> Num -> Int;
-sub (Bit0 m) (Bit1 n) = minus_int (dup (sub m n)) one_int;
-sub (Bit1 m) (Bit0 n) = plus_int (dup (sub m n)) one_int;
-sub (Bit1 m) (Bit1 n) = dup (sub m n);
-sub (Bit0 m) (Bit0 n) = dup (sub m n);
-sub One (Bit1 n) = Neg (Bit0 n);
-sub One (Bit0 n) = Neg (bitM n);
-sub (Bit1 m) One = Pos (Bit0 m);
-sub (Bit0 m) One = Pos (bitM m);
-sub One One = Zero_int;
-
-plus_int :: Int -> Int -> Int;
-plus_int (Neg m) (Neg n) = Neg (plus_num m n);
-plus_int (Neg m) (Pos n) = sub n m;
-plus_int (Pos m) (Neg n) = sub m n;
-plus_int (Pos m) (Pos n) = Pos (plus_num m n);
-plus_int Zero_int l = l;
-plus_int k Zero_int = k;
-
-minus_int :: Int -> Int -> Int;
-minus_int (Neg m) (Neg n) = sub n m;
-minus_int (Neg m) (Pos n) = Neg (plus_num m n);
-minus_int (Pos m) (Neg n) = Pos (plus_num m n);
-minus_int (Pos m) (Pos n) = sub m n;
-minus_int Zero_int l = uminus_int l;
-minus_int k Zero_int = k;
 
 bex :: forall a. Set a -> (a -> Bool) -> Bool;
 bex (Set xs) p = any p xs;
@@ -268,12 +289,55 @@ nth :: forall a. [a] -> Nat -> a;
 nth (x : xs) (Suc n) = nth xs n;
 nth (x : xs) Zero_nat = x;
 
+is_tip :: forall a b. (Eq a) => Pre_digraph_ext a b () -> a -> Bool;
+is_tip g a =
+  member a (verts g) &&
+    ball (verts g) (\ x -> not (member (x, a) (trancl (arcs_ends g))));
+
 filtera :: forall a. (a -> Bool) -> Set a -> Set a;
 filtera p (Set xs) = Set (filter p xs);
+
+tips :: forall a b. (Eq a) => Pre_digraph_ext a b () -> Set a;
+tips g = filtera (is_tip g) (verts g);
+
+foldl :: forall a b. (a -> b -> a) -> a -> [b] -> a;
+foldl f a [] = a;
+foldl f a (x : xs) = foldl f (f a x) xs;
+
+foldr :: forall a b. (a -> b -> b) -> [a] -> b -> b;
+foldr f [] = id;
+foldr f (x : xs) = f x . foldr f xs;
 
 remove :: forall a. (Eq a) => a -> Set a -> Set a;
 remove x (Coset xs) = Coset (inserta x xs);
 remove x (Set xs) = Set (removeAll x xs);
+
+hd :: forall a. [a] -> a;
+hd (x21 : x22) = x21;
+
+anticone :: forall a b. (Eq a) => Pre_digraph_ext a b () -> a -> Set a;
+anticone g a =
+  filtera
+    (\ b ->
+      not (member (a, b) (trancl (arcs_ends g)) ||
+            (member (b, a) (trancl (arcs_ends g)) || a == b)))
+    (verts g);
+
+less_eq_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
+less_eq_set (Coset []) (Set []) = False;
+less_eq_set a (Coset ys) = all (\ y -> not (member y a)) ys;
+less_eq_set (Set xs) b = all (\ x -> member x b) xs;
+
+inf_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
+inf_set a (Coset xs) = fold remove xs a;
+inf_set a (Set xs) = Set (filter (\ x -> member x a) xs);
+
+kCluster ::
+  forall a b. (Eq a) => Pre_digraph_ext a b () -> Nat -> Set a -> Bool;
+kCluster g k c =
+  (if less_eq_set c (verts g)
+    then ball c (\ a -> less_eq_nat (card (inf_set (anticone g a) c)) k)
+    else False);
 
 arcAlt ::
   forall a b. (Eq a, Eq b) => Pre_digraph_ext a b () -> b -> (a, a) -> Bool;
@@ -311,59 +375,6 @@ reduce_past g a = induce_subgraph g (past_nodes g a);
 future_nodes :: forall a b. (Eq a) => Pre_digraph_ext a b () -> a -> Set a;
 future_nodes g a =
   filtera (\ b -> member (b, a) (trancl (arcs_ends g))) (verts g);
-
-del_arc ::
-  forall a b. (Eq b) => Pre_digraph_ext a b () -> b -> Pre_digraph_ext a b ();
-del_arc g a =
-  Pre_digraph_ext (verts g) (remove a (arcs g)) (tail g) (head g) ();
-
-blockDAG :: forall a b. (Eq a, Eq b) => Pre_digraph_ext a b () -> Bool;
-blockDAG g =
-  dag g &&
-    bex (verts g)
-      (\ p ->
-        ball (verts g)
-          (\ r -> member (r, p) (trancl (arcs_ends g)) || r == p)) &&
-      ball (arcs g)
-        (\ e ->
-          ball (verts g)
-            (\ u ->
-              ball (verts g)
-                (\ v ->
-                  (if member (u, v) (trancl (arcs_ends (del_arc g e)))
-                    then not (arcAlt g e (u, v)) else True))));
-
-of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
-of_bool True = one;
-of_bool False = zero;
-
-equal_num :: Num -> Num -> Bool;
-equal_num (Bit0 x2) (Bit1 x3) = False;
-equal_num (Bit1 x3) (Bit0 x2) = False;
-equal_num One (Bit1 x3) = False;
-equal_num (Bit1 x3) One = False;
-equal_num One (Bit0 x2) = False;
-equal_num (Bit0 x2) One = False;
-equal_num (Bit1 x3) (Bit1 y3) = equal_num x3 y3;
-equal_num (Bit0 x2) (Bit0 y2) = equal_num x2 y2;
-equal_num One One = True;
-
-equal_int :: Int -> Int -> Bool;
-equal_int (Neg k) (Neg l) = equal_num k l;
-equal_int (Neg k) (Pos l) = False;
-equal_int (Neg k) Zero_int = False;
-equal_int (Pos k) (Neg l) = False;
-equal_int (Pos k) (Pos l) = equal_num k l;
-equal_int (Pos k) Zero_int = False;
-equal_int Zero_int (Neg l) = False;
-equal_int Zero_int (Pos l) = False;
-equal_int Zero_int Zero_int = True;
-
-adjust_div :: (Int, Int) -> Int;
-adjust_div (q, r) = plus_int q (of_bool (not (equal_int r Zero_int)));
-
-adjust_mod :: Int -> Int -> Int;
-adjust_mod l r = (if equal_int r Zero_int then Zero_int else minus_int l r);
 
 equal_nat :: Nat -> Nat -> Bool;
 equal_nat Zero_nat (Suc x2) = False;
@@ -413,6 +424,163 @@ sort_key f xs =
 sorted_list_of_set :: forall a. (Eq a, Linorder a) => Set a -> [a];
 sorted_list_of_set (Set xs) = sort_key (\ x -> x) (remdups xs);
 
+bot_set :: forall a. Set a;
+bot_set = Set [];
+
+add_set_list_tuple ::
+  forall a. (Eq a, Linorder a) => ((Set a, [a]), a) -> (Set a, [a]);
+add_set_list_tuple ((s, l), a) = (sup_set s (insert a bot_set), l ++ [a]);
+
+app_if_blue_else_add_end ::
+  forall a b.
+    (Eq a,
+      Linorder a) => Pre_digraph_ext a b () ->
+                       Nat -> (Set a, [a]) -> a -> (Set a, [a]);
+app_if_blue_else_add_end g k (s, l) a =
+  (if kCluster g k (sup_set s (insert a bot_set))
+    then add_set_list_tuple ((s, l), a) else (s, l ++ [a]));
+
+larger_blue_tuple ::
+  forall a.
+    (Eq a,
+      Linorder a) => ((Set a, [a]), a) ->
+                       ((Set a, [a]), a) -> ((Set a, [a]), a);
+larger_blue_tuple a b =
+  (if less_nat (card (fst (fst b))) (card (fst (fst a))) ||
+        less_eq_nat (card (fst (fst b))) (card (fst (fst a))) &&
+          less_eq (snd a) (snd b)
+    then a else b);
+
+choose_max_blue_set ::
+  forall a. (Eq a, Linorder a) => [((Set a, [a]), a)] -> a -> ((Set a, [a]), a);
+choose_max_blue_set l def = foldr larger_blue_tuple l ((bot_set, []), def);
+
+del_arc ::
+  forall a b. (Eq b) => Pre_digraph_ext a b () -> b -> Pre_digraph_ext a b ();
+del_arc g a =
+  Pre_digraph_ext (verts g) (remove a (arcs g)) (tail g) (head g) ();
+
+blockDAG :: forall a b. (Eq a, Eq b) => Pre_digraph_ext a b () -> Bool;
+blockDAG g =
+  dag g &&
+    bex (verts g)
+      (\ p ->
+        ball (verts g)
+          (\ r -> member (r, p) (trancl (arcs_ends g)) || r == p)) &&
+      ball (arcs g)
+        (\ e ->
+          ball (verts g)
+            (\ u ->
+              ball (verts g)
+                (\ v ->
+                  (if member (u, v) (trancl (arcs_ends (del_arc g e)))
+                    then not (arcAlt g e (u, v)) else True))));
+
+tie_breakingDAG ::
+  forall a b. (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> Bool;
+tie_breakingDAG g = blockDAG g;
+
+genesis_nodeAlt ::
+  forall a b. (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> a;
+genesis_nodeAlt g =
+  (if not (blockDAG g) then error "undefined"
+    else (if equal_nat (card (verts g)) one_nat
+           then hd (sorted_list_of_set (verts g))
+           else genesis_nodeAlt
+                  (reduce_past g (hd (sorted_list_of_set (tips g))))));
+
+orderDAG ::
+  forall a b.
+    (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> Nat -> (Set a, [a]);
+orderDAG g k =
+  (if not (tie_breakingDAG g) then (bot_set, [])
+    else (if equal_nat (card (verts g)) one_nat
+           then (insert (genesis_nodeAlt g) bot_set, [genesis_nodeAlt g])
+           else let {
+                  m = choose_max_blue_set
+                        (map (\ i -> (orderDAG (reduce_past g i) k, i))
+                          (sorted_list_of_set (tips g)))
+                        (genesis_nodeAlt g);
+                  current = (add_set_list_tuple m, snd m);
+                } in foldl (app_if_blue_else_add_end g k) (fst current)
+                       (sorted_list_of_set (anticone g (snd m)))));
+
+of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
+of_bool True = one;
+of_bool False = zero;
+
+equal_num :: Num -> Num -> Bool;
+equal_num (Bit0 x2) (Bit1 x3) = False;
+equal_num (Bit1 x3) (Bit0 x2) = False;
+equal_num One (Bit1 x3) = False;
+equal_num (Bit1 x3) One = False;
+equal_num One (Bit0 x2) = False;
+equal_num (Bit0 x2) One = False;
+equal_num (Bit1 x3) (Bit1 y3) = equal_num x3 y3;
+equal_num (Bit0 x2) (Bit0 y2) = equal_num x2 y2;
+equal_num One One = True;
+
+equal_int :: Int -> Int -> Bool;
+equal_int (Neg k) (Neg l) = equal_num k l;
+equal_int (Neg k) (Pos l) = False;
+equal_int (Neg k) Zero_int = False;
+equal_int (Pos k) (Neg l) = False;
+equal_int (Pos k) (Pos l) = equal_num k l;
+equal_int (Pos k) Zero_int = False;
+equal_int Zero_int (Neg l) = False;
+equal_int Zero_int (Pos l) = False;
+equal_int Zero_int Zero_int = True;
+
+adjust_div :: (Int, Int) -> Int;
+adjust_div (q, r) = plus_int q (of_bool (not (equal_int r Zero_int)));
+
+adjust_mod :: Int -> Int -> Int;
+adjust_mod l r = (if equal_int r Zero_int then Zero_int else minus_int l r);
+
+apsnd :: forall a b c. (a -> b) -> (c, a) -> (c, b);
+apsnd f (x, y) = (x, f y);
+
+divmod_integer :: Integer -> Integer -> (Integer, Integer);
+divmod_integer k l =
+  (if k == (0 :: Integer) then ((0 :: Integer), (0 :: Integer))
+    else (if (0 :: Integer) < l
+           then (if (0 :: Integer) < k then divMod (abs k) (abs l)
+                  else (case divMod (abs k) (abs l) of {
+                         (r, s) ->
+                           (if s == (0 :: Integer)
+                             then (negate r, (0 :: Integer))
+                             else (negate r - (1 :: Integer), l - s));
+                       }))
+           else (if l == (0 :: Integer) then ((0 :: Integer), k)
+                  else apsnd negate
+                         (if k < (0 :: Integer) then divMod (abs k) (abs l)
+                           else (case divMod (abs k) (abs l) of {
+                                  (r, s) ->
+                                    (if s == (0 :: Integer)
+                                      then (negate r, (0 :: Integer))
+                                      else (negate r - (1 :: Integer),
+     negate l - s));
+                                })))));
+
+nat_of_integer :: Integer -> Nat;
+nat_of_integer k =
+  (if k <= (0 :: Integer) then Zero_nat
+    else (case divmod_integer k (2 :: Integer) of {
+           (l, j) ->
+             let {
+               la = nat_of_integer l;
+               lb = plus_nat la la;
+             } in (if j == (0 :: Integer) then lb else plus_nat lb one_nat);
+         }));
+
+orderDAG_Int ::
+  Pre_digraph_ext Integer (Integer, Integer) () ->
+    Integer -> (Set Integer, [Integer]);
+orderDAG_Int v a = orderDAG v (nat_of_integer a);
+
+sum_list :: forall a. (Monoid_add a) => [a] -> a;
+sum_list xs = foldr plus xs zero;
+
 less_num :: Num -> Num -> Bool;
 less_num (Bit1 m) (Bit0 n) = less_num m n;
 less_num (Bit1 m) (Bit1 n) = less_num m n;
@@ -448,13 +616,9 @@ tie_break_int a b i =
     then (if less b a then uminus_int one_int else one_int)
     else (if less_int Zero_int i then one_int else uminus_int one_int));
 
-sumlist_break_acc :: forall a. (Linorder a) => a -> a -> Int -> [Int] -> Int;
-sumlist_break_acc a b s [] = tie_break_int a b s;
-sumlist_break_acc a b s (x : xs) = sumlist_break_acc a b (plus_int s x) xs;
-
 sumlist_break :: forall a. (Linorder a) => a -> a -> [Int] -> Int;
 sumlist_break a b [] = Zero_int;
-sumlist_break a b (x : xs) = sumlist_break_acc a b Zero_int (x : xs);
+sumlist_break a b (x : xs) = tie_break_int a b (sum_list (x : xs));
 
 vote_Spectre ::
   forall a b.
@@ -481,18 +645,16 @@ vote_Spectre v a b c =
                                        (map (\ i -> vote_Spectre v i b c)
  (sorted_list_of_set (future_nodes v a))))))));
 
-spectreOrder ::
+spectreOrderAlt ::
   forall a b.
     (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> a -> a -> Bool;
-spectreOrder g a b =
-  equal_int
-    (sumlist_break a b
-      (map (\ i -> vote_Spectre g i a b) (sorted_list_of_set (verts g))))
-    one_int;
+spectreOrderAlt g a b =
+  (if not (blockDAG g) then error "undefined"
+    else equal_int (vote_Spectre g (genesis_nodeAlt g) a b) one_int);
 
 spectreOrder_Int ::
   Pre_digraph_ext Integer (Integer, Integer) () -> Integer -> Integer -> Bool;
-spectreOrder_Int g = spectreOrder g;
+spectreOrder_Int g = spectreOrderAlt g;
 
 times_num :: Num -> Num -> Num;
 times_num (Bit1 m) (Bit1 n) =

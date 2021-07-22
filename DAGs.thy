@@ -39,15 +39,14 @@ fun reduce_past_refl:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'
   "reduce_past_refl G a = induce_subgraph G (past_nodes_refl G a)"
                                           
 fun is_tip:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> bool"
-  where "is_tip G a = ((a \<in> verts G) \<and>  (ALL x. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a))"
+  where "is_tip G a = ((a \<in> verts G) \<and>  (\<forall> x \<in> verts G. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a))"
 
 definition tips:: "('a,'b) pre_digraph \<Rightarrow> 'a set"
-  where "tips G = {v. is_tip G v}"
+  where "tips G = {v \<in> verts G. is_tip G v}"
 
 fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a set  \<Rightarrow> bool"
   where  "kCluster G k C =  (if (C \<subseteq> (verts G))
    then (\<forall>a \<in> C. card ((anticone G a) \<inter> C) \<le> k) else False)"
-  
 
 subsection \<open>Lemmas\<close>
   
