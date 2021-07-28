@@ -74,6 +74,42 @@ next
       by (simp add: cycle_free)
   qed
 
+lemma (in digraph) tips_finite:
+  shows "finite (tips G)"
+  using tips_def fin_digraph.finite_verts digraph.axioms(1) digraph_axioms Collect_mono is_tip.simps
+  by (simp add: tips_def)
+  
+lemma (in digraph) tips_in_verts:
+  shows "tips G \<subseteq>  verts G"  unfolding tips_def
+  using Collect_subset by auto
+
+subsubsection \<open>Anticone\<close>
+
+lemma (in DAG) tips_anticone:
+  assumes "a \<in> tips G"
+  and "b \<in> tips G"
+  and "a \<noteq> b"
+  shows "a \<in> anticone G b"
+proof(rule ccontr)
+  assume " a \<notin> anticone G b" 
+  then have k: "(a \<rightarrow>\<^sup>+ b \<or>  b \<rightarrow>\<^sup>+ a \<or> a = b)" using anticone.simps assms tips_def
+    by fastforce 
+  then have "\<not> (\<forall>x\<in>verts G.  x \<rightarrow>\<^sup>+ a) \<or> \<not> (\<forall>x\<in>verts G.  x \<rightarrow>\<^sup>+ b)" using  reachable1_in_verts
+      assms(3) cycle_free
+    by (metis) 
+  then have "\<not> is_tip G a \<or> \<not> is_tip G b" using  assms(3) is_tip.simps k
+    by (metis)
+  then have "  \<not> a \<in> tips G \<or>  \<not>  b \<in> tips G" using tips_def CollectD by metis
+  then show False using assms by auto
+qed
+
+lemma (in DAG) anticone_in_verts: 
+  shows "anticone G a \<subseteq> verts G" using anticone.simps by auto
+
+lemma (in DAG) anticon_finite:
+   shows "finite (anticone G a)" using anticone_in_verts by auto
+
+
 subsubsection \<open>Future Nodes\<close>
 
 lemma (in DAG) future_nodes_not_refl:

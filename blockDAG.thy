@@ -104,6 +104,16 @@ proof (rule ccontr)
     using less not_le by auto
 qed
 
+lemma (in blockDAG) tips_not_empty: 
+  shows "tips G \<noteq> {}" 
+proof(rule ccontr)
+  assume as1: "\<not> tips G \<noteq> {}" 
+  obtain t where t_in: "is_tip G t" using tips_exist by auto
+  then have t_inV: "t \<in> verts G" by auto
+  then have "t \<in> tips G" using tips_def CollectI t_in by metis
+  then show False using as1 by auto
+qed
+
 lemma (in blockDAG) tips_unequal_gen:
   assumes "card( verts G) > 1"
   and "is_tip G p"
@@ -265,6 +275,35 @@ qed
     by (metis reachable_rtranclI rtranclD) 
 qed
 
+
+lemma (in blockDAG) tips_cases [consumes 2, case_names ma past nma]:
+  assumes "p \<in> tips G"
+  and "x \<in> verts G"
+  obtains (ma) "x = p"
+        | (past) "x \<in> past_nodes G p"
+        | (nma) "x \<in> anticone G p"      
+proof -
+  consider (eq)"x = p" | (neq) "\<not>x =  p" by auto
+  then show ?thesis
+  proof(cases)
+    case eq
+    then show thesis using eq ma by simp
+  next
+    case neq
+    consider (in_p)"x \<in> past_nodes G p" | (nin_p)"x \<notin> past_nodes G p" by auto
+    then show ?thesis 
+    proof(cases)
+      case in_p
+        then show ?thesis using past by auto
+      next
+        case nin_p
+        then have nn: "\<not> p \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x" using nin_p past_nodes.simps assms(2) by auto
+        have "\<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p" using is_tip.simps assms tips_def CollectD by metis          
+        then have "x \<in> anticone G p" using anticone.simps neq nn assms(2) by auto
+      then show ?thesis using nma by auto  
+    qed
+  qed
+qed
 
 subsection \<open>Future Nodes\<close>
 lemma (in blockDAG) future_nodes_ex:
@@ -587,7 +626,9 @@ definition (in blockDAG) gen_graph::"('a,'b) pre_digraph" where
 
 lemma (in blockDAG) gen_gen :"verts (gen_graph) = {genesis_node}" 
   unfolding genesis_node_def gen_graph_def by simp
-   
+
+lemma (in blockDAG) gen_graph_one: "card (verts gen_graph) = 1 " using gen_gen by simp
+
 lemma (in blockDAG) gen_graph_digraph:
   "digraph gen_graph"
 using digraphI_induced induced_induce gen_graph_def 
@@ -660,9 +701,11 @@ proof -
 qed
 
 lemma (in blockDAG) gen_graph_all_one:
-"card (verts (G)) = 1 \<longrightarrow> G = gen_graph"
-  by (metis card_1_singletonE gen_graph_def genesis_in_verts 
-induce_eq_iff_induced induced_subgraph_refl singletonD)
+"card (verts (G)) = 1 \<longleftrightarrow> G = gen_graph"
+  using card_1_singletonE gen_graph_def genesis_in_verts 
+induce_eq_iff_induced induced_subgraph_refl singletonD gen_graph_def genesis_node_def
+  by (metis gen_gen genesis_existAlt is_genesis_node.simps less_one linorder_neqE_nat
+ neq0_conv no_empty_blockDAG tips_unequal_gen_exist) 
 
 lemma blockDAG_nat_induct[consumes 1, case_names base step]: 
  assumes
@@ -806,14 +849,15 @@ lemma (in blockDAG) blockDAG_cases:
   using blockDAG_cases_one blockDAG_cases_more
     blockDAG_size_cases by auto
 
-lemma (in blockDAG) blockDAG_induct[consumes 1, case_names base step]:
-  assumes cases: "\<And>V. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
-       "\<And>H. 
-   (\<And>b. blockDAG (pre_digraph.del_vert H b) \<Longrightarrow> b \<in> verts H \<Longrightarrow> P(pre_digraph.del_vert H b))
+lemma blockDAG_induct[case_names fund base step]:
+  assumes base: "blockDAG G"
+  assumes cases: "\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
+       "\<And>H::('a,'b) pre_digraph. 
+   (\<And>b::'a. blockDAG (pre_digraph.del_vert H b) \<Longrightarrow> b \<in> verts H \<Longrightarrow> P(pre_digraph.del_vert H b))
   \<Longrightarrow> (blockDAG H \<Longrightarrow> P H)"
      shows "P G"
 proof(induct_tac G rule:blockDAG_nat_induct) 
-  show "blockDAG G" using blockDAG_axioms by simp
+  show "blockDAG G" using assms(1) by simp
 next
   fix V::"('a,'b) pre_digraph"
   assume bD: "blockDAG V" 
@@ -839,10 +883,10 @@ next
       have "verts (pre_digraph.del_vert W b) = verts W - {b}"
         by (simp add: pre_digraph.verts_del_vert) 
       then have "card ( verts (pre_digraph.del_vert W b)) = c" 
-        using in_verts fin_digraph.finite_verts bD fin_digraph_del_vert 
+        using in_verts fin_digraph.finite_verts bD subs fin_digraph.fin_digraph_del_vert 
          size
-        by (simp add: fin_digraph.finite_verts
-            DAG.axioms blockDAG.axioms digraph.axioms) 
+        by (simp add: fin_digraph.finite_verts subs
+            DAG.axioms assms(1) digraph.axioms) 
       then show "P (pre_digraph.del_vert W b)" using ind bD2 by auto
     qed
     show "?thesis" using cases(2)

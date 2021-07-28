@@ -300,10 +300,6 @@ filtera p (Set xs) = Set (filter p xs);
 tips :: forall a b. (Eq a) => Pre_digraph_ext a b () -> Set a;
 tips g = filtera (is_tip g) (verts g);
 
-foldl :: forall a b. (a -> b -> a) -> a -> [b] -> a;
-foldl f a [] = a;
-foldl f a (x : xs) = foldl f (f a x) xs;
-
 foldr :: forall a b. (a -> b -> b) -> [a] -> b -> b;
 foldr f [] = id;
 foldr f (x : xs) = f x . foldr f xs;
@@ -435,8 +431,8 @@ app_if_blue_else_add_end ::
   forall a b.
     (Eq a,
       Linorder a) => Pre_digraph_ext a b () ->
-                       Nat -> (Set a, [a]) -> a -> (Set a, [a]);
-app_if_blue_else_add_end g k (s, l) a =
+                       Nat -> a -> (Set a, [a]) -> (Set a, [a]);
+app_if_blue_else_add_end g k a (s, l) =
   (if kCluster g k (sup_set s (insert a bot_set))
     then add_set_list_tuple ((s, l), a) else (s, l ++ [a]));
 
@@ -452,8 +448,8 @@ larger_blue_tuple a b =
     then a else b);
 
 choose_max_blue_set ::
-  forall a. (Eq a, Linorder a) => [((Set a, [a]), a)] -> a -> ((Set a, [a]), a);
-choose_max_blue_set l def = foldr larger_blue_tuple l ((bot_set, []), def);
+  forall a. (Eq a, Linorder a) => [((Set a, [a]), a)] -> ((Set a, [a]), a);
+choose_max_blue_set l = fold larger_blue_tuple l (hd l);
 
 del_arc ::
   forall a b. (Eq b) => Pre_digraph_ext a b () -> b -> Pre_digraph_ext a b ();
@@ -499,11 +495,11 @@ orderDAG g k =
            else let {
                   m = choose_max_blue_set
                         (map (\ i -> (orderDAG (reduce_past g i) k, i))
-                          (sorted_list_of_set (tips g)))
-                        (genesis_nodeAlt g);
+                          (sorted_list_of_set (tips g)));
                   current = (add_set_list_tuple m, snd m);
-                } in foldl (app_if_blue_else_add_end g k) (fst current)
-                       (sorted_list_of_set (anticone g (snd m)))));
+                } in fold (app_if_blue_else_add_end g k)
+                       (sorted_list_of_set (anticone g (snd m)))
+                       (fst current)));
 
 of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
 of_bool True = one;
