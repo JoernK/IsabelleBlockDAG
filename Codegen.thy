@@ -81,4 +81,14 @@ export_code top_sort anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_
  SpectreOrder_Int OrderDAG_Int generate_Pairs SpectreOrder_Relation_Int
  in Haskell module_name DAGS file "code/" 
 
+(**notepad begin
+  let ?G = "\<lparr>verts = {1::int,2,3,4,5,6,7,8,9,10}, arcs = {(2,1),(3,1),(4,1),
+  (5,2),(6,3),(7,4),(8,5),(8,3),(9,6),(9,4),(10,7),(10,2)}, tail = fst, head = snd\<rparr>"
+  let ?a2 = "2"
+  let ?b4 = "3"
+  let ?c6 = "4"
+  value "blockDAG ?G"
+  value "SpectreOrder ?G ?a2 ?b4 \<and> SpectreOrder ?G ?b4 ?c6 \<and> \<not> SpectreOrder ?G ?a2 ?c6"
+end
+**)
 end
