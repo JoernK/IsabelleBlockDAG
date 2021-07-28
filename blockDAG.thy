@@ -359,7 +359,6 @@ proof safe
 
 
 lemma (in blockDAG) reduce_past_dagbased:
-  assumes "blockDAG G"
   assumes " a \<in> verts G"
   and "\<not>is_genesis_node a"
   shows "blockDAG (reduce_past G a)"
@@ -407,8 +406,8 @@ next
         have pe: "p \<in> verts (reduce_past G a) \<and> (\<forall>r. r \<in> verts (reduce_past G a) \<longrightarrow> r \<rightarrow>\<^sup>*\<^bsub>reduce_past G a\<^esub> p)"
         proof 
           show "p \<in> verts (reduce_past G a)" using genesisAlt induce_reachable_preserves_paths
-            reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts assms(2)
-            assms(3) gen mem_Collect_eq reachable_neq_reachable1
+            reduce_past.simps past_nodes.simps reachable1_reachable induce_subgraph_verts assms(1)
+            assms(2) gen mem_Collect_eq reachable_neq_reachable1
             by (metis (no_types, lifting)) 
             
         next    
@@ -488,7 +487,7 @@ proof -
     qed
     then show "blockDAG.is_genesis_node (reduce_past G a) b" using inv is_genesis_node.simps
       by (metis assms(1) assms(2) blockDAG.is_genesis_node.elims(3)
-          blockDAG_axioms reduce_past_dagbased) 
+          reduce_past_dagbased) 
   qed
 
 
