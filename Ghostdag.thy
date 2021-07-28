@@ -13,6 +13,30 @@ fun top_less  :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> '
 (b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<or> (\<not>(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> a < b) else 
 a < b)"
 
+
+fun top_insert:: "('a::linorder,'b) pre_digraph \<Rightarrow>'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
+  where "top_insert G [] a = [a]"
+  | "top_insert G (b # L) a = (if (a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) then (b # top_insert G L a) else (a # ( b # L)))"
+
+fun top_sort:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a list \<Rightarrow> 'a list"
+  where "top_sort G []= [] "
+  | "top_sort G (a # L) = top_insert G (top_sort G L) a"
+
+
+lemma in_insert: "set (top_insert G L a) = set L \<union> {a}" 
+proof(induct L, simp_all, auto) qed 
+
+lemma top_sort_con: "set (top_sort G L) = set L"
+proof(induct L)
+case Nil
+then show ?case by auto
+next
+  case (Cons a L)
+  then show ?case using top_sort.simps(2) in_insert insert_is_Un list.simps(15) sup_commute
+    by (metis) 
+qed
+
+
 fun larger_blue_tuple ::
  "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
   where "larger_blue_tuple A B = 
@@ -41,7 +65,8 @@ function OrderDAG :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarr
  let M =  choose_max_blue_set 
   ((map (\<lambda>i.(((OrderDAG (reduce_past G i) k)) , i)) (sorted_list_of_set (tips G))))
  in let Current = (add_set_list_tuple M, snd M)
- in fold (app_if_blue_else_add_end G k) (sorted_list_of_set (anticone G (snd M))) (fst Current))
+ in fold (app_if_blue_else_add_end G k) (top_sort G (sorted_list_of_set (anticone G (snd M))))
+ (fst Current))
  "
   by auto
 termination proof 
@@ -234,26 +259,27 @@ proof(safe)
           add_set_list_tuple.cases snd_conv insertI1 snd_conv
           by (metis (mono_tags, hide_lams) Un_insert_right fst_conv list.simps(15) set_append) 
         then have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
-                   (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))) (Cur)))"
+                   (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp))))) (Cur)))"
           using  finite_verts fold_app_mono surj_pair
         by (metis)
       then show ?thesis unfolding pp_in cur_in using tie_breakingDAG_axioms OrderDAG.simps cDm
-        by (metis (mono_tags, lifting) fst_conv) 
+         fst_conv 
+        by (metis (mono_tags, lifting)) 
       next
         assume anti: "x \<in> anticone G (snd (choose_max_blue_set pp))" 
         obtain ttt where ttt_in: "ttt = fst (add_set_list_tuple (choose_max_blue_set pp)
         , snd (choose_max_blue_set pp))" by auto
         have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
-                 (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp))))
+                 (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
                    ttt))" 
           using pp_in sorted_list_of_set(1) anti
-         anticon_finite fold_app_mono2 surj_pair by metis 
-        then show "x \<in> set (snd (OrderDAG G k))" using OrderDAG.simps pp_in bD cDm ttt_in
+         anticon_finite fold_app_mono2 surj_pair top_sort_con  by metis 
+        then show "x \<in> set (snd (OrderDAG G k))" using OrderDAG.simps pp_in bD cDm ttt_in 
           by (metis (no_types, lifting) map_eq_conv tie_breakingDAG_axioms) 
       next 
         assume  as2: "x \<in> past_nodes G (snd (choose_max_blue_set pp))"
         show "x \<in> set (snd (OrderDAG G k))" using tie_breakingDAG_axioms pp_in
-          sorry
+          
         
 
 

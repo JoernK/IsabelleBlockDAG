@@ -1,8 +1,8 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
 module
-  DAGS(Int, Nat, Set(..), Pre_digraph_ext(..), anticone, blockDAG, orderDAG_Int,
-        spectreOrder_Int, vote_Spectre_Int)
+  DAGS(Int, Linorder, Nat, Set(..), Pre_digraph_ext(..), anticone, blockDAG,
+        top_sort, orderDAG_Int, spectreOrder_Int, vote_Spectre_Int)
   where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
@@ -500,6 +500,18 @@ orderDAG g k =
                 } in fold (app_if_blue_else_add_end g k)
                        (sorted_list_of_set (anticone g (snd m)))
                        (fst current)));
+
+top_insert ::
+  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> a -> [a];
+top_insert g [] a = [a];
+top_insert g (b : l) a =
+  (if member (a, b) (trancl (arcs_ends g)) then b : top_insert g l a
+    else a : b : l);
+
+top_sort ::
+  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> [a];
+top_sort g [] = [];
+top_sort g (a : l) = top_insert g (top_sort g l) a;
 
 of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
 of_bool True = one;
