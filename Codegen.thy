@@ -73,9 +73,12 @@ declare tie_breakingDAG_def [code]
 fun OrderDAG_Int::  "(integer, integer\<times>integer) pre_digraph \<Rightarrow>
  integer \<Rightarrow> (integer set \<times> integer list)" 
  where " OrderDAG_Int V a =  (OrderDAG V (nat_of_integer a))"
+ 
+fun SpectreOrder_Relation_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarrow> ( integer\<times>integer) set"
+  where "SpectreOrder_Relation_Int G = SpectreOrder_Relation G"
 
 export_code top_sort anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_Int
- SpectreOrder_Int OrderDAG_Int
+ SpectreOrder_Int OrderDAG_Int generate_Pairs SpectreOrder_Relation_Int
  in Haskell module_name DAGS file "code/" 
 
 end

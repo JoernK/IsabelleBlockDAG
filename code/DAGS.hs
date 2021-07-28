@@ -2,7 +2,8 @@
 
 module
   DAGS(Int, Linorder, Nat, Set(..), Pre_digraph_ext(..), anticone, blockDAG,
-        top_sort, orderDAG_Int, spectreOrder_Int, vote_Spectre_Int)
+        top_sort, orderDAG_Int, generate_Pairs, spectreOrder_Int,
+        vote_Spectre_Int, spectreOrder_Relation_Int)
   where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
@@ -485,6 +486,18 @@ genesis_nodeAlt g =
            else genesis_nodeAlt
                   (reduce_past g (hd (sorted_list_of_set (tips g))))));
 
+top_insert ::
+  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> a -> [a];
+top_insert g [] a = [a];
+top_insert g (b : l) a =
+  (if member (a, b) (trancl (arcs_ends g)) then b : top_insert g l a
+    else a : b : l);
+
+top_sort ::
+  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> [a];
+top_sort g [] = [];
+top_sort g (a : l) = top_insert g (top_sort g l) a;
+
 orderDAG ::
   forall a b.
     (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> Nat -> (Set a, [a]);
@@ -498,20 +511,8 @@ orderDAG g k =
                           (sorted_list_of_set (tips g)));
                   current = (add_set_list_tuple m, snd m);
                 } in fold (app_if_blue_else_add_end g k)
-                       (sorted_list_of_set (anticone g (snd m)))
+                       (top_sort g (sorted_list_of_set (anticone g (snd m))))
                        (fst current)));
-
-top_insert ::
-  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> a -> [a];
-top_insert g [] a = [a];
-top_insert g (b : l) a =
-  (if member (a, b) (trancl (arcs_ends g)) then b : top_insert g l a
-    else a : b : l);
-
-top_sort ::
-  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> [a];
-top_sort g [] = [];
-top_sort g (a : l) = top_insert g (top_sort g l) a;
 
 of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
 of_bool True = one;
@@ -586,6 +587,9 @@ orderDAG_Int ::
     Integer -> (Set Integer, [Integer]);
 orderDAG_Int v a = orderDAG v (nat_of_integer a);
 
+product :: forall a b. Set a -> Set b -> Set (a, b);
+product (Set xs) (Set ys) = Set (concatMap (\ x -> map (\ a -> (x, a)) ys) xs);
+
 sum_list :: forall a. (Monoid_add a) => [a] -> a;
 sum_list xs = foldr plus xs zero;
 
@@ -652,6 +656,19 @@ vote_Spectre v a b c =
                                 else sumlist_break b c
                                        (map (\ i -> vote_Spectre v i b c)
  (sorted_list_of_set (future_nodes v a))))))));
+
+spectreOrder ::
+  forall a b.
+    (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> a -> a -> Bool;
+spectreOrder g a b =
+  equal_int
+    (sumlist_break a b
+      (map (\ i -> vote_Spectre g i a b) (sorted_list_of_set (verts g))))
+    one_int;
+
+generate_Pairs ::
+  forall a b. (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> a -> Set a;
+generate_Pairs g a = filtera (spectreOrder g a) (verts g);
 
 spectreOrderAlt ::
   forall a b.
@@ -751,5 +768,15 @@ vote_Spectre_Int ::
   Pre_digraph_ext Integer (Integer, Integer) () ->
     Integer -> Integer -> Integer -> Integer;
 vote_Spectre_Int v a b c = integer_of_int (vote_Spectre v a b c);
+
+spectreOrder_Relation ::
+  forall a b. (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> Set (a, a);
+spectreOrder_Relation g =
+  fold (\ i -> sup_set (product (insert i bot_set) (generate_Pairs g i)))
+    (sorted_list_of_set (verts g)) bot_set;
+
+spectreOrder_Relation_Int ::
+  Pre_digraph_ext Integer (Integer, Integer) () -> Set (Integer, Integer);
+spectreOrder_Relation_Int g = spectreOrder_Relation g;
 
 }

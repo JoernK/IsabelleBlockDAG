@@ -436,4 +436,11 @@ proof safe
    qed
  qed
 
+
+fun generate_Pairs :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
+  where "generate_Pairs G a = {b \<in> (verts G). SpectreOrder G a b}" 
+
+fun SpectreOrder_Relation:: "('a::linorder,'b) pre_digraph \<Rightarrow> ('a \<times> 'a) set" 
+  where "SpectreOrder_Relation G = fold (\<lambda>i. (\<union>) ({i} \<times> (generate_Pairs G i))) 
+  (sorted_list_of_set (verts G)) {}"
 end
