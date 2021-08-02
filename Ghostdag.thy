@@ -23,20 +23,6 @@ fun top_sort:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a list \<Rightarrow
   | "top_sort G (a # L) = top_insert G (top_sort G L) a"
 
 
-lemma in_insert: "set (top_insert G L a) = set L \<union> {a}" 
-proof(induct L, simp_all, auto) qed 
-
-lemma top_sort_con: "set (top_sort G L) = set L"
-proof(induct L)
-case Nil
-then show ?case by auto
-next
-  case (Cons a L)
-  then show ?case using top_sort.simps(2) in_insert insert_is_Un list.simps(15) sup_commute
-    by (metis) 
-qed
-
-
 fun larger_blue_tuple ::
  "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
   where "larger_blue_tuple A B = 
@@ -89,6 +75,44 @@ next
     using blockDAG.reduce_less bD tips_def is_tip.simps
     by fastforce  
 qed
+
+
+lemma in_insert: "set (top_insert G L a) = set L \<union> {a}" 
+proof(induct L, simp_all, auto) qed 
+
+lemma top_sort_con: "set (top_sort G L) = set L"
+proof(induct L)
+case Nil
+then show ?case by auto
+next
+  case (Cons a L)
+  then show ?case using top_sort.simps(2) in_insert insert_is_Un list.simps(15) sup_commute
+    by (metis) 
+qed
+
+
+lemma top_insert_len: "length (top_insert G L a) = Suc (length L)"
+proof(induct L)
+case Nil
+then show ?case by auto
+next
+  case (Cons a L)
+  then show ?case using top_insert.simps(2) by auto
+qed
+
+
+lemma top_sort_len: "length (top_sort G L) = length L"
+proof(induct L)
+case Nil
+then show ?case by auto
+next
+  case (Cons a L)
+  then have "length (a#L) = Suc (length L)" by auto
+  then show ?case using
+      top_insert_len top_sort.simps(2) Cons
+    by (simp add: top_insert_len)   
+qed
+
 
 lemma add_set_list_tuple_mono:
   shows "set L \<subseteq> set (snd (add_set_list_tuple ((S,L),a)))"
@@ -248,7 +272,43 @@ next
     qed
   qed
 
-lemma (in tie_breakingDAG) OrderDAG_total: 
+
+lemma (in tie_breakingDAG) chosen_max_tip:
+  assumes "x = snd ( choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+       (sorted_list_of_set (tips G))))" 
+  shows  "x \<in> set (sorted_list_of_set (tips G))" and " x \<in> tips G"
+
+proof - 
+  have bD: "blockDAG G" using tie_breakingDAG_axioms tie_breakingDAG_def by auto
+  obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+   (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
+    have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
+        digraph.tips_finite subs bD
+       list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
+      by (metis (mono_tags, lifting))  
+    then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
+      by auto 
+    have mm2: "\<And>L. (map snd (map (\<lambda>i. ((OrderDAG (reduce_past G i) k) , i)) L)) =  L" 
+    proof -
+      fix L
+      show "map snd (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i)) L) = L"
+      proof(induct L)
+        case Nil
+        then show ?case by auto
+      next
+        case (Cons a L)
+        then show ?case by auto
+      qed
+    qed
+    have "set (map snd pp) = set (sorted_list_of_set (tips G))" 
+      using mm2 pp_in  by auto
+    then show "x \<in> set (sorted_list_of_set (tips G))" using pp_in assms(1) kk by blast 
+    then show "x \<in> tips G"
+      using digraph.tips_finite sorted_list_of_set(1) kk bD subs assms(1) pp_in by auto
+qed
+
+
+lemma (in tie_breakingDAG) Verts_in_OrderDAG: 
   shows "x \<in> verts G \<longrightarrow> x \<in> set (snd (OrderDAG G k))"
   using tie_breakingDAG_axioms
 proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
@@ -361,7 +421,7 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
 qed
 
 
-lemma "x \<in> set (snd (OrderDAG G k)) \<longrightarrow> x \<in> verts G"
+lemma OrderDAG_in_verts: "x \<in> set (snd (OrderDAG G k)) \<longrightarrow> x \<in> verts G"
 proof(induction G k arbitrary: x rule: OrderDAG.induct)
   case (1 G k x)
   consider (inval) "\<not> tie_breakingDAG G"| (one) "tie_breakingDAG G \<and>
@@ -387,7 +447,7 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
           have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-              digraph.tips_finite subs 1 bD 
+              digraph.tips_finite subs bD 
              list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
             by (metis (mono_tags, lifting))  
           then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
@@ -449,5 +509,92 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
     qed
   qed
 qed
+
+lemma add_set_list_tuple_length:
+  shows "length (snd (add_set_list_tuple ((S,L),a))) = Suc (length L)"
+proof(induct L, auto) qed
+  
+lemma app_if_blue_else_add_end_length:
+  shows "length (snd (app_if_blue_else_add_end G k a (S,L))) = Suc (length  L)"
+proof(induction L, auto) qed
+  
+
+lemma fold_app_length:
+  shows "length (snd  (fold (app_if_blue_else_add_end G k) 
+  L1 PL2)) = length L1 + length (snd PL2)"
+proof(induct L1 arbitrary: PL2)
+case Nil
+then show ?case by auto
+next
+case (Cons a L1)
+  then show ?case unfolding fold_Cons comp_apply using app_if_blue_else_add_end_length
+    by (metis add_Suc add_Suc_right length_Cons old.prod.exhaust snd_conv) 
+qed
+  
+lemma OrderDAG_casesAlt:
+  obtains (ntB) "\<not> tie_breakingDAG G" 
+  | (one) "tie_breakingDAG G \<and> card (verts G) = 1"
+  | (more) "tie_breakingDAG G \<and> card (verts G) > 1"
+  using  tie_breakingDAG_def blockDAG.blockDAG_size_cases by blast 
+     
+  
+
+lemma OrderDAG_length:
+  shows "blockDAG G \<Longrightarrow> length (snd (OrderDAG G k)) = card (verts G)"
+  proof(induct G k rule: OrderDAG.induct)
+    case (1 G k)
+    then show ?case proof (cases G rule: OrderDAG_casesAlt)
+    case ntB
+    then show ?thesis using tie_breakingDAG_def 1 by auto
+    next
+      case one
+      then show ?thesis using OrderDAG.simps by auto
+    next
+    case more
+    show ?thesis using 1
+    proof -
+      have bD: "blockDAG G" using 1 by auto
+      assume ind: "(\<And>x. \<not> \<not> tie_breakingDAG G \<Longrightarrow>
+          card (verts G) \<noteq> 1 \<Longrightarrow>
+          x \<in> set (sorted_list_of_set (tips G)) \<Longrightarrow> blockDAG (reduce_past G x)
+           \<Longrightarrow> length (snd (OrderDAG (reduce_past G x) k)) = card (verts (reduce_past G x)))"
+      obtain x where x_in: "x = (choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+       (sorted_list_of_set (tips G))))"
+        by (metis)
+      then have tt: "snd x \<in> set (sorted_list_of_set (tips G))" using tie_breakingDAG.chosen_max_tip 
+      more by auto
+      have ttt: "snd x \<in> tips G" using tie_breakingDAG.chosen_max_tip(2) x_in
+      more by auto
+      then have bD2: "blockDAG (reduce_past G (snd x))" using blockDAG.tips_unequal_gen bD more 
+      blockDAG.reduce_past_dagbased bD tips_def 
+        by fastforce
+      then have "length (snd (OrderDAG (reduce_past G (snd x)) k)) 
+                  = card (verts (reduce_past G (snd x)))"
+        using ind tt bD2 more by auto
+      moreover have "(OrderDAG (reduce_past G (snd x)) k) = fst x" unfolding x_in using 
+          choose_max_blue_avoid_empty prod.collapse 
+          Pair_inject ex_map_conv list.map_disc_iff map_eq_conv tt 
+        by (smt (verit, del_insts)) 
+      ultimately show ?thesis using x_in OrderDAG.simps more fold_app_length 
+          add_set_list_tuple_length  DAG.verts_size_comp subs bD
+           add_Suc_shift length_sorted_list_of_set less_irrefl_nat map_eq_conv
+           plus_1_eq_Suc prod.collapse top_sort_len ttt
+        by (smt (z3)) 
+    qed
+  qed
+qed
+
+lemma (in tie_breakingDAG) OrderDAG_total:
+  shows "set (snd (OrderDAG G k)) = verts G"
+  using Verts_in_OrderDAG OrderDAG_in_verts
+  by blast 
+  
+     
+lemma (in tie_breakingDAG)  OrderDAG_distinct:
+  shows "distinct (snd (OrderDAG G k))"
+  using OrderDAG_length tie_breakingDAG_axioms tie_breakingDAG_def OrderDAG_total
+  card_distinct
+  by metis 
+
 
 end

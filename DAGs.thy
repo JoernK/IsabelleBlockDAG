@@ -56,6 +56,13 @@ lemma (in DAG) unidirectional:
 
 subsubsection \<open>Tips\<close>
 
+
+lemma (in DAG) tips_not_referenced:
+  assumes "is_tip G t"
+  shows "\<forall>x. \<not> x \<rightarrow>\<^sup>+ t"
+  using is_tip.simps assms reachable1_in_verts(1)
+  by metis 
+
 lemma (in DAG) del_tips_dag:
 assumes "is_tip G t"
 shows "DAG (del_vert t)"
@@ -83,6 +90,10 @@ lemma (in digraph) tips_in_verts:
   shows "tips G \<subseteq>  verts G"  unfolding tips_def
   using Collect_subset by auto
 
+lemma tips_tips: 
+  assumes "x \<in> tips G"
+  shows "is_tip G x" using tips_def CollectD assms(1) by metis
+
 subsubsection \<open>Anticone\<close>
 
 lemma (in DAG) tips_anticone:
@@ -109,6 +120,8 @@ lemma (in DAG) anticone_in_verts:
 lemma (in DAG) anticon_finite:
    shows "finite (anticone G a)" using anticone_in_verts by auto
 
+lemma (in DAG) anticon_not_refl:
+   shows "a \<notin> (anticone G a)" by auto
 
 subsubsection \<open>Future Nodes\<close>
 

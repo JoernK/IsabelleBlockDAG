@@ -893,4 +893,73 @@ next
   qed
 qed 
 
+lemma (in DAG) reachable1_cases:
+  obtains (nR) "\<not> a \<rightarrow>\<^sup>+ b \<and> \<not>  b \<rightarrow>\<^sup>+ a \<and> a \<noteq> b"
+  | (one) "a \<rightarrow>\<^sup>+ b"
+  | (two) "b \<rightarrow>\<^sup>+ a"
+  | (eq) "a = b"
+  using reachable_neq_reachable1 DAG_axioms
+  by metis
+
+lemma (in DAG) verts_comp:
+  assumes "x \<in> tips G"
+  shows " verts G = {x} \<union> (anticone G x) \<union> (verts (reduce_past G x))"
+proof 
+  show "verts G \<subseteq> {x} \<union> anticone G x \<union> verts (reduce_past G x)" 
+  proof(rule subsetI)
+    fix xa 
+    assume in_V: "xa \<in> verts G"
+    then show "xa \<in> {x} \<union> anticone G x \<union> verts (reduce_past G x)"
+    proof( cases x xa rule: reachable1_cases)
+      case nR
+      then show ?thesis using anticone.simps in_V by auto 
+      next
+        case one
+        then show ?thesis using reduce_past.simps induce_subgraph_verts past_nodes.simps in_V
+          by auto
+      next
+        case two
+        have "is_tip G x" using tips_tips assms(1) by simp
+        then have "False" using  tips_not_referenced two by auto
+        then show ?thesis by simp
+      next
+        case eq
+        then show ?thesis by auto
+      qed
+    qed
+  next 
+    show "{x} \<union> anticone G x \<union> verts (reduce_past G x) \<subseteq> verts G" using digraph.tips_in_verts 
+    digraph_axioms anticone_in_verts reduce_past_induced_subgraph induced_subgraph_def
+    subgraph_def assms by auto
+  qed
+
+lemma (in DAG) verts_comp_dis:
+  shows "{x} \<inter> (anticone G x) = {}" 
+  and " {x} \<inter> (verts (reduce_past G x)) = {}"
+  and "anticone G x \<inter> (verts (reduce_past G x)) = {}"
+proof(simp_all, simp add: cycle_free, safe) qed
+ 
+ 
+lemma (in DAG) verts_size_comp:
+  assumes  "x \<in> tips G"
+  shows  "card (verts G) = 1 + card (anticone G x) + card (verts (reduce_past G x))"
+proof -
+  have f1: "finite (verts G)" using finite_verts by simp
+  have f2: "finite {x}" by auto
+  have f3: "finite (anticone G x)" using anticone.simps by auto
+  have f4: "finite (verts (reduce_past G x))" by auto
+  have c1: "card {x} + card (anticone G x) = card ({x} \<union> (anticone G x))" using card_Un_disjoint
+  verts_comp_dis by auto
+  have "({x} \<union> (anticone G x)) \<inter> verts (reduce_past G x) = {}" using verts_comp_dis by auto
+  then have " card ({x} \<union> (anticone G x) \<union> verts (reduce_past G x)) 
+      = card {x} + card (anticone G x) + card (verts (reduce_past G x))
+        " using card_Un_disjoint
+    by (metis c1 f2 f3 f4 finite_UnI) 
+  moreover have "card (verts G) = card ({x} \<union> (anticone G x) \<union> verts (reduce_past G x))"
+    using assms verts_comp by auto
+  moreover have "card {x} = 1" by simp
+  ultimately show ?thesis using assms verts_comp
+    by presburger  
+qed
+
 end
