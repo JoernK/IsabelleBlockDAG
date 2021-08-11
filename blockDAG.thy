@@ -19,7 +19,7 @@ fun (in blockDAG) is_genesis_node :: "'a \<Rightarrow> bool" where
 "is_genesis_node v = ((v \<in> verts G) \<and> (ALL x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
 
 definition (in blockDAG) genesis_node:: "'a"
-  where "genesis_node = (SOME x. is_genesis_node x)"
+  where "genesis_node = (THE x. is_genesis_node x)"
 
 
 subsection \<open>Lemmas\<close>
@@ -36,7 +36,7 @@ lemma (in blockDAG) genesisAlt :
   
 lemma (in blockDAG) genesis_existAlt:
   "\<exists>a. is_genesis_node a"
-  using genesis genesisAlt blockDAG_axioms_def subs wf_digraph_def
+  using genesis genesisAlt
   by (metis reachable1_reachable reachable_refl)  
 
 lemma (in blockDAG) unique_genesis: "is_genesis_node a \<and> is_genesis_node b \<longrightarrow> a = b"
@@ -50,7 +50,7 @@ lemma (in blockDAG) genesis_unique_exists:
 
 lemma (in blockDAG) genesis_in_verts:
   "genesis_node \<in> verts G"
-    using is_genesis_node.simps genesis_node_def genesis_existAlt someI2_ex
+    using is_genesis_node.simps genesis_node_def genesis_existAlt the1I2 genesis_unique_exists
     by metis 
 
 
@@ -892,6 +892,110 @@ next
       by (metis assm2 bD) 
   qed
 qed 
+
+function genesis_nodeAlt:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a"
+  where "genesis_nodeAlt G = (if (\<not> blockDAG G) then undefined else 
+  if (card (verts G ) = 1) then (hd (sorted_list_of_set (verts G)))
+  else genesis_nodeAlt (reduce_past G ((hd (sorted_list_of_set (tips G))))))"
+  by auto 
+termination proof 
+  let ?R = "measure ( \<lambda>G. (card (verts G)))"
+  show "wf ?R" by auto
+next
+  fix G ::"('a::linorder,'b) pre_digraph"
+  assume "\<not> \<not> blockDAG G"
+  then have bD: "blockDAG G" by simp
+  assume "card (verts G) \<noteq> 1"
+  then have bG: "card (verts G) > 1" using bD blockDAG.blockDAG_size_cases by auto 
+  have " set (sorted_list_of_set (tips G)) = tips G"  
+    by (simp add: bD subs tips_def fin_digraph.finite_verts)
+  then have " hd (sorted_list_of_set (tips G)) \<in> tips G"  
+    using hd_in_set bD  tips_def bG blockDAG.tips_unequal_gen_exist 
+        empty_iff empty_set mem_Collect_eq
+    by (metis (mono_tags, lifting))  
+  then show "(reduce_past G (hd (sorted_list_of_set (tips G))), G) \<in> measure (\<lambda>G. card (verts G))"
+    using blockDAG.reduce_less bD
+    using tips_def by fastforce 
+qed
+
+lemma genesis_nodeAlt_one_sound:
+  assumes bD: "blockDAG G"
+  and one: "card (verts G) = 1"
+  shows "blockDAG.is_genesis_node G (genesis_nodeAlt G)" 
+proof -
+  have exone: "\<exists>! x. x \<in> (verts G)"
+    using bD one blockDAG.genesis_in_verts blockDAG.genesis_unique_exists blockDAG.reduce_less
+        blockDAG.reduce_past_dagbased less_nat_zero_code less_one by metis 
+  then have "sorted_list_of_set (verts G) \<noteq> []"
+    by (metis card.infinite card_0_eq finite.emptyI one 
+        sorted_list_of_set_empty sorted_list_of_set_inject zero_neq_one) 
+  then have "genesis_nodeAlt G \<in> verts G" using hd_in_set genesis_nodeAlt.simps bD exone
+    by (metis one set_sorted_list_of_set sorted_list_of_set.infinite) 
+  then show one_sound: "blockDAG.is_genesis_node G (genesis_nodeAlt G)"
+    using bD one 
+    by (metis blockDAG.blockDAG_size_cases blockDAG.reduce_less
+        blockDAG.reduce_past_dagbased less_one not_one_less_zero)
+qed
+
+lemma genesis_nodeAlt_sound : 
+  assumes "blockDAG G"
+  shows "blockDAG.is_genesis_node G (genesis_nodeAlt G)" 
+proof(induct_tac G rule:blockDAG_nat_less_induct)
+  show "blockDAG G" using assms by simp
+next 
+  fix V::"('a,'b) pre_digraph"
+  assume bD: "blockDAG V"
+  assume one: "card (verts V) = 1"
+  then show "blockDAG.is_genesis_node V (genesis_nodeAlt V)"
+    using genesis_nodeAlt_one_sound bD
+    by blast 
+next
+  fix W::"('a,'b) pre_digraph"
+  fix c::nat
+  assume basis: 
+    "(\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> card (verts V) < c \<Longrightarrow> 
+  blockDAG.is_genesis_node V (genesis_nodeAlt V))"
+  assume bD: "blockDAG W"
+  assume cd: "card (verts W) = c" 
+  consider (one) "card (verts W) = 1" | (more) "card (verts W) > 1"
+    using bD blockDAG.blockDAG_size_cases by blast
+  then show "blockDAG.is_genesis_node W (genesis_nodeAlt W)" 
+  proof(cases)
+    case one
+    then show ?thesis  using genesis_nodeAlt_one_sound bD
+    by blast
+  next
+    case more
+    then have not_one: "1 \<noteq> card (verts W)" by auto
+    have se: " set (sorted_list_of_set (tips W)) = tips W"  
+       by (simp add: bD subs  tips_def fin_digraph.finite_verts)
+     obtain a where a_def: "a = hd (sorted_list_of_set (tips W))"
+       by simp 
+    have tip: "a \<in> tips W"  
+    using se a_def hd_in_set bD  tips_def more  blockDAG.tips_unequal_gen_exist 
+        empty_iff empty_set mem_Collect_eq
+    by (metis (mono_tags, lifting))    
+    then have ver: "a \<in> verts W" 
+      by (simp add: tips_def a_def) 
+    then have "card ( verts (reduce_past W a)) < card (verts W)"
+      using more cd  blockDAG.reduce_less bD
+      by metis 
+    then have cd2: "card ( verts (reduce_past W a)) < c"
+      using cd by simp
+    have n_gen: "\<not> blockDAG.is_genesis_node W a"
+      using blockDAG.tips_unequal_gen bD more tip  tips_def Collect_mem_eq by fastforce
+    then have bD2: "blockDAG (reduce_past W a)"
+      using blockDAG.reduce_past_dagbased ver bD by auto
+    have ff: "blockDAG.is_genesis_node (reduce_past W a)
+     (genesis_nodeAlt (reduce_past W a))" using cd2 basis bD2 more
+      by blast
+    have rec: "genesis_nodeAlt W = genesis_nodeAlt (reduce_past W (hd (sorted_list_of_set (tips W))))"
+      using genesis_nodeAlt.simps not_one bD
+      by metis 
+    show ?thesis using rec ff bD n_gen ver blockDAG.reduce_past_gen_eq  a_def by metis
+  qed
+qed
+
 
 lemma (in DAG) reachable1_cases:
   obtains (nR) "\<not> a \<rightarrow>\<^sup>+ b \<and> \<not>  b \<rightarrow>\<^sup>+ a \<and> a \<noteq> b"

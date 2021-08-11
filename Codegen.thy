@@ -26,7 +26,6 @@ lemma [code]: "blockDAG G = (DAG G \<and> ((\<exists> p \<in> verts G. ((\<foral
     digraph.axioms(1) fin_digraph.axioms(1) wf_digraph.arcE blockDAG_axioms_def blockDAG_def 
   by metis
      
-
 lemma [code]: "DAG G = (digraph G \<and> (\<forall>v \<in> verts G. \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)))"
   unfolding DAG_axioms_def DAG_def
   by (metis digraph.axioms(1) fin_digraph.axioms(1) wf_digraph.reachable1_in_verts(1)) 
@@ -52,9 +51,6 @@ lemma [code]: "pre_digraph.del_arc G a =
   by (simp add: pre_digraph.del_arc_def)
 
 
-fun finiteAlt :: "'a set \<Rightarrow> bool"
-  where "finiteAlt a = (a = {} \<or> (\<exists>A \<in> a. \<exists> b \<subseteq> a. a = insert A b \<and> finite b))"
-
 lemma [code]: "fin_digraph G = (wf_digraph G \<and> (card (verts G) > 0 \<or> verts G = {})
    \<and> ((card (arcs G) > 0 \<or> arcs G = {})))" 
   using card_ge_0_finite fin_digraph_def fin_digraph_axioms_def
@@ -66,19 +62,15 @@ fun vote_Spectre_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarr
   where "vote_Spectre_Int V a b c = integer_of_int (vote_Spectre V a b c)"
 
 fun SpectreOrder_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarrow> integer \<Rightarrow> integer \<Rightarrow> bool"
-  where "SpectreOrder_Int G = SpectreOrderAlt G"
-
-declare tie_breakingDAG_def [code]
+  where "SpectreOrder_Int G = Spectre_Order G"
 
 fun OrderDAG_Int::  "(integer, integer\<times>integer) pre_digraph \<Rightarrow>
  integer \<Rightarrow> (integer set \<times> integer list)" 
  where " OrderDAG_Int V a =  (OrderDAG V (nat_of_integer a))"
  
-fun SpectreOrder_Relation_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarrow> ( integer\<times>integer) set"
-  where "SpectreOrder_Relation_Int G = SpectreOrder_Relation G"
 
 export_code top_sort anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_Int
- SpectreOrder_Int OrderDAG_Int generate_Pairs SpectreOrder_Relation_Int
+ SpectreOrder_Int OrderDAG_Int
  in Haskell module_name DAGS file "code/" 
 
 (**notepad begin

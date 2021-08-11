@@ -1,4 +1,5 @@
 (* 
+    Title: DAGbasedConsensus\Spectre.thy
     Author:     Joern Kussmaul
 *)
 
@@ -6,129 +7,26 @@ theory Spectre
   imports Main Graph_Theory.Graph_Theory blockDAG 
 begin
 
+text \<open>Based on the SPECTRE paper by Sompolinsky, Lewenberg and Zohar 2016\<close>
 section  \<open>Spectre\<close>
- 
-locale tie_breakingDAG = blockDAG G for  
-   G::"('a::linorder,'b) pre_digraph"
+
+subsection  \<open>Definitions\<close>
 
 
-sublocale tie_breakingDAG \<subseteq> blockDAG using tie_breakingDAG_def tie_breakingDAG_axioms by auto 
-
-subsection  \<open>Functions and Definitions\<close>
-
-
-function genesis_nodeAlt:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a"
-  where "genesis_nodeAlt G = (if (\<not> blockDAG G) then undefined else 
-  if (card (verts G ) = 1) then (hd (sorted_list_of_set (verts G)))
-  else genesis_nodeAlt (reduce_past G ((hd (sorted_list_of_set (tips G))))))"
-  by auto 
-termination proof 
-  let ?R = "measure ( \<lambda>G. (card (verts G)))"
-  show "wf ?R" by auto
-next
-  fix G ::"('a::linorder,'b) pre_digraph"
-  assume "\<not> \<not> blockDAG G"
-  then have bD: "blockDAG G" by simp
-  assume "card (verts G) \<noteq> 1"
-  then have bG: "card (verts G) > 1" using bD blockDAG.blockDAG_size_cases by auto 
-  have " set (sorted_list_of_set (tips G)) = tips G"  
-    by (simp add: bD subs tips_def fin_digraph.finite_verts)
-  then have " hd (sorted_list_of_set (tips G)) \<in> tips G"  
-    using hd_in_set bD  tips_def bG blockDAG.tips_unequal_gen_exist 
-        empty_iff empty_set mem_Collect_eq
-    by (metis (mono_tags, lifting))  
-  then show "(reduce_past G (hd (sorted_list_of_set (tips G))), G) \<in> measure (\<lambda>G. card (verts G))"
-    using blockDAG.reduce_less bD
-    using tips_def by fastforce 
-qed
-
-lemma genesis_nodeAlt_one_sound:
-  assumes bD: "blockDAG G"
-  and one: "card (verts G) = 1"
-  shows "blockDAG.is_genesis_node G (genesis_nodeAlt G)" 
-proof -
-  have exone: "\<exists>! x. x \<in> (verts G)"
-    using bD one blockDAG.genesis_in_verts blockDAG.genesis_unique_exists blockDAG.reduce_less
-        blockDAG.reduce_past_dagbased less_nat_zero_code less_one by metis 
-  then have "sorted_list_of_set (verts G) \<noteq> []"
-    by (metis card.infinite card_0_eq finite.emptyI one 
-        sorted_list_of_set_empty sorted_list_of_set_inject zero_neq_one) 
-  then have "genesis_nodeAlt G \<in> verts G" using hd_in_set genesis_nodeAlt.simps bD exone
-    by (metis one set_sorted_list_of_set sorted_list_of_set.infinite) 
-  then show one_sound: "blockDAG.is_genesis_node G (genesis_nodeAlt G)"
-    using bD one 
-    by (metis blockDAG.blockDAG_size_cases blockDAG.reduce_less
-        blockDAG.reduce_past_dagbased less_one not_one_less_zero)
-qed
-
-lemma genesis_nodeAlt_sound : 
-  assumes "blockDAG G"
-  shows "blockDAG.is_genesis_node G (genesis_nodeAlt G)" 
-proof(induct_tac G rule:blockDAG_nat_less_induct)
-  show "blockDAG G" using assms by simp
-next 
-  fix V::"('a,'b) pre_digraph"
-  assume bD: "blockDAG V"
-  assume one: "card (verts V) = 1"
-  then show "blockDAG.is_genesis_node V (genesis_nodeAlt V)"
-    using genesis_nodeAlt_one_sound bD
-    by blast 
-next
-  fix W::"('a,'b) pre_digraph"
-  fix c::nat
-  assume basis: 
-    "(\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> card (verts V) < c \<Longrightarrow> 
-  blockDAG.is_genesis_node V (genesis_nodeAlt V))"
-  assume bD: "blockDAG W"
-  assume cd: "card (verts W) = c" 
-  consider (one) "card (verts W) = 1" | (more) "card (verts W) > 1"
-    using bD blockDAG.blockDAG_size_cases by blast
-  then show "blockDAG.is_genesis_node W (genesis_nodeAlt W)" 
-  proof(cases)
-    case one
-    then show ?thesis  using genesis_nodeAlt_one_sound bD
-    by blast
-  next
-    case more
-    then have not_one: "1 \<noteq> card (verts W)" by auto
-    have se: " set (sorted_list_of_set (tips W)) = tips W"  
-       by (simp add: bD subs  tips_def fin_digraph.finite_verts)
-     obtain a where a_def: "a = hd (sorted_list_of_set (tips W))"
-       by simp 
-    have tip: "a \<in> tips W"  
-    using se a_def hd_in_set bD  tips_def more  blockDAG.tips_unequal_gen_exist 
-        empty_iff empty_set mem_Collect_eq
-    by (metis (mono_tags, lifting))    
-    then have ver: "a \<in> verts W" 
-      by (simp add: tips_def a_def) 
-    then have "card ( verts (reduce_past W a)) < card (verts W)"
-      using more cd  blockDAG.reduce_less bD
-      by metis 
-    then have cd2: "card ( verts (reduce_past W a)) < c"
-      using cd by simp
-    have n_gen: "\<not> blockDAG.is_genesis_node W a"
-      using blockDAG.tips_unequal_gen bD more tip  tips_def Collect_mem_eq by fastforce
-    then have bD2: "blockDAG (reduce_past W a)"
-      using blockDAG.reduce_past_dagbased ver bD by auto
-    have ff: "blockDAG.is_genesis_node (reduce_past W a)
-     (genesis_nodeAlt (reduce_past W a))" using cd2 basis bD2 more
-      by blast
-    have rec: "genesis_nodeAlt W = genesis_nodeAlt (reduce_past W (hd (sorted_list_of_set (tips W))))"
-      using genesis_nodeAlt.simps not_one bD
-      by metis 
-    show ?thesis using rec ff bD n_gen ver blockDAG.reduce_past_gen_eq  a_def by metis
-  qed
-qed
-
+text \<open>Function to check and break occuring ties\<close>
 fun tie_break_int:: "'a::linorder \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> int"
   where "tie_break_int a b i =
  (if i=0 then (if (b < a) then -1 else 1) else 
               (if i > 0 then 1 else -1))"
 
+text \<open>Function given a list of votes, sums them up if non empty, otherwise "no_vote"\<close>
 fun sumlist_break :: "'a::linorder \<Rightarrow>'a \<Rightarrow> int list \<Rightarrow> int"
-  where "sumlist_break a b [] = 0" (* votes like virtual block*)
+  where "sumlist_break a b [] = 0" (* votes like virtual block, occurs if node a neither sees b nor c*)
   | "sumlist_break a b (x # xs) = tie_break_int a b (sum_list (x # xs))"
 
+text \<open>Spectre core algorithm, vote_Spectre V a b c returns 
+      1 if a votes in favour of b (or b = c),
+     -1 if a votes in favour of c, 0 otherwise\<close>
 function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> int" 
   where
   "vote_Spectre V a b c = (
@@ -158,8 +56,9 @@ next
     by metis
   then show "((reduce_past V a, x, b, c), V, a, b, c)
        \<in> measures
-           [\<lambda>(V, a, b, c). card (verts V),
-            \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]"
+           [\<lambda>(V, a, b, c). card (verts V),  
+            \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]" (* In the recursive step, either the number of
+             nodes decreases or the number of nodes that reach the voter a*)
     by simp
 next 
   fix V::"('a::linorder, 'b) pre_digraph" 
@@ -194,16 +93,16 @@ next
     by simp
 qed
 
-fun SpectreOrder :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "SpectreOrder G a b = ( sumlist_break a b (map (\<lambda>i.
+text \<open>Given vote_Spectre calculate if a < b for arbitrary nodes\<close>
+fun Spectre_Order :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
+  where "Spectre_Order G a b = ( sumlist_break a b (map (\<lambda>i.
    (vote_Spectre G i a b)) (sorted_list_of_set (verts G))) = 1)" 
 
-fun SpectreOrderAlt :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "SpectreOrderAlt G a b = (if (\<not> blockDAG G) then undefined else
- (vote_Spectre G (genesis_nodeAlt G) a b) = 1)" 
+text \<open>Given  Spectre_Order calculate the corresponding Relation over the nodes of G\<close>
+definition Spectre_Order_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> ('a \<times> 'a) set"
+  where "Spectre_Order_Relation G \<equiv> {(a,b) \<in> (verts G \<times> verts G). Spectre_Order G a b}"
 
-
-subsubsection \<open>Lemmas\<close>
+subsection \<open>Lemmas\<close>
 
 lemma domain_tie_break:
   shows "tie_break_int a b c \<in> {-1 ,1}"
@@ -214,7 +113,6 @@ lemma domain_sumlist:
   using sumlist_break.simps(1) insertCI sumlist_break.elims domain_tie_break
   by (metis insert_commute)
   
-   
 
 lemma domain_sumlist_not_empty:
   assumes "l \<noteq> []"
@@ -260,17 +158,8 @@ shows "P (vote_Spectre V a b c)"
 
 lemma domain_Spectre:
   shows "vote_Spectre V a b c \<in> {-1, 0, 1}"
-proof(rule Spectre_theo)
-  show "0 \<in> {- 1, 0, 1}" by simp
-  show "1 \<in> {- 1, 0, 1}" by simp
-  show " - 1 \<in> {- 1, 0, 1}" by simp
-  show "sumlist_break b c
-     (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c) (sorted_list_of_set (past_nodes V a)))
-    \<in> {- 1, 0, 1}" using domain_sumlist by simp 
-  show "sumlist_break b c (map (\<lambda>i. vote_Spectre V i b c)
-  (sorted_list_of_set (future_nodes V a))) \<in> {- 1, 0, 1}" using domain_sumlist by simp 
-qed
-
+proof(rule Spectre_theo, simp, simp, simp, metis domain_sumlist, metis domain_sumlist) qed
+ 
 
 lemma antisymmetric_tie_break:
   shows "b\<noteq>c  \<Longrightarrow> tie_break_int b c i = - tie_break_int c b (-i)"
@@ -279,10 +168,7 @@ lemma antisymmetric_tie_break:
    
 lemma antisymmetric_sumlist:
   shows "b \<noteq> c \<Longrightarrow> sumlist_break b c l = - sumlist_break c b (map (\<lambda>x. -x) l) "
-proof(induct l)
-  case Nil
-  then show ?case by simp
-next
+proof(induct l, simp)
   case (Cons a l)
   have "sum_list (map uminus (a # l)) = - sum_list  (a # l)"
     by (metis map_ident map_map uminus_sum_list_map) 
@@ -362,21 +248,21 @@ proof(induction V a b c rule: vote_Spectre.induct)
 qed
 
 
-lemma vote_Spectre_reflexiv:
+lemma vote_Spectre_reflexive:
 assumes "blockDAG V"
   and "a \<in> verts V"
 shows "\<forall>b \<in> verts V. vote_Spectre V b a a = 1 " using vote_Spectre.simps assms by auto 
 
-lemma SpectreOrder_reflexiv:
+lemma Spectre_Order_reflexive:
 assumes "blockDAG V"
   and "a \<in> verts V" 
-shows "SpectreOrder V a a" 
-  unfolding SpectreOrder.simps 
+shows "Spectre_Order V a a" 
+  unfolding Spectre_Order.simps 
 proof -   
   obtain l where l_def: "l = (map (\<lambda>i. vote_Spectre V i a a) (sorted_list_of_set (verts V)))"
     by auto
   have only_one: "l = (map (\<lambda>i.1) (sorted_list_of_set (verts V)))"
-    using l_def vote_Spectre_reflexiv assms sorted_list_of_set(1)
+    using l_def vote_Spectre_reflexive assms sorted_list_of_set(1)
     by (simp add: fin_digraph.finite_verts subs)
   have ne: "l \<noteq> []"
     using  blockDAG.no_empty_blockDAG length_map
@@ -389,11 +275,11 @@ proof -
     by (metis list.exhaust verit_comp_simplify1(1)) 
 qed
 
-lemma Spectre_Order_antisymmetric: 
+lemma Spectre_Order_antisym: 
   assumes "blockDAG V"
   and "a \<in> verts V \<and> b \<in> verts V" 
   and "a \<noteq> b"
-  shows "SpectreOrder V a b = (\<not> (SpectreOrder V b a))"
+  shows "Spectre_Order V a b = (\<not> (Spectre_Order V b a))"
 proof -
   obtain l where l_def: "l = (map (\<lambda>i. vote_Spectre V i a b) (sorted_list_of_set (verts V)))"
     by auto
@@ -413,34 +299,50 @@ proof -
     have ne2: "l2 \<noteq> []"
       using ne minus by auto
     then have dm2: "sumlist_break b a l2 \<in> {-1,1}" using domain_sumlist_not_empty by auto
-    then show "?thesis" unfolding SpectreOrder.simps using anti l_def dm l2_def 
+    then show "?thesis" unfolding Spectre_Order.simps using anti l_def dm l2_def 
     add.inverse_inverse empty_iff equal_neg_zero insert_iff zero_neq_one
     by (metis)
 qed  
   
-lemma SpectreOrder_total:
+lemma Spectre_Order_total:
   assumes "blockDAG V"
   and "a \<in> verts V \<and> b \<in> verts V" 
-shows "SpectreOrder V a b \<or> SpectreOrder V b a"
+shows "Spectre_Order V a b \<or> Spectre_Order V b a"
 proof safe
-  assume notB: " \<not> SpectreOrder V b a"
+  assume notB: " \<not> Spectre_Order V b a"
   consider (eq) "a = b"| (neq) "a \<noteq> b" by auto
-  then show "SpectreOrder V a b"
+  then show "Spectre_Order V a b"
   proof (cases)
   case eq
-  then show ?thesis using SpectreOrder_reflexiv assms by metis
+  then show ?thesis using Spectre_Order_reflexive assms by metis
   next
     case neq
-     then show "?thesis" using Spectre_Order_antisymmetric notB assms
+     then show "?thesis" using Spectre_Order_antisym notB assms
        by blast 
    qed
  qed
 
 
-fun generate_Pairs :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
-  where "generate_Pairs G a = {b \<in> (verts G). SpectreOrder G a b}" 
 
-fun SpectreOrder_Relation:: "('a::linorder,'b) pre_digraph \<Rightarrow> ('a \<times> 'a) set" 
-  where "SpectreOrder_Relation G = fold (\<lambda>i. (\<union>) ({i} \<times> (generate_Pairs G i))) 
-  (sorted_list_of_set (verts G)) {}"
+
+lemma Spectre_Order_Relation_total:
+  assumes "blockDAG G"
+  shows "total_on (verts G) (Spectre_Order_Relation G)"
+  unfolding total_on_def Spectre_Order_Relation_def 
+  using Spectre_Order_total assms
+  by fastforce 
+
+lemma Spectre_Order_Relation_reflexive:
+  assumes "blockDAG G"
+  shows "refl_on (verts G) (Spectre_Order_Relation G)" 
+  unfolding refl_on_def Spectre_Order_Relation_def 
+  using Spectre_Order_reflexive assms by fastforce
+
+lemma Spectre_Order_Relation_antisym:
+  assumes "blockDAG G"
+  shows "antisym (Spectre_Order_Relation G)" 
+  unfolding antisym_def Spectre_Order_Relation_def 
+  using Spectre_Order_antisym assms by fastforce
+     
+  
 end

@@ -1,15 +1,175 @@
 
 theory Ghostdag  
-  imports blockDAG Spectre
+  imports blockDAG
 begin
 
+section \<open>Utils\<close>
+
+fun list_to_rel:: "'a list \<Rightarrow> ('a \<times> 'a) set"
+  where "list_to_rel [] = {}"
+  | "list_to_rel (x#xs) = {x} \<times> (set (x#xs)) \<union> list_to_rel xs"
+
+
+lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<Longrightarrow> a \<in> set L \<and> b \<in> set L" 
+proof(induct L, auto) qed
+
+(**
+lemma list_to_rel_equal: 
+"(a,b) \<in> list_to_rel L \<longleftrightarrow> (\<exists>k::nat. hd (drop k L) = a \<and> b \<in> set (drop k L))"
+proof(safe)
+  assume "(a, b) \<in> list_to_rel L"
+  then show "\<exists>k. hd (drop k L) = a \<and> b \<in> set  (drop k L)"
+  proof(induct L)
+    case Nil
+    then show ?case by auto
+  next
+    case (Cons a2 L)
+    then consider "(a, b) \<in> {a2} \<times> set (a2 # L) " | "(a,b) \<in>  list_to_rel L" by auto
+    then show ?case unfolding list_to_rel.simps(2)  
+    proof(cases)
+      case 1
+      then have "a = hd (a2 # L)" by auto
+      moreover have "b \<in> set (a2 # L)" using 1 by auto
+      ultimately show ?thesis using drop0
+        by metis 
+    next
+      case 2
+      then obtain k where k_in : "hd (drop k (L)) = a \<and> b \<in> set (drop k (L))" 
+        using Cons(1) by auto
+      show ?thesis proof
+        let ?k = "Suc k"
+        show "hd (drop ?k (a2 # L)) = a \<and> b \<in> set (drop ?k (a2 # L))"
+          unfolding drop_Suc using k_in by auto 
+      qed
+  qed
+    qed
+  next
+  fix k 
+  assume "b \<in> set (drop k L)"
+  and "a = hd (drop k L)"
+  then show "(hd (drop k L), b) \<in> list_to_rel L"
+  proof(induct L arbitrary: k)
+    case Nil
+    then show ?case by auto
+  next
+    case (Cons a L)
+    consider (zero) "k = 0" | (more) "k > 0" by auto    
+    then show ?case 
+    proof(cases)
+      case zero
+    then show ?thesis using Cons drop_0 by auto
+  next
+    case more
+    then obtain k2 where k2_in:  "k = Suc k2"
+      using gr0_implies_Suc by auto 
+     show ?thesis using Cons unfolding k2_in drop_Suc list_to_rel.simps(2) by auto
+    qed
+  qed
+qed
+   **) 
+
+lemma list_order_linear:
+  assumes "distinct L"
+  shows "linear_order_on (set L)  (list_to_rel L)" 
+  unfolding linear_order_on_def total_on_def partial_order_on_def preorder_on_def refl_on_def
+  trans_def antisym_def 
+proof(safe)
+  fix a b
+  assume "(a, b) \<in> list_to_rel L"
+  then show "a \<in> set L" 
+  proof(induct L, auto) qed
+next 
+  fix a b
+  assume "(a, b) \<in> list_to_rel L"
+  then show "b \<in> set L" 
+  proof(induct L, auto) qed
+next 
+  fix x 
+  assume "x \<in> set L"
+  then show "(x, x) \<in> list_to_rel L"
+  proof(induct L, auto) qed
+next
+  fix x y z 
+  assume as1: "(x,y) \<in> list_to_rel L"
+  and  as2: "(y, z) \<in> list_to_rel L"
+  then show "(x, z) \<in> list_to_rel L"
+    using assms
+  proof(induct L)
+    case Nil
+    then show ?case by auto
+  next
+    case (Cons a L)
+    then consider (nor) "(x, y) \<in> {a} \<times> set (a # L) \<and> (y, z) \<in> {a} \<times> set (a # L)" 
+      | (xy) "(x,y) \<in> list_to_rel L \<and> (y, z) \<in> {a} \<times> set (a # L)" 
+      | (yz) "(y,z) \<in> list_to_rel L \<and> (x, y) \<in> {a} \<times> set (a # L)"
+      | (both) "(y,z) \<in> list_to_rel L \<and> (x,y) \<in> list_to_rel L" by auto
+    then show ?case proof(cases)
+    case nor
+      then show ?thesis by auto
+    next
+      case xy 
+      then have "y \<in> set L" using list_to_rel_in by metis
+      also have "y = a" using xy by auto
+      ultimately have "\<not> distinct (a # L)"
+        by simp 
+    then show ?thesis using Cons by auto
+    next
+    case yz
+    then show ?thesis using list_to_rel.simps(2)
+      by (metis Cons.prems(2) SigmaD1 SigmaI UnI1 list_to_rel_in)  
+    next
+      case both
+      then show ?thesis unfolding list_to_rel.simps(2) using Cons by auto
+    qed
+  qed 
+next
+  fix x y 
+  assume "(x, y) \<in> list_to_rel L"
+  and "(y, x) \<in> list_to_rel L"
+  then show "x = y"
+    using assms
+  proof(induct L, simp)
+    case (Cons a L)
+      then consider (nor) "(x, y) \<in> {a} \<times> set (a # L) \<and> (y, x) \<in> {a} \<times> set (a # L)" 
+      | (xy) "(x,y) \<in> list_to_rel L \<and> (y, x) \<in> {a} \<times> set (a # L)" 
+      | (yz) "(y,x) \<in> list_to_rel L \<and> (x, y) \<in> {a} \<times> set (a # L)"
+      | (both) "(y,x) \<in> list_to_rel L \<and> (x,y) \<in> list_to_rel L" by auto
+      then show ?case unfolding list_to_rel.simps 
+      proof(cases)
+      case nor
+      then show ?thesis by auto
+      next
+      case xy
+      then show ?thesis
+        by (metis Cons.prems(3) SigmaD1 distinct.simps(2) list_to_rel_in singletonD) 
+      next
+        case yz
+        then show ?thesis  
+          by (metis Cons.prems(3) SigmaD1 distinct.simps(2) list_to_rel_in singletonD) 
+      next
+        case both
+      then show ?thesis using Cons by auto 
+      qed
+    qed
+  next
+    fix x y 
+    assume "x \<in> set L"
+    and "y \<in> set L"
+    and "x \<noteq> y"
+    and "(y, x) \<notin> list_to_rel L"
+    then show "(x, y) \<in> list_to_rel L"
+    proof(induct L, auto) qed    
+  qed
+
+subsection \<open>Funcitions and Definitions\<close>    
+
 fun top_le  :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "top_le G a b = (if(tie_breakingDAG G) then 
+  where "top_le G a b = (if(blockDAG G) then 
 (b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<or> (\<not>(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> a \<le> b) else 
 a \<le> b)"
 
 fun top_less  :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "top_less G a b = (if(tie_breakingDAG G) then 
+  where "top_less G a b = (if(blockDAG G) then 
 (b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<or> (\<not>(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> a < b) else 
 a < b)"
 
@@ -46,7 +206,7 @@ fun choose_max_blue_set :: "(('a::linorder set \<times> 'a list) \<times> 'a) li
 function OrderDAG :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a set \<times> 'a list)" 
   where
   "OrderDAG G k =  
-  (if (\<not> tie_breakingDAG G) then ({},[]) else 
+  (if (\<not> blockDAG G) then ({},[]) else 
   if (card (verts G) = 1)  then ({genesis_nodeAlt G},[genesis_nodeAlt G]) else
  let M =  choose_max_blue_set 
   ((map (\<lambda>i.(((OrderDAG (reduce_past G i) k)) , i)) (sorted_list_of_set (tips G))))
@@ -61,8 +221,7 @@ next
   fix G::"('a::linorder,'b) pre_digraph"
   fix k::nat 
   fix x
-  assume tD:  "\<not> \<not> tie_breakingDAG G"
-  then have bD: "blockDAG G" using tie_breakingDAG_def by auto
+  assume bD:  "\<not> \<not> blockDAG G"
   assume "card (verts G) \<noteq> 1"
   then have "card (verts G) > 1" using bD blockDAG.blockDAG_size_cases by auto 
   then have nT: "\<forall>x \<in> tips G. \<not> blockDAG.is_genesis_node G x"
@@ -76,6 +235,8 @@ next
     by fastforce  
 qed
 
+fun GhostDAG_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a \<times> 'a) set"
+  where "GhostDAG_Relation G k = list_to_rel (snd (OrderDAG G k))"
 
 lemma in_insert: "set (top_insert G L a) = set L \<union> {a}" 
 proof(induct L, simp_all, auto) qed 
@@ -273,17 +434,17 @@ next
   qed
 
 
-lemma (in tie_breakingDAG) chosen_max_tip:
+lemma chosen_max_tip:
+  assumes "blockDAG G"
   assumes "x = snd ( choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G))))" 
   shows  "x \<in> set (sorted_list_of_set (tips G))" and " x \<in> tips G"
 
 proof - 
-  have bD: "blockDAG G" using tie_breakingDAG_axioms tie_breakingDAG_def by auto
   obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
    (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
     have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-        digraph.tips_finite subs bD
+        digraph.tips_finite subs assms(1)
        list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
       by (metis (mono_tags, lifting))  
     then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
@@ -302,18 +463,19 @@ proof -
     qed
     have "set (map snd pp) = set (sorted_list_of_set (tips G))" 
       using mm2 pp_in  by auto
-    then show "x \<in> set (sorted_list_of_set (tips G))" using pp_in assms(1) kk by blast 
+    then show "x \<in> set (sorted_list_of_set (tips G))" using pp_in assms(2) kk by blast 
     then show "x \<in> tips G"
-      using digraph.tips_finite sorted_list_of_set(1) kk bD subs assms(1) pp_in by auto
+      using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
 qed
 
 
-lemma (in tie_breakingDAG) Verts_in_OrderDAG: 
+lemma Verts_in_OrderDAG: 
+  assumes "blockDAG G"
   shows "x \<in> verts G \<longrightarrow> x \<in> set (snd (OrderDAG G k))"
-  using tie_breakingDAG_axioms
+  using assms(1)
 proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
   case (1 G k x)
-  then have bD: "blockDAG G" using tie_breakingDAG_axioms tie_breakingDAG_def by auto
+  then have bD: "blockDAG G" by auto
   assume x_in: "x \<in> verts G"
   then consider (cD1) "card (verts G) = 1"| (cDm) "card (verts G) \<noteq> 1" by auto 
   then show "x \<in> set (snd (OrderDAG G k))"
@@ -323,14 +485,14 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
       using 1 OrderDAG.simps by auto
     then show ?thesis using x_in bD cD1
          genesis_nodeAlt_sound blockDAG.is_genesis_node.simps
-      using gen_gen gen_graph_all_one 1
+      using 1
       by (metis card_1_singletonE singletonD) 
   next
     case (cDm)
     then show ?thesis
     proof -
       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
-       (sorted_list_of_set (tips G)))" using tips_exist by auto
+       (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
       have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
           digraph.tips_finite subs 1 bD 
          list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
@@ -368,7 +530,7 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
           by (metis (mono_tags, hide_lams) Un_insert_right fst_conv list.simps(15) set_append) 
         then have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
                    (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp))))) (fCur)))"
-          using  finite_verts fold_app_mono surj_pair
+          using  fold_app_mono surj_pair
         by (metis)
       then show ?thesis unfolding pp_in fcur_in using 1 OrderDAG.simps cDm
         by (metis (mono_tags, lifting)) 
@@ -391,9 +553,9 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
         have "(snd (choose_max_blue_set pp)) \<in> set (sorted_list_of_set (tips G))" using tt2
         digraph.tips_finite bD subs sorted_list_of_set(1) by auto
         moreover 
-        have "tie_breakingDAG (reduce_past G (snd (choose_max_blue_set pp)))" using 
+        have "blockDAG (reduce_past G (snd (choose_max_blue_set pp)))" using 
         blockDAG.reduce_past_dagbased bD tt2  blockDAG.tips_unequal_gen 
-        cd1 tie_breakingDAG_def tips_def CollectD by metis
+        cd1 tips_def CollectD by metis
         ultimately have bass: 
           "x \<in> set ((snd (OrderDAG (reduce_past G (snd (choose_max_blue_set pp))) k)))" 
           using  pp_in 1 cDm tt2 pas by metis
@@ -424,8 +586,8 @@ qed
 lemma OrderDAG_in_verts: "x \<in> set (snd (OrderDAG G k)) \<longrightarrow> x \<in> verts G"
 proof(induction G k arbitrary: x rule: OrderDAG.induct)
   case (1 G k x)
-  consider (inval) "\<not> tie_breakingDAG G"| (one) "tie_breakingDAG G \<and>
-  card (verts G) = 1" | (val) "tie_breakingDAG G \<and>
+  consider (inval) "\<not> blockDAG G"| (one) "blockDAG G \<and>
+  card (verts G) = 1" | (val) "blockDAG G \<and>
   card (verts G) \<noteq> 1" by auto
   then show ?case 
   proof(cases)
@@ -434,13 +596,12 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
   next
     case one
     then show ?thesis using OrderDAG.simps genesis_nodeAlt_one_sound blockDAG.is_genesis_node.simps
-    tie_breakingDAG_def
       using empty_set list.simps(15) singleton_iff sndI by fastforce  
   next
     case val
     then show ?thesis
     proof safe
-    have bD: "blockDAG G" using val tie_breakingDAG_def by auto
+    have bD: "blockDAG G" using val  by auto
     assume pre: "x \<in> set (snd (OrderDAG G k))"
     obtain M where M_in:"M = choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" by auto
@@ -481,7 +642,7 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
       using pre by auto
     then show "x \<in> verts G" proof(cases)
         case ac
-        then show ?thesis using top_sort_con DAG.anticone_in_verts val tie_breakingDAG_def 
+        then show ?thesis using top_sort_con DAG.anticone_in_verts val 
         sorted_list_of_set(1) subs
           by (metis DAG.anticon_finite subsetD) 
       next
@@ -532,10 +693,10 @@ case (Cons a L1)
 qed
   
 lemma OrderDAG_casesAlt:
-  obtains (ntB) "\<not> tie_breakingDAG G" 
-  | (one) "tie_breakingDAG G \<and> card (verts G) = 1"
-  | (more) "tie_breakingDAG G \<and> card (verts G) > 1"
-  using  tie_breakingDAG_def blockDAG.blockDAG_size_cases by blast 
+  obtains (ntB) "\<not> blockDAG G" 
+  | (one) "blockDAG G \<and> card (verts G) = 1"
+  | (more) "blockDAG G \<and> card (verts G) > 1"
+  using  blockDAG.blockDAG_size_cases by auto
      
   
 
@@ -545,7 +706,7 @@ lemma OrderDAG_length:
     case (1 G k)
     then show ?case proof (cases G rule: OrderDAG_casesAlt)
     case ntB
-    then show ?thesis using tie_breakingDAG_def 1 by auto
+    then show ?thesis using  1 by auto
     next
       case one
       then show ?thesis using OrderDAG.simps by auto
@@ -554,16 +715,16 @@ lemma OrderDAG_length:
     show ?thesis using 1
     proof -
       have bD: "blockDAG G" using 1 by auto
-      assume ind: "(\<And>x. \<not> \<not> tie_breakingDAG G \<Longrightarrow>
+      assume ind: "(\<And>x. \<not> \<not> blockDAG G \<Longrightarrow>
           card (verts G) \<noteq> 1 \<Longrightarrow>
           x \<in> set (sorted_list_of_set (tips G)) \<Longrightarrow> blockDAG (reduce_past G x)
            \<Longrightarrow> length (snd (OrderDAG (reduce_past G x) k)) = card (verts (reduce_past G x)))"
       obtain x where x_in: "x = (choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G))))"
         by (metis)
-      then have tt: "snd x \<in> set (sorted_list_of_set (tips G))" using tie_breakingDAG.chosen_max_tip 
+      then have tt: "snd x \<in> set (sorted_list_of_set (tips G))" using chosen_max_tip 
       more by auto
-      have ttt: "snd x \<in> tips G" using tie_breakingDAG.chosen_max_tip(2) x_in
+      have ttt: "snd x \<in> tips G" using chosen_max_tip(2) x_in
       more by auto
       then have bD2: "blockDAG (reduce_past G (snd x))" using blockDAG.tips_unequal_gen bD more 
       blockDAG.reduce_past_dagbased bD tips_def 
@@ -584,17 +745,46 @@ lemma OrderDAG_length:
   qed
 qed
 
-lemma (in tie_breakingDAG) OrderDAG_total:
+lemma OrderDAG_total:
+  assumes "blockDAG G" 
   shows "set (snd (OrderDAG G k)) = verts G"
-  using Verts_in_OrderDAG OrderDAG_in_verts
+  using Verts_in_OrderDAG OrderDAG_in_verts assms(1)
   by blast 
-  
      
-lemma (in tie_breakingDAG)  OrderDAG_distinct:
+lemma  OrderDAG_distinct:
+  assumes "blockDAG G"
   shows "distinct (snd (OrderDAG G k))"
-  using OrderDAG_length tie_breakingDAG_axioms tie_breakingDAG_def OrderDAG_total
-  card_distinct
+  using OrderDAG_length OrderDAG_total
+  card_distinct assms
   by metis 
 
 
+lemma GhostDAG_linear: 
+  assumes "blockDAG G" 
+  shows "linear_order_on (verts G) (GhostDAG_Relation G k)"
+  unfolding GhostDAG_Relation.simps 
+  using list_order_linear OrderDAG_distinct OrderDAG_total assms by metis
+
+lemma GhostDAG_preserving:
+  assumes "blockDAG G"
+  and "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
+shows "(y,x) \<in> GhostDAG_Relation G k"
+  unfolding GhostDAG_Relation.simps using assms 
+proof(induct G k arbitrary: x y rule: OrderDAG.induct )
+  case (1 G k)
+  then show ?case proof (cases G rule: OrderDAG_casesAlt)
+    case ntB
+    then show ?thesis using 1 by auto
+    next
+      case one
+      then have "\<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
+        using subs wf_digraph.reachable1_in_verts 1
+        by (metis DAG.cycle_free OrderDAG_casesAlt blockDAG.reduce_less
+            blockDAG.reduce_past_dagbased blockDAG.unique_genesis less_one not_one_less_zero) 
+      then show ?thesis using 1 by simp
+    next
+      case more 
+      then show ?thesis using 1 OrderDAG.simps sorry
+    qed
+qed
 end
