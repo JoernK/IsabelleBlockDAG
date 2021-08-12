@@ -13,6 +13,8 @@ section \<open>DAG\<close>
 locale DAG = digraph +
   assumes cycle_free: "\<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)" 
 
+sublocale DAG \<subseteq> wf_digraph using DAG_def digraph_def nomulti_digraph_def DAG_axioms by auto
+
 subsection  \<open>Functions and Definitions\<close>
 
 fun  direct_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
@@ -195,6 +197,46 @@ next case (step u v) show ?case
         reduce_past.simps step.hyps(2) step.hyps(3) by metis
      
 qed
+
+lemma (in DAG) reduce_past_path2:
+  assumes "u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v"
+  and "u \<in> past_nodes G a"
+  and "v \<in> past_nodes G a"
+  shows "u \<rightarrow>\<^sup>+\<^bsub>reduce_past G a\<^esub> v" 
+  using assms
+proof(induct u v)
+  case (r_into_trancl u v )
+  then obtain e where e_in: " arc e (u,v)" using arc_def DAG_axioms wf_digraph_def
+    by auto 
+  then have e_in2: "e \<in> arcs (reduce_past G a)" unfolding reduce_past.simps induce_subgraph_arcs
+    using arcE r_into_trancl.prems(1) r_into_trancl.prems(2) by blast
+  then have "arc_to_ends (reduce_past G a) e = (u,v)" unfolding reduce_past.simps using e_in
+  arcE arc_to_ends_def induce_subgraph_head induce_subgraph_tail
+    by metis  
+  
+  then have  "u \<rightarrow>\<^bsub>reduce_past G a\<^esub> v" using e_in2 wf_digraph.dominatesI DAG_axioms
+    by (metis reduce_past.simps wellformed_induce_subgraph)  
+  then show ?case by auto
+next
+  case (trancl_into_trancl a2 b c)
+  then have b_in: "b \<in> past_nodes G a" unfolding past_nodes.simps 
+    by (metis (mono_tags, lifting) adj_in_verts(1) mem_Collect_eq
+        reachable1_reachable reachable1_reachable_trans) 
+  then have a2_re_b: "a2 \<rightarrow>\<^sup>+\<^bsub>reduce_past G a\<^esub> b" using trancl_into_trancl by auto
+  then obtain e where e_in: " arc e (b,c)" using trancl_into_trancl 
+      arc_def DAG_axioms wf_digraph_def by auto 
+  then have e_in2: "e \<in> arcs (reduce_past G a)" unfolding reduce_past.simps induce_subgraph_arcs
+    using arcE trancl_into_trancl
+    b_in by blast 
+  then have "arc_to_ends (reduce_past G a) e = (b,c)" unfolding reduce_past.simps using e_in
+  arcE arc_to_ends_def induce_subgraph_head induce_subgraph_tail
+    by metis  
+  then have  "b \<rightarrow>\<^bsub>reduce_past G a\<^esub> c" using e_in2 wf_digraph.dominatesI DAG_axioms
+    by (metis reduce_past.simps wellformed_induce_subgraph)  
+  then show ?case using a2_re_b
+    by (metis trancl.trancl_into_trancl) 
+qed
+
 
 
 lemma (in DAG) reduce_past_pathr:

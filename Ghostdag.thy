@@ -3,17 +3,21 @@ theory Ghostdag
   imports blockDAG
 begin
 
-section \<open>Utils\<close>
+section \<open>GHOSTDAG\<close>
+text \<open>Based on the GHOSTDAG blockDAG consensus algorithmus by Sompolinsky and Zohar 2018\<close>
+subsection \<open>Utils\<close>
 
+text \<open>The following functions transform a list L to a relation containing a  tuple (a,b)
+  iff a = b or a precedes b in the list L \<close>
 fun list_to_rel:: "'a list \<Rightarrow> ('a \<times> 'a) set"
   where "list_to_rel [] = {}"
   | "list_to_rel (x#xs) = {x} \<times> (set (x#xs)) \<union> list_to_rel xs"
 
 
-lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<Longrightarrow> a \<in> set L \<and> b \<in> set L" 
+lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<longrightarrow> a \<in> set L \<and> b \<in> set L" 
 proof(induct L, auto) qed
 
-(**
+text \<open>Show soundness of list_to_rel\<close>
 lemma list_to_rel_equal: 
 "(a,b) \<in> list_to_rel L \<longleftrightarrow> (\<exists>k::nat. hd (drop k L) = a \<and> b \<in> set (drop k L))"
 proof(safe)
@@ -66,8 +70,14 @@ proof(safe)
     qed
   qed
 qed
-   **) 
 
+lemma list_to_rel_append:
+  assumes "a \<in> set L"
+  shows "(a,b) \<in> list_to_rel (L @ [b])" 
+  using assms
+proof(induct L, simp, auto) qed 
+
+text \<open>For every distinct L, list_to_rel L return a linear order on set L\<close>
 lemma list_order_linear:
   assumes "distinct L"
   shows "linear_order_on (set L)  (list_to_rel L)" 
@@ -163,16 +173,8 @@ next
 
 subsection \<open>Funcitions and Definitions\<close>    
 
-fun top_le  :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "top_le G a b = (if(blockDAG G) then 
-(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<or> (\<not>(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> a \<le> b) else 
-a \<le> b)"
-
-fun top_less  :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "top_less G a b = (if(blockDAG G) then 
-(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<or> (\<not>(b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> a < b) else 
-a < b)"
-
+text \<open>Function to sort a list $L$ under a graph G such if $a$ references $b$,
+$b$ precedes $a$ in the list\<close>
 
 fun top_insert:: "('a::linorder,'b) pre_digraph \<Rightarrow>'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
   where "top_insert G [] a = [a]"
@@ -182,27 +184,31 @@ fun top_sort:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a list \<Rightarrow
   where "top_sort G []= [] "
   | "top_sort G (a # L) = top_insert G (top_sort G L) a"
 
-
+text \<open>Function to compare the size of set and break ties. Used for the GHOSTDAG maximum blue 
+      cluster selection\<close>
 fun larger_blue_tuple ::
  "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
   where "larger_blue_tuple A B = 
   (if (card (fst (fst A))) > (card (fst (fst B))) \<or> 
   (card (fst (fst A)) \<ge> card (fst (fst B)) \<and> snd A \<le> snd B) then A else B)"
 
-
+text \<open>Function to add node $a$ to a tuple of a set S and List L\<close>
 fun add_set_list_tuple :: "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> ('a::linorder set \<times> 'a list)" 
   where "add_set_list_tuple ((S,L),a) = (S \<union> {a}, L @ [a])"
 
+text \<open>Function that adds a node $a$ to a kCluster $S$, if $S \<union> {a}$ remains a kCluster.
+    Also adds $a$ to the end of list $L$\<close>
 fun app_if_blue_else_add_end :: 
 "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a \<Rightarrow> ('a::linorder set \<times> 'a list)
  \<Rightarrow> ('a::linorder set \<times> 'a list)"  
 where "app_if_blue_else_add_end G k a (S,L) = (if (kCluster G k (S \<union> {a})) 
 then add_set_list_tuple ((S,L),a) else (S,L @ [a]))"
 
+text \<open>Function to select the largest $((S,L),a)$ according to $larger_blue_tuple$\<close>
 fun choose_max_blue_set :: "(('a::linorder set \<times> 'a list) \<times> 'a) list \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
   where "choose_max_blue_set L = fold (larger_blue_tuple) L (hd L)" 
 
-
+text \<open>GHOSTDAG ordering algorithm\<close>
 function OrderDAG :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a set \<times> 'a list)" 
   where
   "OrderDAG G k =  
@@ -235,9 +241,20 @@ next
     by fastforce  
 qed
 
+text \<open>Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm\<close>
 fun GhostDAG_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a \<times> 'a) set"
   where "GhostDAG_Relation G k = list_to_rel (snd (OrderDAG G k))"
 
+subsection\<open>Soundness\<close>
+
+lemma OrderDAG_casesAlt:
+  obtains (ntB) "\<not> blockDAG G" 
+  | (one) "blockDAG G \<and> card (verts G) = 1"
+  | (more) "blockDAG G \<and> card (verts G) > 1"
+  using  blockDAG.blockDAG_size_cases by auto
+   
+
+subsubsection \<open>Soundness of the topological sort algorithm\<close>
 lemma in_insert: "set (top_insert G L a) = set L \<union> {a}" 
 proof(induct L, simp_all, auto) qed 
 
@@ -275,6 +292,8 @@ next
 qed
 
 
+subsubsection \<open>Soundness of the $add_set_list$ function\<close>
+
 lemma add_set_list_tuple_mono:
   shows "set L \<subseteq> set (snd (add_set_list_tuple ((S,L),a)))"
   using add_set_list_tuple.simps by auto
@@ -282,6 +301,13 @@ lemma add_set_list_tuple_mono:
 lemma add_set_list_tuple_mono2:
   shows "set (snd (add_set_list_tuple ((S,L),a))) \<subseteq> set L \<union> {a} "
   using add_set_list_tuple.simps by auto
+
+lemma add_set_list_tuple_length:
+  shows "length (snd (add_set_list_tuple ((S,L),a))) = Suc (length L)"
+proof(induct L, auto) qed
+
+
+subsubsection \<open>Soundness of the $add_if_blue$ function\<close>
 
 lemma app_if_blue_mono:
   assumes "finite S"
@@ -320,6 +346,16 @@ lemma app_if_blue_card_mono:
   by (simp add: assms card_mono subset_insertI)  
   
 
+  
+lemma app_if_blue_else_add_end_length:
+  shows "length (snd (app_if_blue_else_add_end G k a (S,L))) = Suc (length  L)"
+proof(induction L, auto) qed
+  
+
+  
+  
+subsubsection \<open>Soundness of the $larger_blue_tuple$ comparison\<close>
+
 lemma larger_blue_tuple_mono:
   assumes "finite (fst V)"
   shows "larger_blue_tuple ((app_if_blue_else_add_end G k a V),b) (V,b)
@@ -331,6 +367,8 @@ lemma larger_blue_tuple_mono:
 lemma larger_blue_tuple_subs:
   shows "larger_blue_tuple A B \<in> {A,B}" by auto
 
+
+subsubsection \<open>Soundness of the $choose_max_blue_set$ function\<close>
 lemma choose_max_blue_avoid_empty:
   assumes "L \<noteq> []"
   shows "choose_max_blue_set L \<in> set L"
@@ -345,6 +383,22 @@ proof (rule fold_invariant)
     and "s \<in> set L"
     then show "larger_blue_tuple x s \<in> set L" using larger_blue_tuple.simps by auto
   qed
+
+
+subsubsection \<open>Auxiliary lemmas for OrderDAG\<close>
+
+lemma fold_app_length:
+  shows "length (snd  (fold (app_if_blue_else_add_end G k) 
+  L1 PL2)) = length L1 + length (snd PL2)"
+proof(induct L1 arbitrary: PL2)
+case Nil
+then show ?case by auto
+next
+case (Cons a L1)
+  then show ?case unfolding fold_Cons comp_apply using app_if_blue_else_add_end_length
+    by (metis add_Suc add_Suc_right length_Cons old.prod.exhaust snd_conv) 
+qed
+  
 
 lemma fold_app_mono:
   assumes "x \<in> set (snd (S,L1))"
@@ -380,7 +434,7 @@ next
     using app_if_blue_else_add_end.simps fst_def snd_def by auto 
   then show ?case unfolding fold_Cons comp_apply  using kk by auto     
 qed
-  
+
 
 lemma fold_app_mono2:
   assumes "x \<in> set L2"
@@ -434,12 +488,25 @@ next
   qed
 
 
+
+lemma map_snd_map: "\<And>L. (map snd (map (\<lambda>i. (P i , i)) L)) =  L" 
+      proof -
+        fix L
+        show "map snd (map (\<lambda>i. (P i, i)) L) = L"
+        proof(induct L)
+          case Nil
+          then show ?case by auto
+        next
+          case (Cons a L)
+          then show ?case by auto
+        qed
+      qed
+
 lemma chosen_max_tip:
   assumes "blockDAG G"
   assumes "x = snd ( choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G))))" 
   shows  "x \<in> set (sorted_list_of_set (tips G))" and " x \<in> tips G"
-
 proof - 
   obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
    (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
@@ -468,6 +535,42 @@ proof -
       using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
 qed
 
+lemma chosen_map_simps:
+  assumes "blockDAG G"
+  assumes "x = map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+       (sorted_list_of_set (tips G))" 
+  shows  "snd  (choose_max_blue_set x) \<in> set (sorted_list_of_set (tips G))" 
+    and  "snd (choose_max_blue_set x) \<in> tips G"
+    and "set (map snd x) = set (sorted_list_of_set (tips G))"
+    and "choose_max_blue_set x \<in> set x"
+proof - 
+  obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+   (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
+    have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
+        digraph.tips_finite subs assms(1)
+       list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
+      by (metis (mono_tags, lifting))  
+    then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
+      by auto 
+    have seteq: "set (map snd pp) = set (sorted_list_of_set (tips G))" 
+      using map_snd_map pp_in  by auto
+    then show "snd (choose_max_blue_set x) \<in> set (sorted_list_of_set (tips G))" 
+      using pp_in assms(2) kk by blast 
+    then show "snd (choose_max_blue_set x) \<in> tips G"
+      using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
+    show "set (map snd x) = set (sorted_list_of_set (tips G))"
+      using map_snd_map assms(2) 
+      by simp
+    then show "choose_max_blue_set x \<in> set x" using seteq pp_in assms(2)
+      mm by blast 
+qed
+
+
+
+
+
+
+subsubsection \<open>OrderDAG soundness\<close>
 
 lemma Verts_in_OrderDAG: 
   assumes "blockDAG G"
@@ -493,28 +596,9 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
     proof -
       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
-      have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-          digraph.tips_finite subs 1 bD 
-         list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
-        by (metis (mono_tags, lifting))  
-      then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
-        by auto 
-      have mm2: "\<And>L. (map snd (map (\<lambda>i. ((OrderDAG (reduce_past G i) k) , i)) L)) =  L" 
-      proof -
-        fix L
-        show "map snd (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i)) L) = L"
-        proof(induct L)
-          case Nil
-          then show ?case by auto
-        next
-          case (Cons a L)
-          then show ?case by auto
-        qed
-      qed
-      have "set (map snd pp) = set (sorted_list_of_set (tips G))" 
-        using mm2 pp_in  by auto
       then have tt2: "snd (choose_max_blue_set pp) \<in> tips G"
-        using digraph.tips_finite sorted_list_of_set(1) kk bD subs  by auto  
+        using chosen_map_simps bD
+        by blast   
       show ?thesis 
          proof(rule blockDAG.tips_cases)
          show "blockDAG G" using bD by auto
@@ -561,11 +645,9 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
           using  pp_in 1 cDm tt2 pas by metis
         then have in_F: "x \<in> set (snd ( fst ((choose_max_blue_set pp))))" unfolding pp_in
           using surj_pair
-          imageE list.set_map mm old.prod.inject pp_in prod.collapse
-          by (smt (verit, best))
-        then have "x \<in> set (snd (fst (choose_max_blue_set pp)))"
-          using pp_in
-          by (metis (no_types, lifting)) 
+          imageE list.set_map chosen_map_simps old.prod.inject pp_in prod.collapse
+          bD map_eq_conv 
+          by (smt (verit, best) map_eq_conv) 
         then have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
          (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
          (fst((choose_max_blue_set pp)))))"
@@ -607,28 +689,6 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
        (sorted_list_of_set (tips G)))" by auto
       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
-          have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-              digraph.tips_finite subs bD 
-             list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
-            by (metis (mono_tags, lifting))  
-          then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
-            by auto 
-          have mm2: "\<And>L. (map snd (map (\<lambda>i. ((OrderDAG (reduce_past G i) k) , i)) L)) =  L" 
-          proof -
-            fix L
-            show "map snd (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i)) L) = L"
-            proof(induct L)
-              case Nil
-              then show ?case by auto
-            next
-              case (Cons a L)
-              then show ?case by auto
-            qed
-          qed
-          have "set (map snd pp) = set (sorted_list_of_set (tips G))" 
-            using mm2 pp_in  by auto
-          then have tt2: "snd (choose_max_blue_set pp) \<in> tips G"
-            using digraph.tips_finite sorted_list_of_set(1) kk bD subs  by auto
       have "set (snd (OrderDAG G k)) =
        set (snd (fold (app_if_blue_else_add_end G k) (top_sort G (sorted_list_of_set (anticone G (snd M))))
       (add_set_list_tuple M)))" unfolding M_in val using OrderDAG.simps val
@@ -653,14 +713,17 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
               list.simps(15) prod.collapse set_append sndI) 
         then show ?thesis proof(cases)
           case ma
-          then show ?thesis unfolding M_in  using pp_in M_in ma digraph.tips_in_verts bD subs tt2
-            by auto
+          then show ?thesis unfolding M_in  using bD 
+            chosen_map_simps(2) digraph.tips_in_verts subs
+            by blast 
         next
+          have mm: "choose_max_blue_set pp \<in> set pp" unfolding pp_in using bD chosen_map_simps(4)
+            by (metis (mono_tags, lifting) Nil_is_map_conv choose_max_blue_avoid_empty)   
           case nma
           then have "x \<in> set (snd (OrderDAG (reduce_past G (snd M)) k))" 
             unfolding M_in choose_max_blue_avoid_empty blockDAG.tips_not_empty bD
             by (metis (no_types, lifting) ex_map_conv fst_conv mm pp_in snd_conv) 
-          then have "x \<in> verts (reduce_past G (snd M))" using 1 val tt2 M_in pp_in 
+          then have "x \<in> verts (reduce_past G (snd M))" using 1 val chosen_map_simps M_in pp_in 
           sorted_list_of_set(1) digraph.tips_finite subs bD
             by blast 
           then show "x \<in> verts G" using reduce_past.simps induce_subgraph_verts past_nodes.simps
@@ -671,34 +734,6 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
   qed
 qed
 
-lemma add_set_list_tuple_length:
-  shows "length (snd (add_set_list_tuple ((S,L),a))) = Suc (length L)"
-proof(induct L, auto) qed
-  
-lemma app_if_blue_else_add_end_length:
-  shows "length (snd (app_if_blue_else_add_end G k a (S,L))) = Suc (length  L)"
-proof(induction L, auto) qed
-  
-
-lemma fold_app_length:
-  shows "length (snd  (fold (app_if_blue_else_add_end G k) 
-  L1 PL2)) = length L1 + length (snd PL2)"
-proof(induct L1 arbitrary: PL2)
-case Nil
-then show ?case by auto
-next
-case (Cons a L1)
-  then show ?case unfolding fold_Cons comp_apply using app_if_blue_else_add_end_length
-    by (metis add_Suc add_Suc_right length_Cons old.prod.exhaust snd_conv) 
-qed
-  
-lemma OrderDAG_casesAlt:
-  obtains (ntB) "\<not> blockDAG G" 
-  | (one) "blockDAG G \<and> card (verts G) = 1"
-  | (more) "blockDAG G \<and> card (verts G) > 1"
-  using  blockDAG.blockDAG_size_cases by auto
-     
-  
 
 lemma OrderDAG_length:
   shows "blockDAG G \<Longrightarrow> length (snd (OrderDAG G k)) = card (verts G)"
@@ -783,8 +818,10 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
             blockDAG.reduce_past_dagbased blockDAG.unique_genesis less_one not_one_less_zero) 
       then show ?thesis using 1 by simp
     next
-      case more 
-      then show ?thesis using 1 OrderDAG.simps sorry
-    qed
-qed
+       case more
+       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+       (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
+       oops
+      
+
 end
