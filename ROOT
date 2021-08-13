@@ -4,7 +4,6 @@ session Isabelle = HOL +
   theories
 	blockDAG
     Spectre
-	Composition
-	SpectreComposition
+	Ghostdag
   document_files
     "root.tex"
