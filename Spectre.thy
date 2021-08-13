@@ -24,15 +24,15 @@ fun zero_list:: "int list \<Rightarrow> bool"
   where "zero_list [] = True"
   | "zero_list (x # xs) = ((x = 0) \<and> zero_list xs)" 
 
-text \<open>Function given a list of votes, sums them up if not only zeros, otherwise "no_vote"\<close>
+text \<open>Function given a list of votes, sums them up if not only zeros, otherwise "no vote"\<close>
  (* votes like virtual block, occurs if node a neither sees b nor c*)
 fun sumlist_break :: "'a::linorder \<Rightarrow>'a \<Rightarrow> int list \<Rightarrow> int"
   where "sumlist_break a b L = (if (zero_list L) then 0 else
    tie_break_int a b (sum_list L))"
 
-text \<open>Spectre core algorithm, vote_Spectre V a b c returns 
-      1 if a votes in favour of b (or b = c),
-     -1 if a votes in favour of c, 0 otherwise\<close>
+text \<open>Spectre core algorithm, $vote-Spectre V a b c$ returns 
+     $1$ if a votes in favour of $b$ (or $b = c$),
+     $-1$ if a votes in favour of $c$, $0$ otherwise\<close>
 function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> int" 
   where
   "vote_Spectre V a b c = (
@@ -99,12 +99,12 @@ next
     by simp
 qed
 
-text \<open>Given vote_Spectre calculate if a < b for arbitrary nodes\<close>
+text \<open>Given vote-Spectre calculate if $a < b$ for arbitrary nodes\<close>
 definition Spectre_Order :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
   where "Spectre_Order G a b = ( sumlist_break a b (map (\<lambda>i.
    (vote_Spectre G i a b)) (sorted_list_of_set (verts G))) = 1)" 
 
-text \<open>Given  Spectre_Order calculate the corresponding Relation over the nodes of G\<close>
+text \<open>Given Spectre-Order calculate the corresponding relation over the nodes of G\<close>
 definition Spectre_Order_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> ('a \<times> 'a) set"
   where "Spectre_Order_Relation G \<equiv> {(a,b) \<in> (verts G \<times> verts G). Spectre_Order G a b}"
 
@@ -225,31 +225,14 @@ qed
 lemma vote_Spectre_antisymmetric: 
   shows "b \<noteq> c \<Longrightarrow> vote_Spectre V a b c = - (vote_Spectre V a c b)"
 proof(induction V a b c rule: vote_Spectre.induct)
-  fix V ::"('a::linorder, 'b) pre_digraph"
-  and a:: "'a::linorder" and  b:: "'a::linorder" and  c :: "'a::linorder"
-  assume past: "(\<And>x. \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) \<Longrightarrow>
-             b \<noteq> c \<Longrightarrow>
-             \<not> ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<or> a = b) \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             \<not> ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c \<or> a = c) \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c \<Longrightarrow>
-             x \<in> set (sorted_list_of_set (past_nodes V a)) \<Longrightarrow>
-              b \<noteq> c \<Longrightarrow> vote_Spectre (reduce_past V a) x b c
-               = - vote_Spectre (reduce_past V a) x c b)"
-  and fut: "(\<And>x. \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) \<Longrightarrow>
-             b \<noteq> c \<Longrightarrow>
-             \<not> ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<or> a = b) \<and> (a, c) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             \<not> ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c \<or> a = c) \<and> (a, b) \<notin> (arcs_ends V)\<^sup>+) \<Longrightarrow>
-             \<not> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<Longrightarrow>
-             x \<in> set (sorted_list_of_set (future_nodes V a)) \<Longrightarrow>
-             b \<noteq> c \<Longrightarrow> vote_Spectre V x b c = - vote_Spectre V x c b)"
-  and not_eq: "b \<noteq> c"
+  case (1 V a b c)
   show "vote_Spectre V a b c = - vote_Spectre V a c b"
   proof(cases a b c V rule:Spectre_casesAlt)
   case no_bD
     then show ?thesis by fastforce
   next
   case equal
-  then show ?thesis using not_eq  by simp
+  then show ?thesis using 1  by simp
   next
     case one
     then show ?thesis by auto   
@@ -263,7 +246,7 @@ proof(induction V a b c rule: vote_Spectre.induct)
       by (metis (mono_tags, lifting) vote_Spectre.elims) 
     have ff2: "vote_Spectre V a c b = (sumlist_break c b (map (\<lambda>i.
     (- vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))" 
-       using three past vote_Spectre.simps map_eq_conv
+       using three 1 vote_Spectre.simps map_eq_conv
        by (smt (verit, ccfv_SIG))
      have "(map (\<lambda>i. - vote_Spectre (reduce_past V a) i b c) (sorted_list_of_set (past_nodes V a)))
      = (map uminus (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c)
@@ -271,7 +254,7 @@ proof(induction V a b c rule: vote_Spectre.induct)
        using map_map by auto       
      then have "vote_Spectre V a c b = - (sumlist_break b c (map (\<lambda>i.
     (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))" 
-    using  antisymmetric_sumlist not_eq ff2
+    using  antisymmetric_sumlist 1 ff2
     by (metis verit_minus_simplify(4)) 
     then show ?thesis using  ff
       by presburger 
@@ -283,14 +266,14 @@ proof(induction V a b c rule: vote_Spectre.induct)
       by (metis (mono_tags, lifting)) 
     have ff2: "vote_Spectre V a c b = (sumlist_break c b (map (\<lambda>i.
     (- vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))" 
-       using four fut vote_Spectre.simps map_eq_conv
+       using four 1 vote_Spectre.simps map_eq_conv
        by (smt (z3))
      have "(map (\<lambda>i. - vote_Spectre V i b c) (sorted_list_of_set (future_nodes V a)))
      = (map uminus (map (\<lambda>i. vote_Spectre V i b c) (sorted_list_of_set (future_nodes V a))))" 
        using map_map by auto       
      then have "vote_Spectre V a c b = - (sumlist_break b c (map (\<lambda>i.
     (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))" 
-    using  antisymmetric_sumlist not_eq ff2
+    using  antisymmetric_sumlist 1 ff2
     by (metis verit_minus_simplify(4)) 
     then show ?thesis using ff
       by linarith 
@@ -427,7 +410,7 @@ lemma Spectre_Order_Relation_antisym:
   using Spectre_Order_antisym assms by fastforce
 
 
-lemma vote_Spectre_Preserving01:
+lemma vote_Spectre_Preserving:
   assumes "c \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b"
   shows "vote_Spectre G a b c \<in> {0,1}"
   using assms
@@ -528,10 +511,54 @@ proof(induction G a b c rule: vote_Spectre.induct)
        by (simp add: four)
    qed
  qed
- 
-lemma Spectre_Order_Relation_antisym:
+
+
+
+lemma Spectre_Order_Preserving:
+  assumes "blockDAG G"
+  and "b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
+  shows "Spectre_Order G a b" 
+proof - 
+  have set_ordered: "set (sorted_list_of_set (verts G)) = verts G"
+    using assms(1) subs fin_digraph.finite_verts
+    sorted_list_of_set by auto
+  have a_in: "a \<in> verts G" using wf_digraph.reachable1_in_verts(2) assms subs
+    by metis 
+  have b_in: "b \<in> verts G" using wf_digraph.reachable1_in_verts(1) assms subs
+    by metis 
+  obtain the_map where the_map_in: 
+     "the_map = (map (\<lambda>i. vote_Spectre G i a b) (sorted_list_of_set (verts G)))" by auto
+  obtain wit where wit_in: "wit \<in> verts G" and wit_vote: "vote_Spectre G wit a b \<noteq> 0"
+    using vote_Spectre_one_exists a_in b_in assms(1)
+    by blast 
+  have "(vote_Spectre G wit a b) \<in> set the_map" 
+    unfolding the_map_in set_map 
+    using assms(1) fin_digraph.finite_verts 
+  subs sorted_list_of_set(1) wit_in image_iff
+    by metis 
+  then have exune: "\<exists>x \<in> set the_map. x \<noteq> 0"
+    using wit_vote by blast 
+  have all01: "\<forall>x \<in> set the_map. x \<in> {0,1}" 
+    unfolding set_ordered the_map_in set_map using vote_Spectre_Preserving assms(2) image_iff 
+    by (metis (no_types, lifting))
+  then have "\<exists>x \<in> set the_map. x = 1" using exune
+          by blast 
+  then have "\<exists>x \<in> set the_map. x > 0"
+    using zero_less_one by blast 
+  moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01
+    by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
+  ultimately show ?thesis unfolding the_map_in Spectre_Order_def using sumlist_one_mono
+      empty_iff set_empty
+    by (metis)
+qed
+
+
+lemma Spectre_Order_Relation_Preserving:
   assumes "blockDAG G"
   and "b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
 shows "(a,b) \<in> (Spectre_Order_Relation G)"   
-
+  unfolding Spectre_Order_Relation_def
+  using assms  wf_digraph.reachable1_in_verts subs
+  Spectre_Order_Preserving
+  SigmaI case_prodI mem_Collect_eq by fastforce 
 end

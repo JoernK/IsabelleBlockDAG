@@ -7,8 +7,8 @@ section \<open>GHOSTDAG\<close>
 text \<open>Based on the GHOSTDAG blockDAG consensus algorithmus by Sompolinsky and Zohar 2018\<close>
 subsection \<open>Utils\<close>
 
-text \<open>The following functions transform a list L to a relation containing a  tuple (a,b)
-  iff a = b or a precedes b in the list L \<close>
+text \<open>The following functions transform a list L to a relation containing a  tuple $(a,b)$
+  iff $a = b$ or $a$ precedes $b$ in the list L \<close>
 fun list_to_rel:: "'a list \<Rightarrow> ('a \<times> 'a) set"
   where "list_to_rel [] = {}"
   | "list_to_rel (x#xs) = {x} \<times> (set (x#xs)) \<union> list_to_rel xs"
@@ -17,7 +17,7 @@ fun list_to_rel:: "'a list \<Rightarrow> ('a \<times> 'a) set"
 lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<longrightarrow> a \<in> set L \<and> b \<in> set L" 
 proof(induct L, auto) qed
 
-text \<open>Show soundness of list_to_rel\<close>
+text \<open>Show soundness of list-to-rel\<close>
 lemma list_to_rel_equal: 
 "(a,b) \<in> list_to_rel L \<longleftrightarrow> (\<exists>k::nat. hd (drop k L) = a \<and> b \<in> set (drop k L))"
 proof(safe)
@@ -204,7 +204,7 @@ fun app_if_blue_else_add_end ::
 where "app_if_blue_else_add_end G k a (S,L) = (if (kCluster G k (S \<union> {a})) 
 then add_set_list_tuple ((S,L),a) else (S,L @ [a]))"
 
-text \<open>Function to select the largest $((S,L),a)$ according to $larger_blue_tuple$\<close>
+text \<open>Function to select the largest $((S,L),a)$ according to $larger-blue-tuple$\<close>
 fun choose_max_blue_set :: "(('a::linorder set \<times> 'a list) \<times> 'a) list \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
   where "choose_max_blue_set L = fold (larger_blue_tuple) L (hd L)" 
 
@@ -292,7 +292,7 @@ next
 qed
 
 
-subsubsection \<open>Soundness of the $add_set_list$ function\<close>
+subsubsection \<open>Soundness of the $add-set-list$ function\<close>
 
 lemma add_set_list_tuple_mono:
   shows "set L \<subseteq> set (snd (add_set_list_tuple ((S,L),a)))"
@@ -307,7 +307,7 @@ lemma add_set_list_tuple_length:
 proof(induct L, auto) qed
 
 
-subsubsection \<open>Soundness of the $add_if_blue$ function\<close>
+subsubsection \<open>Soundness of the $add-if-blue$ function\<close>
 
 lemma app_if_blue_mono:
   assumes "finite S"
@@ -354,7 +354,7 @@ proof(induction L, auto) qed
 
   
   
-subsubsection \<open>Soundness of the $larger_blue_tuple$ comparison\<close>
+subsubsection \<open>Soundness of the $larger-blue-tuple$ comparison\<close>
 
 lemma larger_blue_tuple_mono:
   assumes "finite (fst V)"

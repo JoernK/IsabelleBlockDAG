@@ -3,7 +3,7 @@
 *)
 
 theory Composition
-  imports Main blockDAG Spectre
+  imports Main blockDAG
 begin
 
 section  \<open>Composition\<close>
@@ -22,14 +22,6 @@ locale compositionGraph = blockDAG +
   and "\<forall> C1 \<in> (verts G'). \<forall> C2 \<in> (verts G'). C1 \<inter> C2 \<noteq> {} \<longrightarrow> C1 = C2"
   and "\<Union> (verts G') = verts G"
 
-locale tie_break_compositionGraph = tie_breakingDAG + 
-  fixes G' ::"('a::linorder set, 'b) pre_digraph"
-  fixes le::"'a::linorder set \<Rightarrow> 'a set \<Rightarrow> bool" 
-  and l::"'a set \<Rightarrow> 'a set \<Rightarrow> bool"
-  assumes "\<forall>C \<in> (verts G'). composition G C"
-  and "\<forall> C1 \<in> (verts G'). \<forall> C2 \<in> (verts G'). C1 \<inter> C2 \<noteq> {} \<longrightarrow> C1 = C2"
-  and "\<Union> (verts G') = verts G"
-  assumes "class.linorder le l"
  
 subsection  \<open>Functions and Definitions\<close>
 
