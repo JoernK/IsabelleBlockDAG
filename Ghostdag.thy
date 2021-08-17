@@ -876,9 +876,9 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
           using more 1 ind less_numeral_extra(4) ma_def red_bd
           by (metis)
         then have "(y,x) \<in> list_to_rel (snd (fst (choose_max_blue_set pp)))"
-          using chosen_map_simps 
+          using chosen_map_simps sorry
         then show ?thesis using more pp_in list_to_rel_mono OrderDAG.simps
-            unfolding add_set_list_tuple.simps app_if_blue_else_add_end.simps ma_def 
+            unfolding add_set_list_tuple.simps app_if_blue_else_add_end.simps ma_def sorry
       next
         case x_in
       then show ?thesis sorry
@@ -892,7 +892,7 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
         case both_nin
         then show ?thesis sorry
       qed
-      
-      
+    qed
+  qed
 
 end
