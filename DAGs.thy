@@ -59,7 +59,7 @@ lemma (in DAG) unidirectional:
 subsubsection \<open>Tips\<close>
 
 
-lemma (in DAG) tips_not_referenced:
+lemma (in wf_digraph) tips_not_referenced:
   assumes "is_tip G t"
   shows "\<forall>x. \<not> x \<rightarrow>\<^sup>+ t"
   using is_tip.simps assms reachable1_in_verts(1)
@@ -303,12 +303,34 @@ proof
     subgraph_def assms by auto
   qed
 
+
+lemma (in DAG) verts_comp2:
+  assumes "x \<in> tips G"
+  and "a \<in> verts G"
+  obtains  "a = x" 
+  | "a \<in> anticone G x"
+  | "a \<in> past_nodes G x"
+  using assms
+proof(cases a x rule:reachable1_cases)
+  case one
+  then show ?thesis
+    by (metis assms(1) tips_not_referenced tips_tips) 
+next
+case two
+  then show ?thesis using past_nodes.simps wf_digraph.reachable1_in_verts(2) wf_digraph_axioms
+    mem_Collect_eq that(3)
+    by (metis (no_types, lifting)) 
+next
+  case nR
+  then show ?thesis using that(2) anticone.simps assms by auto
+qed 
+
 lemma (in DAG) verts_comp_dis:
   shows "{x} \<inter> (anticone G x) = {}" 
   and " {x} \<inter> (verts (reduce_past G x)) = {}"
   and "anticone G x \<inter> (verts (reduce_past G x)) = {}"
 proof(simp_all, simp add: cycle_free, safe) qed
- 
+
  
 lemma (in DAG) verts_size_comp:
   assumes  "x \<in> tips G"
