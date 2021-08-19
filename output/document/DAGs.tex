@@ -168,7 +168,7 @@
 %
 \endisadelimdocument
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ DAG{\isacharparenright}{\kern0pt}\ tips{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}referenced{\isacharcolon}{\kern0pt}\isanewline
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ wf{\isacharunderscore}{\kern0pt}digraph{\isacharparenright}{\kern0pt}\ tips{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}referenced{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}tip\ G\ t{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isasymforall}x{\isachardot}{\kern0pt}\ {\isasymnot}\ x\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\ t{\isachardoublequoteclose}\isanewline
 %
@@ -1096,6 +1096,61 @@
 %
 \endisadelimproof
 \isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ DAG{\isacharparenright}{\kern0pt}\ verts{\isacharunderscore}{\kern0pt}comp{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}x\ {\isasymin}\ tips\ G{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ G{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{obtains}\ \ {\isachardoublequoteopen}a\ {\isacharequal}{\kern0pt}\ x{\isachardoublequoteclose}\ \isanewline
+\ \ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}a\ {\isasymin}\ anticone\ G\ x{\isachardoublequoteclose}\isanewline
+\ \ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}a\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ x{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\isacommand{proof}\isamarkupfalse%
+{\isacharparenleft}{\kern0pt}cases\ a\ x\ rule{\isacharcolon}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ one\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}metis\ assms{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ tips{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}referenced\ tips{\isacharunderscore}{\kern0pt}tips{\isacharparenright}{\kern0pt}\ \isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\isacommand{case}\isamarkupfalse%
+\ two\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
+\ past{\isacharunderscore}{\kern0pt}nodes{\isachardot}{\kern0pt}simps\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ wf{\isacharunderscore}{\kern0pt}digraph{\isacharunderscore}{\kern0pt}axioms\isanewline
+\ \ \ \ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ that{\isacharparenleft}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}no{\isacharunderscore}{\kern0pt}types{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ nR\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
+\ that{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ anticone{\isachardot}{\kern0pt}simps\ assms\ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\ \isanewline
+%
+\endisadelimproof
+\isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ DAG{\isacharparenright}{\kern0pt}\ verts{\isacharunderscore}{\kern0pt}comp{\isacharunderscore}{\kern0pt}dis{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}x{\isacharbraceright}{\kern0pt}\ {\isasyminter}\ {\isacharparenleft}{\kern0pt}anticone\ G\ x{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
@@ -1117,7 +1172,7 @@
 \isanewline
 %
 \endisadelimproof
-\ \isanewline
+\isanewline
 \ \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ DAG{\isacharparenright}{\kern0pt}\ verts{\isacharunderscore}{\kern0pt}size{\isacharunderscore}{\kern0pt}comp{\isacharcolon}{\kern0pt}\isanewline
@@ -1786,68 +1841,111 @@
 %:%1095=304%:%
 %:%1098=305%:%
 %:%1099=306%:%
-%:%1100=306%:%
+%:%1100=307%:%
 %:%1101=307%:%
 %:%1102=308%:%
 %:%1103=309%:%
-%:%1110=310%:%
-%:%1111=310%:%
-%:%1117=310%:%
-%:%1120=311%:%
-%:%1121=312%:%
-%:%1122=313%:%
-%:%1123=313%:%
-%:%1124=314%:%
-%:%1125=315%:%
-%:%1132=316%:%
-%:%1133=316%:%
-%:%1134=317%:%
-%:%1135=317%:%
-%:%1136=317%:%
-%:%1137=317%:%
-%:%1138=318%:%
-%:%1139=318%:%
-%:%1140=318%:%
-%:%1141=319%:%
-%:%1142=319%:%
-%:%1143=319%:%
-%:%1144=319%:%
-%:%1145=320%:%
-%:%1146=320%:%
-%:%1147=320%:%
-%:%1148=321%:%
-%:%1149=321%:%
-%:%1150=321%:%
-%:%1151=322%:%
-%:%1152=322%:%
-%:%1153=323%:%
-%:%1154=323%:%
-%:%1155=323%:%
-%:%1156=323%:%
-%:%1157=324%:%
-%:%1158=324%:%
-%:%1159=324%:%
-%:%1161=326%:%
-%:%1162=326%:%
-%:%1163=327%:%
-%:%1164=327%:%
-%:%1165=328%:%
-%:%1166=328%:%
-%:%1167=328%:%
-%:%1168=329%:%
-%:%1169=329%:%
-%:%1170=329%:%
-%:%1171=330%:%
-%:%1172=330%:%
-%:%1173=330%:%
-%:%1174=330%:%
-%:%1175=331%:%
-%:%1176=331%:%
-%:%1177=331%:%
-%:%1178=331%:%
-%:%1179=332%:%
-%:%1180=332%:%
-%:%1181=333%:%
-%:%1187=333%:%
-%:%1192=334%:%
-%:%1197=335%:%
+%:%1104=310%:%
+%:%1105=311%:%
+%:%1106=312%:%
+%:%1109=313%:%
+%:%1113=313%:%
+%:%1114=313%:%
+%:%1115=314%:%
+%:%1116=314%:%
+%:%1117=315%:%
+%:%1118=315%:%
+%:%1119=316%:%
+%:%1120=316%:%
+%:%1121=316%:%
+%:%1122=317%:%
+%:%1123=317%:%
+%:%1124=318%:%
+%:%1125=318%:%
+%:%1126=319%:%
+%:%1127=319%:%
+%:%1128=320%:%
+%:%1129=320%:%
+%:%1130=320%:%
+%:%1131=320%:%
+%:%1132=321%:%
+%:%1133=322%:%
+%:%1134=322%:%
+%:%1135=323%:%
+%:%1136=323%:%
+%:%1137=324%:%
+%:%1138=324%:%
+%:%1139=325%:%
+%:%1140=325%:%
+%:%1141=325%:%
+%:%1142=325%:%
+%:%1143=325%:%
+%:%1144=326%:%
+%:%1150=326%:%
+%:%1153=327%:%
+%:%1154=328%:%
+%:%1155=328%:%
+%:%1156=329%:%
+%:%1157=330%:%
+%:%1158=331%:%
+%:%1165=332%:%
+%:%1166=332%:%
+%:%1172=332%:%
+%:%1175=333%:%
+%:%1176=334%:%
+%:%1177=335%:%
+%:%1178=335%:%
+%:%1179=336%:%
+%:%1180=337%:%
+%:%1187=338%:%
+%:%1188=338%:%
+%:%1189=339%:%
+%:%1190=339%:%
+%:%1191=339%:%
+%:%1192=339%:%
+%:%1193=340%:%
+%:%1194=340%:%
+%:%1195=340%:%
+%:%1196=341%:%
+%:%1197=341%:%
+%:%1198=341%:%
+%:%1199=341%:%
+%:%1200=342%:%
+%:%1201=342%:%
+%:%1202=342%:%
+%:%1203=343%:%
+%:%1204=343%:%
+%:%1205=343%:%
+%:%1206=344%:%
+%:%1207=344%:%
+%:%1208=345%:%
+%:%1209=345%:%
+%:%1210=345%:%
+%:%1211=345%:%
+%:%1212=346%:%
+%:%1213=346%:%
+%:%1214=346%:%
+%:%1216=348%:%
+%:%1217=348%:%
+%:%1218=349%:%
+%:%1219=349%:%
+%:%1220=350%:%
+%:%1221=350%:%
+%:%1222=350%:%
+%:%1223=351%:%
+%:%1224=351%:%
+%:%1225=351%:%
+%:%1226=352%:%
+%:%1227=352%:%
+%:%1228=352%:%
+%:%1229=352%:%
+%:%1230=353%:%
+%:%1231=353%:%
+%:%1232=353%:%
+%:%1233=353%:%
+%:%1234=354%:%
+%:%1235=354%:%
+%:%1236=355%:%
+%:%1242=355%:%
+%:%1247=356%:%
+%:%1252=357%:%

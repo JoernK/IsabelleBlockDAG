@@ -1,212 +1,13 @@
 
 theory Ghostdag  
-  imports blockDAG
+  imports blockDAG Utils TopSort
 begin
 
 section \<open>GHOSTDAG\<close>
 text \<open>Based on the GHOSTDAG blockDAG consensus algorithmus by Sompolinsky and Zohar 2018\<close>
-subsection \<open>Utils\<close>
 
-text \<open>The following functions transform a list L to a relation containing a  tuple $(a,b)$
-  iff $a = b$ or $a$ precedes $b$ in the list L \<close>
-
-fun list_to_rel:: "'a list \<Rightarrow> ('a \<times> 'a) set"
-  where "list_to_rel [] = {}"
-  | "list_to_rel (x#xs) = {x} \<times> (set (x#xs)) \<union> list_to_rel xs"
-
-
-lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<longrightarrow> a \<in> set L \<and> b \<in> set L" 
-proof(induct L, auto) qed
-
-text \<open>Show soundness of list-to-rel\<close>
-lemma list_to_rel_equal: 
-"(a,b) \<in> list_to_rel L \<longleftrightarrow> (\<exists>k::nat. hd (drop k L) = a \<and> b \<in> set (drop k L))"
-proof(safe)
-  assume "(a, b) \<in> list_to_rel L"
-  then show "\<exists>k. hd (drop k L) = a \<and> b \<in> set  (drop k L)"
-  proof(induct L)
-    case Nil
-    then show ?case by auto
-  next
-    case (Cons a2 L)
-    then consider "(a, b) \<in> {a2} \<times> set (a2 # L) " | "(a,b) \<in>  list_to_rel L" by auto
-    then show ?case unfolding list_to_rel.simps(2)  
-    proof(cases)
-      case 1
-      then have "a = hd (a2 # L)" by auto
-      moreover have "b \<in> set (a2 # L)" using 1 by auto
-      ultimately show ?thesis using drop0
-        by metis 
-    next
-      case 2
-      then obtain k where k_in : "hd (drop k (L)) = a \<and> b \<in> set (drop k (L))" 
-        using Cons(1) by auto
-      show ?thesis proof
-        let ?k = "Suc k"
-        show "hd (drop ?k (a2 # L)) = a \<and> b \<in> set (drop ?k (a2 # L))"
-          unfolding drop_Suc using k_in by auto 
-      qed
-  qed
-    qed
-  next
-  fix k 
-  assume "b \<in> set (drop k L)"
-  and "a = hd (drop k L)"
-  then show "(hd (drop k L), b) \<in> list_to_rel L"
-  proof(induct L arbitrary: k)
-    case Nil
-    then show ?case by auto
-  next
-    case (Cons a L)
-    consider (zero) "k = 0" | (more) "k > 0" by auto    
-    then show ?case 
-    proof(cases)
-      case zero
-    then show ?thesis using Cons drop_0 by auto
-  next
-    case more
-    then obtain k2 where k2_in:  "k = Suc k2"
-      using gr0_implies_Suc by auto 
-     show ?thesis using Cons unfolding k2_in drop_Suc list_to_rel.simps(2) by auto
-    qed
-  qed
-qed
-
-lemma list_to_rel_append:
-  assumes "a \<in> set L"
-  shows "(a,b) \<in> list_to_rel (L @ [b])" 
-  using assms
-proof(induct L, simp, auto) qed 
-
-text \<open>For every distinct L, list_to_rel L return a linear order on set L\<close>
-lemma list_order_linear:
-  assumes "distinct L"
-  shows "linear_order_on (set L)  (list_to_rel L)" 
-  unfolding linear_order_on_def total_on_def partial_order_on_def preorder_on_def refl_on_def
-  trans_def antisym_def 
-proof(safe)
-  fix a b
-  assume "(a, b) \<in> list_to_rel L"
-  then show "a \<in> set L" 
-  proof(induct L, auto) qed
-next 
-  fix a b
-  assume "(a, b) \<in> list_to_rel L"
-  then show "b \<in> set L" 
-  proof(induct L, auto) qed
-next 
-  fix x 
-  assume "x \<in> set L"
-  then show "(x, x) \<in> list_to_rel L"
-  proof(induct L, auto) qed
-next
-  fix x y z 
-  assume as1: "(x,y) \<in> list_to_rel L"
-  and  as2: "(y, z) \<in> list_to_rel L"
-  then show "(x, z) \<in> list_to_rel L"
-    using assms
-  proof(induct L)
-    case Nil
-    then show ?case by auto
-  next
-    case (Cons a L)
-    then consider (nor) "(x, y) \<in> {a} \<times> set (a # L) \<and> (y, z) \<in> {a} \<times> set (a # L)" 
-      | (xy) "(x,y) \<in> list_to_rel L \<and> (y, z) \<in> {a} \<times> set (a # L)" 
-      | (yz) "(y,z) \<in> list_to_rel L \<and> (x, y) \<in> {a} \<times> set (a # L)"
-      | (both) "(y,z) \<in> list_to_rel L \<and> (x,y) \<in> list_to_rel L" by auto
-    then show ?case proof(cases)
-    case nor
-      then show ?thesis by auto
-    next
-      case xy 
-      then have "y \<in> set L" using list_to_rel_in by metis
-      also have "y = a" using xy by auto
-      ultimately have "\<not> distinct (a # L)"
-        by simp 
-    then show ?thesis using Cons by auto
-    next
-    case yz
-    then show ?thesis using list_to_rel.simps(2)
-      by (metis Cons.prems(2) SigmaD1 SigmaI UnI1 list_to_rel_in)  
-    next
-      case both
-      then show ?thesis unfolding list_to_rel.simps(2) using Cons by auto
-    qed
-  qed 
-next
-  fix x y 
-  assume "(x, y) \<in> list_to_rel L"
-  and "(y, x) \<in> list_to_rel L"
-  then show "x = y"
-    using assms
-  proof(induct L, simp)
-    case (Cons a L)
-      then consider (nor) "(x, y) \<in> {a} \<times> set (a # L) \<and> (y, x) \<in> {a} \<times> set (a # L)" 
-      | (xy) "(x,y) \<in> list_to_rel L \<and> (y, x) \<in> {a} \<times> set (a # L)" 
-      | (yz) "(y,x) \<in> list_to_rel L \<and> (x, y) \<in> {a} \<times> set (a # L)"
-      | (both) "(y,x) \<in> list_to_rel L \<and> (x,y) \<in> list_to_rel L" by auto
-      then show ?case unfolding list_to_rel.simps 
-      proof(cases)
-      case nor
-      then show ?thesis by auto
-      next
-      case xy
-      then show ?thesis
-        by (metis Cons.prems(3) SigmaD1 distinct.simps(2) list_to_rel_in singletonD) 
-      next
-        case yz
-        then show ?thesis  
-          by (metis Cons.prems(3) SigmaD1 distinct.simps(2) list_to_rel_in singletonD) 
-      next
-        case both
-      then show ?thesis using Cons by auto 
-      qed
-    qed
-  next
-    fix x y 
-    assume "x \<in> set L"
-    and "y \<in> set L"
-    and "x \<noteq> y"
-    and "(y, x) \<notin> list_to_rel L"
-    then show "(x, y) \<in> list_to_rel L"
-    proof(induct L, auto) qed    
-  qed
-
-
-lemma list_to_rel_mono:
-  assumes "(a,b) \<in> list_to_rel (L)"
-  shows "(a,b) \<in> list_to_rel (L @ L2)"
-  using assms
-proof(induct L2 arbitrary: L, simp)
-  case (Cons a L2)
-  then show ?case 
-  proof(induct L, auto)
-  qed
-qed
-
-lemma list_to_rel_mono2:
-  assumes "(a,b) \<in> list_to_rel (L2)"
-  shows "(a,b) \<in> list_to_rel (L @ L2)"
-  using assms
-proof(induct L2 arbitrary: L, simp)
-  case (Cons a L2)
-  then show ?case 
-  proof(induct L, auto)
-  qed
-qed
 
 subsection \<open>Funcitions and Definitions\<close>    
-
-text \<open>Function to sort a list $L$ under a graph G such if $a$ references $b$,
-$b$ precedes $a$ in the list\<close>
-
-fun top_insert:: "('a::linorder,'b) pre_digraph \<Rightarrow>'a list \<Rightarrow> 'a \<Rightarrow> 'a list"
-  where "top_insert G [] a = [a]"
-  | "top_insert G (b # L) a = (if (b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a) then  (a # ( b # L)) else (b # top_insert G L a))"
-
-fun top_sort:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a list \<Rightarrow> 'a list"
-  where "top_sort G []= [] "
-  | "top_sort G (a # L) = top_insert G (top_sort G L) a"
 
 text \<open>Function to compare the size of set and break ties. Used for the GHOSTDAG maximum blue 
       cluster selection\<close>
@@ -220,7 +21,7 @@ text \<open>Function to add node $a$ to a tuple of a set S and List L\<close>
 fun add_set_list_tuple :: "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> ('a::linorder set \<times> 'a list)" 
   where "add_set_list_tuple ((S,L),a) = (S \<union> {a}, L @ [a])"
 
-text \<open>Function that adds a node $a$ to a kCluster $S$, if $S \<union> {a}$ remains a kCluster.
+text \<open>Function that adds a node $a$ to a kCluster $S$, if $S + {a}$ remains a kCluster.
     Also adds $a$ to the end of list $L$\<close>
 fun app_if_blue_else_add_end :: 
 "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a \<Rightarrow> ('a::linorder set \<times> 'a list)
@@ -266,7 +67,7 @@ next
 qed
 
 text \<open>Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm\<close>
-fun GhostDAG_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a \<times> 'a) set"
+fun GhostDAG_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a rel"
   where "GhostDAG_Relation G k = list_to_rel (snd (OrderDAG G k))"
 
 subsection\<open>Soundness\<close>
@@ -278,188 +79,6 @@ lemma OrderDAG_casesAlt:
   using  blockDAG.blockDAG_size_cases by auto
    
 
-subsubsection \<open>Soundness of the topological sort algorithm\<close>
-lemma in_insert: "set (top_insert G L a) = set L \<union> {a}" 
-proof(induct L, simp_all, auto) qed 
-
-lemma top_sort_con: "set (top_sort G L) = set L"
-proof(induct L)
-case Nil
-then show ?case by auto
-next
-  case (Cons a L)
-  then show ?case using top_sort.simps(2) in_insert insert_is_Un list.simps(15) sup_commute
-    by (metis) 
-qed
- 
-
-lemma top_insert_len: "length (top_insert G L a) = Suc (length L)"
-proof(induct L)
-case Nil
-then show ?case by auto
-next
-  case (Cons a L)
-  then show ?case using top_insert.simps(2) by auto
-qed
-
-lemma top_sort_len: "length (top_sort G L) = length L"
-proof(induct L, simp)
-  case (Cons a L)
-  then have "length (a#L) = Suc (length L)" by auto
-  then show ?case using
-      top_insert_len top_sort.simps(2) Cons
-    by (simp add: top_insert_len)  
-qed
-
-lemma top_insert_mono:
-assumes "(y, x) \<in> list_to_rel ls"
-shows "(y, x) \<in> list_to_rel (top_insert G ls l)"
-  using assms 
-proof(induct ls, simp)
-  case (Cons a ls)
-  consider (rec) "a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> l" | (nrec) "\<not> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> l" by auto
-  then show ?case 
-  proof(cases)
-    case rec
-    then have sinse: "(top_insert G (a # ls) l)  = l # a # ls"
-      unfolding top_insert.simps by simp
-    show ?thesis unfolding sinse list_to_rel.simps  using Cons
-      by auto
-  next
-    case nrec
-    then have sinse: "(top_insert G (a # ls) l)  = a # top_insert G ls l"
-      unfolding top_insert.simps by simp
-    consider (ya) "y = a" | (yan) "(y, x) \<in> list_to_rel ls" using Cons by auto
-    then show ?thesis proof(cases)
-      case ya
-      then show ?thesis unfolding sinse list_to_rel.simps
-        by (metis Cons.prems SigmaI UnI1 in_insert insertCI list_to_rel_in sinse) 
-    next
-      case yan
-      then show ?thesis using Cons unfolding sinse list_to_rel.simps by auto 
-    qed
-  qed
-qed
-
-lemma top_sort_mono:
-  assumes "(y, x) \<in> list_to_rel (top_sort G ls)"
-  shows "(y, x) \<in> list_to_rel (top_sort G (l # ls))"
-  using assms 
-  by (simp add: top_insert_mono) 
-
-
-
-fun (in DAG) top_sorted :: "'a list \<Rightarrow> bool" where
-"top_sorted [] = True" |
-"top_sorted (x # ys) = ((\<forall>y \<in> set ys. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> top_sorted ys)"
-
-lemma (in DAG) top_sorted_sub:
-  assumes "S = drop k L"
-  and "top_sorted L"  
-shows "top_sorted S"
-  using assms
-proof(induct k arbitrary: L S)
-  case 0
-  then show ?case by auto
-next
-  case (Suc k)
-  then show ?case unfolding drop_Suc using top_sorted.simps
-    by (metis Suc.prems(1) drop_Nil list.sel(3) top_sorted.elims(2)) 
-qed
-
-
-lemma top_insert_part_ord:
-  assumes "DAG G"
-  and "DAG.top_sorted G L"
-  shows "DAG.top_sorted G (top_insert G L a)" 
-  using assms 
-proof(induct L)
-  case Nil
-  then show ?case  
-    by (simp add: DAG.top_sorted.simps)  
-next
-  case (Cons b list)
-  consider (re) "b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a" | (nre) "\<not> b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a " by auto
-  then show ?case proof(cases)
-    case re
-    have "(\<forall>y\<in>set (b # list). \<not> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y )" 
-    proof(rule ccontr)
-      assume "\<not> (\<forall>y\<in>set (b # list). \<not> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y)"
-      then obtain wit where wit_in: "wit \<in> set  (b # list) \<and> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> wit" by auto
-      then have "b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> wit" using re
-        by auto 
-      then have "\<not> DAG.top_sorted G  (b # list)"
-        using wit_in using DAG.top_sorted.simps(2) Cons(2)
-        by (metis DAG.cycle_free set_ConsD) 
-      then show "False" using Cons by auto 
-    qed
-    then show ?thesis using assms(1) DAG.top_sorted.simps Cons
-      by (simp add: DAG.top_sorted.simps(2) re) 
-  next
-    case nre
-    have "DAG.top_sorted G list" using Cons(2,3)
-      by (metis DAG.top_sorted.simps(2)) 
-    then have "DAG.top_sorted G (top_insert G list a)" 
-      using  Cons(1,2) by auto
-    moreover have "(\<forall>y\<in>set (top_insert G list a). \<not> b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y )" using in_insert 
-    Cons DAG.top_sorted.simps(2) nre
-      by (metis Un_iff empty_iff empty_set list.simps(15) set_ConsD)  
-    ultimately show ?thesis using Cons(2)
-      by (simp add: DAG.top_sorted.simps(2) nre)  
-  qed 
-qed
-   
-  
-lemma top_sort_sorted:
-  assumes "DAG G"
-  shows "DAG.top_sorted G (top_sort G L)" 
-  using assms 
-proof(induct L)
-  case Nil
-  then show ?case
-    by (simp add: DAG.top_sorted.simps(1)) 
-  case (Cons a L)
-  then show ?case unfolding top_sort.simps using top_insert_part_ord by auto
-qed
-
-lemma top_sorted_rel: 
-  assumes "DAG G"
-  and "y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x"
-  and "x \<in> set L"
-  and "y \<in> set L"
-  and "DAG.top_sorted G L"
-shows "(x,y) \<in> list_to_rel L"
-  using assms
-proof(induct L, simp)
-  have une:"x \<noteq> y" using assms
-    by (metis DAG.cycle_free) 
-  case (Cons a L)
-  then consider "x = a \<and> y \<in> set (a # L)" | "y = a \<and> x \<in> set L" | "x \<in> set L \<and> y \<in> set L"
-    using une by auto
-  then show ?case proof(cases)
-  case 1
-    then show ?thesis unfolding list_to_rel.simps by auto
-  next
-    case 2
-    then have "\<not> DAG.top_sorted G (a # L)"
-      using assms DAG.top_sorted.simps(2)
-      by fastforce  
-    then show ?thesis using Cons by auto
-  next
-    case 3
-  then show ?thesis unfolding list_to_rel.simps using Cons DAG.top_sorted.simps(2) Un_iff
-    by metis  
-  qed
-qed
-
-lemma top_sort_rel: 
-  assumes "DAG G"
-  and "y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x"
-  and "x \<in> set L"
-  and "y \<in> set L"
-shows "(x,y) \<in> list_to_rel (top_sort G L)"
-  using assms top_sort_sorted top_sorted_rel top_sort_con
-  by metis  
 
 subsubsection \<open>Soundness of the $add-set-list$ function\<close>
 
@@ -568,7 +187,7 @@ case (Cons a L1)
     by (metis add_Suc add_Suc_right length_Cons old.prod.exhaust snd_conv) 
 qed
   
-lemma fold_app_mono_list:
+lemma fold_app_mono:
   shows "snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)) = L1 @ L2 "
 proof(induct L2 arbitrary: S L1, simp)
   case (Cons a L2)
@@ -577,30 +196,28 @@ proof(induct L2 arbitrary: S L1, simp)
 qed
   
 
-lemma fold_app_mono:
+lemma fold_app_mono1:
   assumes "x \<in> set (snd (S,L1))"
   shows " x \<in> set (snd (fold (app_if_blue_else_add_end G k) L2 (S2,L1)))"
-  using fold_app_mono_list
+  using fold_app_mono
   by (metis Cons_eq_appendI append.assoc assms in_set_conv_decomp sndI) 
 
+lemma fold_app_mono2:
+  assumes "x \<in> set L2"
+  shows "x \<in> set (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
+  using assms unfolding fold_app_mono by auto
 
 lemma fold_app_mono3: 
   assumes "set L1 \<subseteq> set L2"
   shows "set (snd (fold (app_if_blue_else_add_end G k) L (S1, L1)))
    \<subseteq> set (snd (fold (app_if_blue_else_add_end G k) L (S2, L2)))"
-  using assms unfolding fold_app_mono_list
+  using assms unfolding fold_app_mono
   by auto 
 
 
-lemma fold_app_mono2:
-  assumes "x \<in> set L2"
-  shows "x \<in> set (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
-  using assms unfolding fold_app_mono_list by auto
-
-
 lemma fold_app_mono_ex: 
-  shows "(set L2 \<union> set L1) = set (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
-  unfolding fold_app_mono_list by auto
+  shows "set (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1))) = (set L2 \<union> set L1)" 
+  unfolding fold_app_mono by auto
 
 
 lemma fold_app_mono_rel: 
@@ -619,7 +236,7 @@ lemma fold_app_mono_rel2:
   assumes "(x,y) \<in> list_to_rel L2"
   shows "(x,y) \<in> list_to_rel (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
   using assms
-  by (simp add: fold_app_mono_list list_to_rel_mono2) 
+  by (simp add: fold_app_mono list_to_rel_mono2) 
 
 lemma fold_app_app_rel: 
   assumes "x \<in> set L1"
@@ -633,20 +250,6 @@ proof(induct L2 arbitrary: S L1, simp)
     using list_to_rel_append app_if_blue_else_add_end.simps
     by (metis Un_iff add_set_list_tuple.simps fold_app_mono_rel set_ConsD set_append)  
 qed
-
-
-lemma map_snd_map: "\<And>L. (map snd (map (\<lambda>i. (P i , i)) L)) =  L" 
-      proof -
-        fix L
-        show "map snd (map (\<lambda>i. (P i, i)) L) = L"
-        proof(induct L)
-          case Nil
-          then show ?case by auto
-        next
-          case (Cons a L)
-          then show ?case by auto
-        qed
-      qed
 
 lemma chosen_max_tip:
   assumes "blockDAG G"
@@ -736,9 +339,10 @@ subsubsection \<open>OrderDAG soundness\<close>
 
 lemma Verts_in_OrderDAG: 
   assumes "blockDAG G"
-  shows "x \<in> verts G \<longrightarrow> x \<in> set (snd (OrderDAG G k))"
-  using assms(1)
-proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
+  and "x \<in> verts G"
+  shows "x \<in> set (snd (OrderDAG G k))"
+  using assms
+proof(induct G k  arbitrary: x rule: OrderDAG.induct)
   case (1 G k x)
   then have bD: "blockDAG G" by auto
   assume x_in: "x \<in> verts G"
@@ -776,7 +380,7 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
           by (metis (mono_tags, hide_lams) Un_insert_right fst_conv list.simps(15) set_append) 
         then have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
                    (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp))))) (fCur)))"
-          using  fold_app_mono surj_pair
+          using  fold_app_mono1 surj_pair
         by (metis)
       then show ?thesis unfolding pp_in fcur_in using 1 OrderDAG.simps cDm
         by (metis (mono_tags, lifting)) 
@@ -811,13 +415,13 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
         then have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
          (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
          (fst((choose_max_blue_set pp)))))"
-          by (metis fold_app_mono in_F prod.collapse) 
+          by (metis fold_app_mono1 in_F prod.collapse) 
         moreover have "OrderDAG G k = (fold (app_if_blue_else_add_end G k)
          (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
-         (add_set_list_tuple (choose_max_blue_set pp)))" using cDm 1(4) OrderDAG.simps pp_in
+         (add_set_list_tuple (choose_max_blue_set pp)))" using cDm 1 OrderDAG.simps pp_in
           by (metis (no_types, lifting) map_eq_conv) 
         then show "x \<in> set (snd (OrderDAG G k))"
-          by (metis (no_types, lifting) add_set_list_tuple_mono fold_app_mono
+          by (metis (no_types, lifting) add_set_list_tuple_mono fold_app_mono1
                in_F prod.collapse subset_code(1))  
       qed
     qed
@@ -825,7 +429,10 @@ proof(safe, induct G k  arbitrary: x rule: OrderDAG.induct)
 qed
 
 
-lemma OrderDAG_in_verts: "x \<in> set (snd (OrderDAG G k)) \<longrightarrow> x \<in> verts G"
+lemma OrderDAG_in_verts: 
+  assumes "x \<in> set (snd (OrderDAG G k))"
+  shows "x \<in> verts G"
+  using assms
 proof(induction G k arbitrary: x rule: OrderDAG.induct)
   case (1 G k x)
   consider (inval) "\<not> blockDAG G"| (one) "blockDAG G \<and>
@@ -834,17 +441,16 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
   then show ?case 
   proof(cases)
     case inval
-    then show ?thesis using OrderDAG.simps by auto
+    then show ?thesis using 1 by auto
   next
     case one
-    then show ?thesis using OrderDAG.simps genesis_nodeAlt_one_sound blockDAG.is_genesis_node.simps
+    then show ?thesis using OrderDAG.simps 1 genesis_nodeAlt_one_sound blockDAG.is_genesis_node.simps
       using empty_set list.simps(15) singleton_iff sndI by fastforce  
   next
     case val
     then show ?thesis
-    proof safe
+    proof 
     have bD: "blockDAG G" using val  by auto
-    assume pre: "x \<in> set (snd (OrderDAG G k))"
     obtain M where M_in:"M = choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" by auto
       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
@@ -859,7 +465,7 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
         by (metis eq_snd_iff)
     then consider (ac) "x \<in> set (top_sort G (sorted_list_of_set (anticone G (snd M))))" 
         | (co) "x \<in> set (snd (add_set_list_tuple M))" 
-      using pre by auto
+      using 1 by auto
     then show "x \<in> verts G" proof(cases)
         case ac
         then show ?thesis using top_sort_con DAG.anticone_in_verts val 
@@ -901,7 +507,7 @@ lemma OrderDAG_length:
     case (1 G k)
     then show ?case proof (cases G rule: OrderDAG_casesAlt)
     case ntB
-    then show ?thesis using  1 by auto
+    then show ?thesis using 1 by auto
     next
       case one
       then show ?thesis using OrderDAG.simps by auto
@@ -910,32 +516,33 @@ lemma OrderDAG_length:
     show ?thesis using 1
     proof -
       have bD: "blockDAG G" using 1 by auto
-      assume ind: "(\<And>x. \<not> \<not> blockDAG G \<Longrightarrow>
-          card (verts G) \<noteq> 1 \<Longrightarrow>
-          x \<in> set (sorted_list_of_set (tips G)) \<Longrightarrow> blockDAG (reduce_past G x)
-           \<Longrightarrow> length (snd (OrderDAG (reduce_past G x) k)) = card (verts (reduce_past G x)))"
-      obtain x where x_in: "x = (choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+      obtain ma where pp_in: "ma = (choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G))))"
         by (metis)
-      then have tt: "snd x \<in> set (sorted_list_of_set (tips G))" using chosen_max_tip 
+      then have backw: "OrderDAG G k = fold (app_if_blue_else_add_end G k) 
+              (top_sort G (sorted_list_of_set (anticone G (snd ma))))
+              (add_set_list_tuple ma)" using OrderDAG.simps pp_in more
+        by (metis (mono_tags, lifting) less_numeral_extra(4)) 
+      have tt: "snd ma \<in> set (sorted_list_of_set (tips G))" using pp_in chosen_max_tip 
       more by auto
-      have ttt: "snd x \<in> tips G" using chosen_max_tip(2) x_in
+      have ttt: "snd ma \<in> tips G" using chosen_max_tip(2) pp_in
       more by auto
-      then have bD2: "blockDAG (reduce_past G (snd x))" using blockDAG.tips_unequal_gen bD more 
+      then have bD2: "blockDAG (reduce_past G (snd ma))" using blockDAG.tips_unequal_gen bD more 
       blockDAG.reduce_past_dagbased bD tips_def 
         by fastforce
-      then have "length (snd (OrderDAG (reduce_past G (snd x)) k)) 
-                  = card (verts (reduce_past G (snd x)))"
-        using ind tt bD2 more by auto
-      moreover have "(OrderDAG (reduce_past G (snd x)) k) = fst x" unfolding x_in using 
-          choose_max_blue_avoid_empty prod.collapse 
-          Pair_inject ex_map_conv list.map_disc_iff map_eq_conv tt 
-        by (smt (verit, del_insts)) 
-      ultimately show ?thesis using x_in OrderDAG.simps more fold_app_length 
-          add_set_list_tuple_length  DAG.verts_size_comp subs bD
-           add_Suc_shift length_sorted_list_of_set less_irrefl_nat map_eq_conv
-           plus_1_eq_Suc prod.collapse top_sort_len ttt
-        by (smt (z3)) 
+      then have "length (snd (OrderDAG (reduce_past G (snd ma)) k)) 
+                  = card (verts (reduce_past G (snd ma)))"
+        using 1 tt bD2 more by auto
+      then have "length (snd (fst ma)) 
+                  = card (verts (reduce_past G (snd ma)))"
+        using bD chosen_map_simps(6) pp_in
+        by fastforce  
+      then have "length (snd (add_set_list_tuple ma)) = 1 + card (verts (reduce_past G (snd ma)))"
+        by (metis add_set_list_tuple_length plus_1_eq_Suc prod.collapse)
+      then show ?thesis unfolding backw
+        using subs DAG.verts_size_comp ttt
+         add.assoc add.commute bD fold_app_length length_sorted_list_of_set top_sort_len
+        by (metis (full_types))   
     qed
   qed
 qed
@@ -1098,7 +705,7 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
             using y_ina DAG.anticon_finite subs 1(2,3) sorted_list_of_set(1) top_sort_rel
             by metis
           then show ?thesis unfolding backw ma_def  using
-          fold_app_mono_list list_to_rel_mono2
+          fold_app_mono list_to_rel_mono2
             by (metis old.prod.exhaust)
         qed
       qed
