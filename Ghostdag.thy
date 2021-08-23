@@ -12,7 +12,7 @@ subsection \<open>Funcitions and Definitions\<close>
 text \<open>Function to compare the size of set and break ties. Used for the GHOSTDAG maximum blue 
       cluster selection\<close>
 fun larger_blue_tuple ::
- "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
+  "(('a::linorder set \<times> 'a list)  \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a) \<Rightarrow> (('a set \<times> 'a list) \<times> 'a)"
   where "larger_blue_tuple A B = 
   (if (card (fst (fst A))) > (card (fst (fst B))) \<or> 
   (card (fst (fst A)) \<ge> card (fst (fst B)) \<and> snd A \<le> snd B) then A else B)"
@@ -24,9 +24,9 @@ fun add_set_list_tuple :: "(('a::linorder set \<times> 'a list)  \<times> 'a) \<
 text \<open>Function that adds a node $a$ to a kCluster $S$, if $S + {a}$ remains a kCluster.
     Also adds $a$ to the end of list $L$\<close>
 fun app_if_blue_else_add_end :: 
-"('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a \<Rightarrow> ('a::linorder set \<times> 'a list)
+  "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a \<Rightarrow> ('a::linorder set \<times> 'a list)
  \<Rightarrow> ('a::linorder set \<times> 'a list)"  
-where "app_if_blue_else_add_end G k a (S,L) = (if (kCluster G k (S \<union> {a})) 
+  where "app_if_blue_else_add_end G k a (S,L) = (if (kCluster G k (S \<union> {a})) 
 then add_set_list_tuple ((S,L),a) else (S,L @ [a]))"
 
 text \<open>Function to select the largest $((S,L),a)$ according to $larger-blue-tuple$\<close>
@@ -36,7 +36,7 @@ fun choose_max_blue_set :: "(('a::linorder set \<times> 'a list) \<times> 'a) li
 text \<open>GHOSTDAG ordering algorithm\<close>
 function OrderDAG :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> ('a set \<times> 'a list)" 
   where
-  "OrderDAG G k =  
+    "OrderDAG G k =  
   (if (\<not> blockDAG G) then ({},[]) else 
   if (card (verts G) = 1)  then ({genesis_nodeAlt G},[genesis_nodeAlt G]) else
  let M =  choose_max_blue_set 
@@ -77,7 +77,7 @@ lemma OrderDAG_casesAlt:
   | (one) "blockDAG G \<and> card (verts G) = 1"
   | (more) "blockDAG G \<and> card (verts G) > 1"
   using  blockDAG.blockDAG_size_cases by auto
-   
+
 
 
 subsubsection \<open>Soundness of the $add-set-list$ function\<close>
@@ -125,23 +125,23 @@ lemma app_if_blue_mono4:
    \<subseteq> set (snd (app_if_blue_else_add_end G k a (S2,L2)))"
   unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
   using assms by auto
- 
+
 
 lemma app_if_blue_card_mono:
   assumes "finite S"
   shows  "card (fst (S,L)) \<le> card (fst (app_if_blue_else_add_end G k a (S,L)))"
   unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
   by (simp add: assms card_mono subset_insertI)  
-  
 
-  
+
+
 lemma app_if_blue_else_add_end_length:
   shows "length (snd (app_if_blue_else_add_end G k a (S,L))) = Suc (length  L)"
 proof(induction L, auto) qed
-  
 
-  
-  
+
+
+
 subsubsection \<open>Soundness of the $larger-blue-tuple$ comparison\<close>
 
 lemma larger_blue_tuple_mono:
@@ -162,15 +162,15 @@ lemma choose_max_blue_avoid_empty:
   shows "choose_max_blue_set L \<in> set L"
   unfolding choose_max_blue_set.simps 
 proof (rule fold_invariant)
-    show " \<And>x. x \<in> set L \<Longrightarrow> x \<in> set L" using assms by auto
-  next 
-    show "hd L \<in> set L" using assms by auto
-  next 
-    fix x s 
-    assume "x \<in> set L"
+  show " \<And>x. x \<in> set L \<Longrightarrow> x \<in> set L" using assms by auto
+next 
+  show "hd L \<in> set L" using assms by auto
+next 
+  fix x s 
+  assume "x \<in> set L"
     and "s \<in> set L"
-    then show "larger_blue_tuple x s \<in> set L" using larger_blue_tuple.simps by auto
-  qed
+  then show "larger_blue_tuple x s \<in> set L" using larger_blue_tuple.simps by auto
+qed
 
 
 subsubsection \<open>Auxiliary lemmas for OrderDAG\<close>
@@ -179,14 +179,14 @@ lemma fold_app_length:
   shows "length (snd  (fold (app_if_blue_else_add_end G k) 
   L1 PL2)) = length L1 + length (snd PL2)"
 proof(induct L1 arbitrary: PL2)
-case Nil
-then show ?case by auto
+  case Nil
+  then show ?case by auto
 next
-case (Cons a L1)
+  case (Cons a L1)
   then show ?case unfolding fold_Cons comp_apply using app_if_blue_else_add_end_length
     by (metis add_Suc add_Suc_right length_Cons old.prod.exhaust snd_conv) 
 qed
-  
+
 lemma fold_app_mono:
   shows "snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)) = L1 @ L2 "
 proof(induct L2 arbitrary: S L1, simp)
@@ -194,7 +194,7 @@ proof(induct L2 arbitrary: S L1, simp)
   then show ?case unfolding fold_simps(2) using app_if_blue_else_add_end.simps
     by simp
 qed
-  
+
 
 lemma fold_app_mono1:
   assumes "x \<in> set (snd (S,L1))"
@@ -240,7 +240,7 @@ lemma fold_app_mono_rel2:
 
 lemma fold_app_app_rel: 
   assumes "x \<in> set L1"
-  and "y \<in> set L2"
+    and "y \<in> set L2"
   shows "(x,y) \<in> list_to_rel (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
   using assms 
 proof(induct L2 arbitrary: S L1, simp)
@@ -259,29 +259,29 @@ lemma chosen_max_tip:
 proof - 
   obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
    (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
-    have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-        digraph.tips_finite subs assms(1)
-       list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
-      by (metis (mono_tags, lifting))  
-    then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
-      by auto 
-    have mm2: "\<And>L. (map snd (map (\<lambda>i. ((OrderDAG (reduce_past G i) k) , i)) L)) =  L" 
-    proof -
-      fix L
-      show "map snd (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i)) L) = L"
-      proof(induct L)
-        case Nil
-        then show ?case by auto
-      next
-        case (Cons a L)
-        then show ?case by auto
-      qed
+  have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
+      digraph.tips_finite subs assms(1)
+      list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
+    by (metis (mono_tags, lifting))  
+  then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
+    by auto 
+  have mm2: "\<And>L. (map snd (map (\<lambda>i. ((OrderDAG (reduce_past G i) k) , i)) L)) =  L" 
+  proof -
+    fix L
+    show "map snd (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i)) L) = L"
+    proof(induct L)
+      case Nil
+      then show ?case by auto
+    next
+      case (Cons a L)
+      then show ?case by auto
     qed
-    have "set (map snd pp) = set (sorted_list_of_set (tips G))" 
-      using mm2 pp_in  by auto
-    then show "x \<in> set (sorted_list_of_set (tips G))" using pp_in assms(2) kk by blast 
-    then show "x \<in> tips G"
-      using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
+  qed
+  have "set (map snd pp) = set (sorted_list_of_set (tips G))" 
+    using mm2 pp_in  by auto
+  then show "x \<in> set (sorted_list_of_set (tips G))" using pp_in assms(2) kk by blast 
+  then show "x \<in> tips G"
+    using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
 qed
 
 
@@ -305,33 +305,33 @@ lemma chosen_map_simps:
 proof - 
   obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
    (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
-    have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-        digraph.tips_finite subs assms(1)
-       list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
-      by (metis (mono_tags, lifting))  
-    then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
-      by auto 
-    have seteq: "set (map snd pp) = set (sorted_list_of_set (tips G))" 
-      using map_snd_map pp_in  by auto
-    then show "snd (choose_max_blue_set x) \<in> set (sorted_list_of_set (tips G))" 
-      using pp_in assms(2) kk by blast 
-    then show tip: "snd (choose_max_blue_set x) \<in> tips G"
-      using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
-    show "set (map snd x) = set (sorted_list_of_set (tips G))"
-      using map_snd_map assms(2) 
-      by simp
-    then show "choose_max_blue_set x \<in> set x" using seteq pp_in assms(2)
+  have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
+      digraph.tips_finite subs assms(1)
+      list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
+    by (metis (mono_tags, lifting))  
+  then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
+    by auto 
+  have seteq: "set (map snd pp) = set (sorted_list_of_set (tips G))" 
+    using map_snd_map pp_in  by auto
+  then show "snd (choose_max_blue_set x) \<in> set (sorted_list_of_set (tips G))" 
+    using pp_in assms(2) kk by blast 
+  then show tip: "snd (choose_max_blue_set x) \<in> tips G"
+    using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
+  show "set (map snd x) = set (sorted_list_of_set (tips G))"
+    using map_snd_map assms(2) 
+    by simp
+  then show "choose_max_blue_set x \<in> set x" using seteq pp_in assms(2)
       mm by blast 
-    show "OrderDAG (reduce_past G (snd (choose_max_blue_set x))) k = fst (choose_max_blue_set x)"
-         by (metis (no_types) assms(2) chosen_map_simps1 mm pp_in) 
-    assume "\<not> blockDAG.is_genesis_node G (snd (choose_max_blue_set x))"
-    then show " blockDAG (reduce_past G (snd (choose_max_blue_set x)))"
-       using tip blockDAG.reduce_past_dagbased assms(1) digraph.tips_in_verts subs subsetD
-       by metis    
+  show "OrderDAG (reduce_past G (snd (choose_max_blue_set x))) k = fst (choose_max_blue_set x)"
+    by (metis (no_types) assms(2) chosen_map_simps1 mm pp_in) 
+  assume "\<not> blockDAG.is_genesis_node G (snd (choose_max_blue_set x))"
+  then show " blockDAG (reduce_past G (snd (choose_max_blue_set x)))"
+    using tip blockDAG.reduce_past_dagbased assms(1) digraph.tips_in_verts subs subsetD
+    by metis    
 qed
 
-   
-     
+
+
 
 
 
@@ -339,7 +339,7 @@ subsubsection \<open>OrderDAG soundness\<close>
 
 lemma Verts_in_OrderDAG: 
   assumes "blockDAG G"
-  and "x \<in> verts G"
+    and "x \<in> verts G"
   shows "x \<in> set (snd (OrderDAG G k))"
   using assms
 proof(induct G k  arbitrary: x rule: OrderDAG.induct)
@@ -353,7 +353,7 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
     then have "set (snd (OrderDAG G k)) = {genesis_nodeAlt G}" 
       using 1 OrderDAG.simps by auto
     then show ?thesis using x_in bD cD1
-         genesis_nodeAlt_sound blockDAG.is_genesis_node.simps
+        genesis_nodeAlt_sound blockDAG.is_genesis_node.simps
       using 1
       by (metis card_1_singletonE singletonD) 
   next
@@ -366,24 +366,24 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
         using chosen_map_simps bD
         by blast   
       show ?thesis 
-         proof(rule blockDAG.tips_cases)
-         show "blockDAG G" using bD by auto
-         show "snd (choose_max_blue_set pp) \<in> tips G" using tt2 by auto
-         show "x \<in> verts G" using x_in by auto
-       next  
+      proof(rule blockDAG.tips_cases)
+        show "blockDAG G" using bD by auto
+        show "snd (choose_max_blue_set pp) \<in> tips G" using tt2 by auto
+        show "x \<in> verts G" using x_in by auto
+      next  
         assume as1: "x = snd (choose_max_blue_set pp)"
         obtain fCur where fcur_in: "fCur = add_set_list_tuple (choose_max_blue_set pp)"
-            by auto
+          by auto
         have "x \<in> set (snd(fCur))" 
           unfolding as1 using  add_set_list_tuple.simps fcur_in
-          add_set_list_tuple.cases snd_conv insertI1 snd_conv
+            add_set_list_tuple.cases snd_conv insertI1 snd_conv
           by (metis (mono_tags, hide_lams) Un_insert_right fst_conv list.simps(15) set_append) 
         then have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
                    (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp))))) (fCur)))"
           using  fold_app_mono1 surj_pair
-        by (metis)
-      then show ?thesis unfolding pp_in fcur_in using 1 OrderDAG.simps cDm
-        by (metis (mono_tags, lifting)) 
+          by (metis)
+        then show ?thesis unfolding pp_in fcur_in using 1 OrderDAG.simps cDm
+          by (metis (mono_tags, lifting)) 
       next
         assume anti: "x \<in> anticone G (snd (choose_max_blue_set pp))" 
         obtain ttt where ttt_in: "ttt = add_set_list_tuple (choose_max_blue_set pp)" by auto
@@ -391,7 +391,7 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
                  (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
                    ttt))" 
           using pp_in sorted_list_of_set(1) anti bD subs
-         DAG.anticon_finite fold_app_mono2 surj_pair top_sort_con  by metis 
+            DAG.anticon_finite fold_app_mono2 surj_pair top_sort_con  by metis 
         then show "x \<in> set (snd (OrderDAG G k))" using OrderDAG.simps pp_in bD cDm ttt_in 1
           by (metis (no_types, lifting) map_eq_conv) 
       next 
@@ -401,11 +401,11 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
         have cd1: "card (verts G) > 1" using cDm bD
           using blockDAG.blockDAG_size_cases by blast 
         have "(snd (choose_max_blue_set pp)) \<in> set (sorted_list_of_set (tips G))" using tt2
-        digraph.tips_finite bD subs sorted_list_of_set(1) by auto
+            digraph.tips_finite bD subs sorted_list_of_set(1) by auto
         moreover 
         have "blockDAG (reduce_past G (snd (choose_max_blue_set pp)))" using 
-        blockDAG.reduce_past_dagbased bD tt2  blockDAG.tips_unequal_gen 
-        cd1 tips_def CollectD by metis
+            blockDAG.reduce_past_dagbased bD tt2  blockDAG.tips_unequal_gen 
+            cd1 tips_def CollectD by metis
         ultimately have bass: 
           "x \<in> set ((snd (OrderDAG (reduce_past G (snd (choose_max_blue_set pp))) k)))" 
           using  pp_in 1 cDm tt2 pas by metis
@@ -422,7 +422,7 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
           by (metis (no_types, lifting) map_eq_conv) 
         then show "x \<in> set (snd (OrderDAG G k))"
           by (metis (no_types, lifting) add_set_list_tuple_mono fold_app_mono1
-               in_F prod.collapse subset_code(1))  
+              in_F prod.collapse subset_code(1))  
       qed
     qed
   qed
@@ -450,8 +450,8 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
     case val
     then show ?thesis
     proof 
-    have bD: "blockDAG G" using val  by auto
-    obtain M where M_in:"M = choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+      have bD: "blockDAG G" using val  by auto
+      obtain M where M_in:"M = choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" by auto
       obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
@@ -463,13 +463,13 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
     = set (top_sort G (sorted_list_of_set (anticone G (snd M)))) \<union> set (snd (add_set_list_tuple M))"
         using fold_app_mono_ex
         by (metis eq_snd_iff)
-    then consider (ac) "x \<in> set (top_sort G (sorted_list_of_set (anticone G (snd M))))" 
+      then consider (ac) "x \<in> set (top_sort G (sorted_list_of_set (anticone G (snd M))))" 
         | (co) "x \<in> set (snd (add_set_list_tuple M))" 
-      using 1 by auto
-    then show "x \<in> verts G" proof(cases)
+        using 1 by auto
+      then show "x \<in> verts G" proof(cases)
         case ac
         then show ?thesis using top_sort_con DAG.anticone_in_verts val 
-        sorted_list_of_set(1) subs
+            sorted_list_of_set(1) subs
           by (metis DAG.anticon_finite subsetD) 
       next
         case co
@@ -480,7 +480,7 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
         then show ?thesis proof(cases)
           case ma
           then show ?thesis unfolding M_in  using bD 
-            chosen_map_simps(2) digraph.tips_in_verts subs
+              chosen_map_simps(2) digraph.tips_in_verts subs
             by blast 
         next
           have mm: "choose_max_blue_set pp \<in> set pp" unfolding pp_in using bD chosen_map_simps(4)
@@ -490,7 +490,7 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
             unfolding M_in choose_max_blue_avoid_empty blockDAG.tips_not_empty bD
             by (metis (no_types, lifting) ex_map_conv fst_conv mm pp_in snd_conv) 
           then have "x \<in> verts (reduce_past G (snd M))" using 1 val chosen_map_simps M_in pp_in 
-          sorted_list_of_set(1) digraph.tips_finite subs bD
+              sorted_list_of_set(1) digraph.tips_finite subs bD
             by blast 
           then show "x \<in> verts G" using reduce_past.simps induce_subgraph_verts past_nodes.simps
             by auto
@@ -503,15 +503,15 @@ qed
 
 lemma OrderDAG_length:
   shows "blockDAG G \<Longrightarrow> length (snd (OrderDAG G k)) = card (verts G)"
-  proof(induct G k rule: OrderDAG.induct)
-    case (1 G k)
-    then show ?case proof (cases G rule: OrderDAG_casesAlt)
+proof(induct G k rule: OrderDAG.induct)
+  case (1 G k)
+  then show ?case proof (cases G rule: OrderDAG_casesAlt)
     case ntB
     then show ?thesis using 1 by auto
-    next
-      case one
-      then show ?thesis using OrderDAG.simps by auto
-    next
+  next
+    case one
+    then show ?thesis using OrderDAG.simps by auto
+  next
     case more
     show ?thesis using 1
     proof -
@@ -524,11 +524,11 @@ lemma OrderDAG_length:
               (add_set_list_tuple ma)" using OrderDAG.simps pp_in more
         by (metis (mono_tags, lifting) less_numeral_extra(4)) 
       have tt: "snd ma \<in> set (sorted_list_of_set (tips G))" using pp_in chosen_max_tip 
-      more by auto
+          more by auto
       have ttt: "snd ma \<in> tips G" using chosen_max_tip(2) pp_in
-      more by auto
+          more by auto
       then have bD2: "blockDAG (reduce_past G (snd ma))" using blockDAG.tips_unequal_gen bD more 
-      blockDAG.reduce_past_dagbased bD tips_def 
+          blockDAG.reduce_past_dagbased bD tips_def 
         by fastforce
       then have "length (snd (OrderDAG (reduce_past G (snd ma)) k)) 
                   = card (verts (reduce_past G (snd ma)))"
@@ -541,7 +541,7 @@ lemma OrderDAG_length:
         by (metis add_set_list_tuple_length plus_1_eq_Suc prod.collapse)
       then show ?thesis unfolding backw
         using subs DAG.verts_size_comp ttt
-         add.assoc add.commute bD fold_app_length length_sorted_list_of_set top_sort_len
+          add.assoc add.commute bD fold_app_length length_sorted_list_of_set top_sort_len
         by (metis (full_types))   
     qed
   qed
@@ -552,12 +552,12 @@ lemma OrderDAG_total:
   shows "set (snd (OrderDAG G k)) = verts G"
   using Verts_in_OrderDAG OrderDAG_in_verts assms(1)
   by blast 
-     
+
 lemma  OrderDAG_distinct:
   assumes "blockDAG G"
   shows "distinct (snd (OrderDAG G k))"
   using OrderDAG_length OrderDAG_total
-  card_distinct assms
+    card_distinct assms
   by metis 
 
 
@@ -569,87 +569,87 @@ lemma GhostDAG_linear:
 
 lemma GhostDAG_preserving:
   assumes "blockDAG G"
-  and "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
-shows "(y,x) \<in> GhostDAG_Relation G k"
+    and "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
+  shows "(y,x) \<in> GhostDAG_Relation G k"
   unfolding GhostDAG_Relation.simps using assms 
 proof(induct G k arbitrary: x y rule: OrderDAG.induct )
   case (1 G k)
   then show ?case proof (cases G rule: OrderDAG_casesAlt)
     case ntB
     then show ?thesis using 1 by auto
-    next
-      case one
-      then have "\<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
-        using subs wf_digraph.reachable1_in_verts 1
-        by (metis DAG.cycle_free OrderDAG_casesAlt blockDAG.reduce_less
-            blockDAG.reduce_past_dagbased blockDAG.unique_genesis less_one not_one_less_zero) 
-      then show ?thesis using 1 by simp
-    next  
-      case more
-      obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+  next
+    case one
+    then have "\<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
+      using subs wf_digraph.reachable1_in_verts 1
+      by (metis DAG.cycle_free OrderDAG_casesAlt blockDAG.reduce_less
+          blockDAG.reduce_past_dagbased blockDAG.unique_genesis less_one not_one_less_zero) 
+    then show ?thesis using 1 by simp
+  next  
+    case more
+    obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
        (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
-      have backw: "list_to_rel (snd (OrderDAG G k)) = 
+    have backw: "list_to_rel (snd (OrderDAG G k)) = 
                      list_to_rel (snd (fold (app_if_blue_else_add_end G k)
                     (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
                    (add_set_list_tuple (choose_max_blue_set pp))))"
-          using OrderDAG.simps less_irrefl_nat more pp_in
-          by (metis (mono_tags, lifting))
-      obtain S where s_in: 
+      using OrderDAG.simps less_irrefl_nat more pp_in
+      by (metis (mono_tags, lifting))
+    obtain S where s_in: 
       "(top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp))))) = S" by simp
-       obtain t where t_in : "(add_set_list_tuple (choose_max_blue_set pp)) = t" by simp
-      obtain ma where ma_def: "ma = (snd (choose_max_blue_set pp))" by simp
-      have ma_vert: "ma \<in> verts G" unfolding ma_def using chosen_map_simps(2) digraph.tips_in_verts
-      more(1) subs subsetD pp_in by blast 
-      have ma_tip: "is_tip G ma" unfolding ma_def
-        using chosen_map_simps(2) more pp_in  tips_tips
-          by (metis (no_types))          
-      then have no_gen: "\<not> blockDAG.is_genesis_node G ma" unfolding ma_def  using pp_in 
-      blockDAG.tips_unequal_gen more
-        by metis
-      then have red_bd: "blockDAG (reduce_past G ma)"  
-        using blockDAG.reduce_past_dagbased more ma_vert unfolding ma_def
-        by auto
-      consider (ind) "x \<in> past_nodes G ma \<and> y \<in> past_nodes G ma"
-        |(x_in) "x \<notin>  past_nodes G ma \<and> y \<in> past_nodes G ma"
-        |(y_in) "x \<in>  past_nodes G ma \<and> y \<notin> past_nodes G ma"
-        |(both_nin) "x \<notin>  past_nodes G ma \<and> y \<notin> past_nodes G ma" by auto
-      then show ?thesis proof(cases)
-        case ind
-        then have "x \<rightarrow>\<^sup>+\<^bsub>reduce_past G ma\<^esub> y" using DAG.reduce_past_path2 more  
-            1 subs
-          by (metis) 
-        moreover have ma_tips: " ma \<in> set (sorted_list_of_set (tips G))" 
-          using chosen_map_simps(1) pp_in more(1) 
-          unfolding ma_def by auto
-        ultimately have "(y,x) \<in> list_to_rel (snd (OrderDAG (reduce_past G ma) k))"
-          unfolding ma_def
-          using more 1 ind less_numeral_extra(4) ma_def red_bd
-          by (metis)
-        then have "(y,x) \<in> list_to_rel (snd (fst (choose_max_blue_set pp)))"
-          using chosen_map_simps(6) pp_in 1 unfolding ma_def by fastforce
-        then have rel_base: "(y,x) \<in> list_to_rel (snd (add_set_list_tuple(choose_max_blue_set pp)))"
-          using add_set_list_tuple.simps list_to_rel_mono prod.collapse snd_conv
-          by metis 
-       
-        show ?thesis 
-          unfolding  ma_def backw s_in
-          using rel_base  unfolding t_in 
-          using fold_app_mono_rel prod.collapse
-          by metis       
-      next
-        case x_in
-        then have "y \<in> set (snd (OrderDAG (reduce_past G ma) k))"
-          unfolding reduce_past.simps using induce_subgraph_verts Verts_in_OrderDAG 
+    obtain t where t_in : "(add_set_list_tuple (choose_max_blue_set pp)) = t" by simp
+    obtain ma where ma_def: "ma = (snd (choose_max_blue_set pp))" by simp
+    have ma_vert: "ma \<in> verts G" unfolding ma_def using chosen_map_simps(2) digraph.tips_in_verts
+        more(1) subs subsetD pp_in by blast 
+    have ma_tip: "is_tip G ma" unfolding ma_def
+      using chosen_map_simps(2) more pp_in  tips_tips
+      by (metis (no_types))          
+    then have no_gen: "\<not> blockDAG.is_genesis_node G ma" unfolding ma_def  using pp_in 
+        blockDAG.tips_unequal_gen more
+      by metis
+    then have red_bd: "blockDAG (reduce_past G ma)"  
+      using blockDAG.reduce_past_dagbased more ma_vert unfolding ma_def
+      by auto
+    consider (ind) "x \<in> past_nodes G ma \<and> y \<in> past_nodes G ma"
+      |(x_in) "x \<notin>  past_nodes G ma \<and> y \<in> past_nodes G ma"
+      |(y_in) "x \<in>  past_nodes G ma \<and> y \<notin> past_nodes G ma"
+      |(both_nin) "x \<notin>  past_nodes G ma \<and> y \<notin> past_nodes G ma" by auto
+    then show ?thesis proof(cases)
+      case ind
+      then have "x \<rightarrow>\<^sup>+\<^bsub>reduce_past G ma\<^esub> y" using DAG.reduce_past_path2 more  
+          1 subs
+        by (metis) 
+      moreover have ma_tips: " ma \<in> set (sorted_list_of_set (tips G))" 
+        using chosen_map_simps(1) pp_in more(1) 
+        unfolding ma_def by auto
+      ultimately have "(y,x) \<in> list_to_rel (snd (OrderDAG (reduce_past G ma) k))"
+        unfolding ma_def
+        using more 1 ind less_numeral_extra(4) ma_def red_bd
+        by (metis)
+      then have "(y,x) \<in> list_to_rel (snd (fst (choose_max_blue_set pp)))"
+        using chosen_map_simps(6) pp_in 1 unfolding ma_def by fastforce
+      then have rel_base: "(y,x) \<in> list_to_rel (snd (add_set_list_tuple(choose_max_blue_set pp)))"
+        using add_set_list_tuple.simps list_to_rel_mono prod.collapse snd_conv
+        by metis 
+
+      show ?thesis 
+        unfolding  ma_def backw s_in
+        using rel_base  unfolding t_in 
+        using fold_app_mono_rel prod.collapse
+        by metis       
+    next
+      case x_in
+      then have "y \<in> set (snd (OrderDAG (reduce_past G ma) k))"
+        unfolding reduce_past.simps using induce_subgraph_verts Verts_in_OrderDAG 
           more red_bd reduce_past.elims
-          by (metis)
-        then have y_in_base: "y \<in> set (snd (fst (choose_max_blue_set pp)))"
-          unfolding ma_def using chosen_map_simps(6) more pp_in
-          by fastforce 
-        consider (x_t) "x = ma" | (x_ant) "x \<in> anticone G ma" using DAG.verts_comp2 
-        subs 1  ma_tip ma_vert 
-        mem_Collect_eq tips_def wf_digraph.reachable1_in_verts(1) x_in
-          by (metis (no_types, lifting)) 
-        then show ?thesis proof(cases)
+        by (metis)
+      then have y_in_base: "y \<in> set (snd (fst (choose_max_blue_set pp)))"
+        unfolding ma_def using chosen_map_simps(6) more pp_in
+        by fastforce 
+      consider (x_t) "x = ma" | (x_ant) "x \<in> anticone G ma" using DAG.verts_comp2 
+          subs 1  ma_tip ma_vert 
+          mem_Collect_eq tips_def wf_digraph.reachable1_in_verts(1) x_in
+        by (metis (no_types, lifting)) 
+      then show ?thesis proof(cases)
         case x_t
         then have "(y,x) \<in>  list_to_rel (snd (add_set_list_tuple (choose_max_blue_set pp)))"
           unfolding x_t ma_def 
@@ -670,46 +670,50 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
         ultimately show ?thesis unfolding backw
           by (metis fold_app_app_rel ma_def prod.collapse top_sort_con) 
       qed
+    next
+      case y_in
+      then have "y \<in> past_nodes G ma" unfolding past_nodes.simps using 1(2,3)
+          wf_digraph.reachable1_in_verts(2) subs mem_Collect_eq trancl_trans
+        by (metis (mono_tags, lifting)) 
+      then show ?thesis using y_in by simp 
+    next
+      case both_nin
+      consider (x_t) "x = ma" | (x_ant) "x \<in> anticone G ma" using DAG.verts_comp2 
+          subs 1  ma_tip ma_vert 
+          mem_Collect_eq tips_def wf_digraph.reachable1_in_verts(1) both_nin
+        by (metis (no_types, lifting)) 
+      then show ?thesis proof(cases)
+        case x_t 
+        have "y \<in> past_nodes G ma" using 1(3) more 
+            past_nodes.simps unfolding x_t
+          by (simp add: subs wf_digraph.reachable1_in_verts(2)) 
+        then show ?thesis using both_nin by simp 
       next
-        case y_in
-        then have "y \<in> past_nodes G ma" unfolding past_nodes.simps using 1(2,3)
-            wf_digraph.reachable1_in_verts(2) subs mem_Collect_eq trancl_trans
-          by (metis (mono_tags, lifting)) 
-        then show ?thesis using y_in by simp 
-      next
-        case both_nin
-        consider (x_t) "x = ma" | (x_ant) "x \<in> anticone G ma" using DAG.verts_comp2 
-        subs 1  ma_tip ma_vert 
-        mem_Collect_eq tips_def wf_digraph.reachable1_in_verts(1) both_nin
-          by (metis (no_types, lifting)) 
-        then show ?thesis proof(cases)
-          case x_t 
-          have "y \<in> past_nodes G ma" using 1(3) more 
-          past_nodes.simps unfolding x_t
-            by (simp add: subs wf_digraph.reachable1_in_verts(2)) 
-          then show ?thesis using both_nin by simp 
-        next
-          have y_ina: "y \<in> anticone G ma" 
-          proof(rule ccontr) 
-            assume "\<not> y \<in> anticone G ma "
-            then have "y = ma"
-              unfolding anticone.simps using subs wf_digraph.reachable1_in_verts(2) 1(2,3) 
+        have y_ina: "y \<in> anticone G ma" 
+        proof(rule ccontr) 
+          assume "\<not> y \<in> anticone G ma "
+          then have "y = ma"
+            unfolding anticone.simps using subs wf_digraph.reachable1_in_verts(2) 1(2,3) 
               ma_tip both_nin
-              by fastforce  
-              then have "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> ma" using 1(3) by auto
-              then show False using subs  1(2)
-                by (metis wf_digraph.tips_not_referenced ma_tip)  
-            qed
-          case x_ant
-          then have "(y,x) \<in> list_to_rel (top_sort G (sorted_list_of_set (anticone G ma)))"
-            using y_ina DAG.anticon_finite subs 1(2,3) sorted_list_of_set(1) top_sort_rel
-            by metis
-          then show ?thesis unfolding backw ma_def  using
-          fold_app_mono list_to_rel_mono2
-            by (metis old.prod.exhaust)
+            by fastforce  
+          then have "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> ma" using 1(3) by auto
+          then show False using subs  1(2)
+            by (metis wf_digraph.tips_not_referenced ma_tip)  
         qed
+        case x_ant
+        then have "(y,x) \<in> list_to_rel (top_sort G (sorted_list_of_set (anticone G ma)))"
+          using y_ina DAG.anticon_finite subs 1(2,3) sorted_list_of_set(1) top_sort_rel
+          by metis
+        then show ?thesis unfolding backw ma_def  using
+            fold_app_mono list_to_rel_mono2
+          by (metis old.prod.exhaust)
       qed
     qed
   qed
+qed
+
+
+
+
 
 end

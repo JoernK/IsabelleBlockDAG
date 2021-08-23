@@ -20,19 +20,19 @@ proof(induct L, simp_all, auto) qed
 
 lemma top_sort_con: "set (top_sort G L) = set L"
 proof(induct L)
-case Nil
-then show ?case by auto
+  case Nil
+  then show ?case by auto
 next
   case (Cons a L)
   then show ?case using top_sort.simps(2) top_insert_set insert_is_Un list.simps(15) sup_commute
     by (metis) 
 qed
- 
+
 
 lemma top_insert_len: "length (top_insert G L a) = Suc (length L)"
 proof(induct L)
-case Nil
-then show ?case by auto
+  case Nil
+  then show ?case by auto
 next
   case (Cons a L)
   then show ?case using top_insert.simps(2) by auto
@@ -48,8 +48,8 @@ proof(induct L, simp)
 qed
 
 lemma top_insert_mono:
-assumes "(y, x) \<in> list_to_rel ls"
-shows "(y, x) \<in> list_to_rel (top_insert G ls l)"
+  assumes "(y, x) \<in> list_to_rel ls"
+  shows "(y, x) \<in> list_to_rel (top_insert G ls l)"
   using assms 
 proof(induct ls, simp)
   case (Cons a ls)
@@ -86,13 +86,13 @@ lemma top_sort_mono:
 
 
 fun (in DAG) top_sorted :: "'a list \<Rightarrow> bool" where
-"top_sorted [] = True" |
-"top_sorted (x # ys) = ((\<forall>y \<in> set ys. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> top_sorted ys)"
+  "top_sorted [] = True" |
+  "top_sorted (x # ys) = ((\<forall>y \<in> set ys. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> top_sorted ys)"
 
 lemma (in DAG) top_sorted_sub:
   assumes "S = drop k L"
-  and "top_sorted L"  
-shows "top_sorted S"
+    and "top_sorted L"  
+  shows "top_sorted S"
   using assms
 proof(induct k arbitrary: L S)
   case 0
@@ -106,7 +106,7 @@ qed
 
 lemma top_insert_part_ord:
   assumes "DAG G"
-  and "DAG.top_sorted G L"
+    and "DAG.top_sorted G L"
   shows "DAG.top_sorted G (top_insert G L a)" 
   using assms 
 proof(induct L)
@@ -138,14 +138,14 @@ next
     then have "DAG.top_sorted G (top_insert G list a)" 
       using  Cons(1,2) by auto
     moreover have "(\<forall>y\<in>set (top_insert G list a). \<not> b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y )" using top_insert_set 
-    Cons DAG.top_sorted.simps(2) nre
+        Cons DAG.top_sorted.simps(2) nre
       by (metis Un_iff empty_iff empty_set list.simps(15) set_ConsD)  
     ultimately show ?thesis using Cons(2)
       by (simp add: DAG.top_sorted.simps(2) nre)  
   qed 
 qed
-   
-  
+
+
 lemma top_sort_sorted:
   assumes "DAG G"
   shows "DAG.top_sorted G (top_sort G L)" 
@@ -160,11 +160,11 @@ qed
 
 lemma top_sorted_rel: 
   assumes "DAG G"
-  and "y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x"
-  and "x \<in> set L"
-  and "y \<in> set L"
-  and "DAG.top_sorted G L"
-shows "(x,y) \<in> list_to_rel L"
+    and "y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x"
+    and "x \<in> set L"
+    and "y \<in> set L"
+    and "DAG.top_sorted G L"
+  shows "(x,y) \<in> list_to_rel L"
   using assms
 proof(induct L, simp)
   have une:"x \<noteq> y" using assms
@@ -173,7 +173,7 @@ proof(induct L, simp)
   then consider "x = a \<and> y \<in> set (a # L)" | "y = a \<and> x \<in> set L" | "x \<in> set L \<and> y \<in> set L"
     using une by auto
   then show ?case proof(cases)
-  case 1
+    case 1
     then show ?thesis unfolding list_to_rel.simps by auto
   next
     case 2
@@ -183,17 +183,17 @@ proof(induct L, simp)
     then show ?thesis using Cons by auto
   next
     case 3
-  then show ?thesis unfolding list_to_rel.simps using Cons DAG.top_sorted.simps(2) Un_iff
-    by metis  
+    then show ?thesis unfolding list_to_rel.simps using Cons DAG.top_sorted.simps(2) Un_iff
+      by metis  
   qed
 qed
 
 lemma top_sort_rel: 
   assumes "DAG G"
-  and "y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x"
-  and "x \<in> set L"
-  and "y \<in> set L"
-shows "(x,y) \<in> list_to_rel (top_sort G L)"
+    and "y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> x"
+    and "x \<in> set L"
+    and "y \<in> set L"
+  shows "(x,y) \<in> list_to_rel (top_sort G L)"
   using assms top_sort_sorted top_sorted_rel top_sort_con
   by metis  
 

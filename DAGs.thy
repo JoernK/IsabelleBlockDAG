@@ -34,12 +34,12 @@ fun anticone:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
 
 fun reduce_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
-  "reduce_past G a = induce_subgraph G (past_nodes G a)"
+    "reduce_past G a = induce_subgraph G (past_nodes G a)"
 
 fun reduce_past_refl:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
-  "reduce_past_refl G a = induce_subgraph G (past_nodes_refl G a)"
-                                          
+    "reduce_past_refl G a = induce_subgraph G (past_nodes_refl G a)"
+
 fun is_tip:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> bool"
   where "is_tip G a = ((a \<in> verts G) \<and>  (\<forall> x \<in> verts G. \<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a))"
 
@@ -51,9 +51,9 @@ fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a set  \<Ri
    then (\<forall>a \<in> C. card ((anticone G a) \<inter> C) \<le> k) else False)"
 
 subsection \<open>Lemmas\<close>
-  
+
 lemma (in DAG) unidirectional:
-"u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
+  "u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v \<longrightarrow> \<not>( v \<rightarrow>\<^sup>*\<^bsub>G\<^esub> u)"
   using cycle_free reachable1_reachable_trans by auto
 
 subsubsection \<open>Tips\<close>
@@ -66,8 +66,8 @@ lemma (in wf_digraph) tips_not_referenced:
   by metis 
 
 lemma (in DAG) del_tips_dag:
-assumes "is_tip G t"
-shows "DAG (del_vert t)"
+  assumes "is_tip G t"
+  shows "DAG (del_vert t)"
   unfolding DAG_def DAG_axioms_def
 proof safe
   show "digraph (del_vert t)" using del_vert_simps DAG_axioms 
@@ -75,19 +75,19 @@ proof safe
     using digraph_subgraph subgraph_del_vert
     by auto 
 next 
-    fix v
-    assume "v \<rightarrow>\<^sup>+\<^bsub>del_vert t\<^esub> v"
-    then have "v \<rightarrow>\<^sup>+ v" using subgraph_del_vert
-      by (meson arcs_ends_mono trancl_mono) 
-    then show False
-      by (simp add: cycle_free)
-  qed
+  fix v
+  assume "v \<rightarrow>\<^sup>+\<^bsub>del_vert t\<^esub> v"
+  then have "v \<rightarrow>\<^sup>+ v" using subgraph_del_vert
+    by (meson arcs_ends_mono trancl_mono) 
+  then show False
+    by (simp add: cycle_free)
+qed
 
 lemma (in digraph) tips_finite:
   shows "finite (tips G)"
   using tips_def fin_digraph.finite_verts digraph.axioms(1) digraph_axioms Collect_mono is_tip.simps
   by (simp add: tips_def)
-  
+
 lemma (in digraph) tips_in_verts:
   shows "tips G \<subseteq>  verts G"  unfolding tips_def
   using Collect_subset by auto
@@ -100,8 +100,8 @@ subsubsection \<open>Anticone\<close>
 
 lemma (in DAG) tips_anticone:
   assumes "a \<in> tips G"
-  and "b \<in> tips G"
-  and "a \<noteq> b"
+    and "b \<in> tips G"
+    and "a \<noteq> b"
   shows "a \<in> anticone G b"
 proof(rule ccontr)
   assume " a \<notin> anticone G b" 
@@ -120,10 +120,10 @@ lemma (in DAG) anticone_in_verts:
   shows "anticone G a \<subseteq> verts G" using anticone.simps by auto
 
 lemma (in DAG) anticon_finite:
-   shows "finite (anticone G a)" using anticone_in_verts by auto
+  shows "finite (anticone G a)" using anticone_in_verts by auto
 
 lemma (in DAG) anticon_not_refl:
-   shows "a \<notin> (anticone G a)" by auto
+  shows "a \<notin> (anticone G a)" by auto
 
 subsubsection \<open>Future Nodes\<close>
 
@@ -194,14 +194,14 @@ proof induct
     by metis
 next case (step u v) show ?case
     using dominates_induce_subgraphD reachable1_reachable_trans reachable_adjI 
-        reduce_past.simps step.hyps(2) step.hyps(3) by metis
-     
+      reduce_past.simps step.hyps(2) step.hyps(3) by metis
+
 qed
 
 lemma (in DAG) reduce_past_path2:
   assumes "u \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v"
-  and "u \<in> past_nodes G a"
-  and "v \<in> past_nodes G a"
+    and "u \<in> past_nodes G a"
+    and "v \<in> past_nodes G a"
   shows "u \<rightarrow>\<^sup>+\<^bsub>reduce_past G a\<^esub> v" 
   using assms
 proof(induct u v)
@@ -211,9 +211,9 @@ proof(induct u v)
   then have e_in2: "e \<in> arcs (reduce_past G a)" unfolding reduce_past.simps induce_subgraph_arcs
     using arcE r_into_trancl.prems(1) r_into_trancl.prems(2) by blast
   then have "arc_to_ends (reduce_past G a) e = (u,v)" unfolding reduce_past.simps using e_in
-  arcE arc_to_ends_def induce_subgraph_head induce_subgraph_tail
+      arcE arc_to_ends_def induce_subgraph_head induce_subgraph_tail
     by metis  
-  
+
   then have  "u \<rightarrow>\<^bsub>reduce_past G a\<^esub> v" using e_in2 wf_digraph.dominatesI DAG_axioms
     by (metis reduce_past.simps wellformed_induce_subgraph)  
   then show ?case by auto
@@ -227,9 +227,9 @@ next
       arc_def DAG_axioms wf_digraph_def by auto 
   then have e_in2: "e \<in> arcs (reduce_past G a)" unfolding reduce_past.simps induce_subgraph_arcs
     using arcE trancl_into_trancl
-    b_in by blast 
+      b_in by blast 
   then have "arc_to_ends (reduce_past G a) e = (b,c)" unfolding reduce_past.simps using e_in
-  arcE arc_to_ends_def induce_subgraph_head induce_subgraph_tail
+      arcE arc_to_ends_def induce_subgraph_head induce_subgraph_tail
     by metis  
   then have  "b \<rightarrow>\<^bsub>reduce_past G a\<^esub> c" using e_in2 wf_digraph.dominatesI DAG_axioms
     by (metis reduce_past.simps wellformed_induce_subgraph)  
@@ -283,30 +283,30 @@ proof
     proof( cases x xa rule: reachable1_cases)
       case nR
       then show ?thesis using anticone.simps in_V by auto 
-      next
-        case one
-        then show ?thesis using reduce_past.simps induce_subgraph_verts past_nodes.simps in_V
-          by auto
-      next
-        case two
-        have "is_tip G x" using tips_tips assms(1) by simp
-        then have "False" using  tips_not_referenced two by auto
-        then show ?thesis by simp
-      next
-        case eq
-        then show ?thesis by auto
-      qed
+    next
+      case one
+      then show ?thesis using reduce_past.simps induce_subgraph_verts past_nodes.simps in_V
+        by auto
+    next
+      case two
+      have "is_tip G x" using tips_tips assms(1) by simp
+      then have "False" using  tips_not_referenced two by auto
+      then show ?thesis by simp
+    next
+      case eq
+      then show ?thesis by auto
     qed
-  next 
-    show "{x} \<union> anticone G x \<union> verts (reduce_past G x) \<subseteq> verts G" using digraph.tips_in_verts 
-    digraph_axioms anticone_in_verts reduce_past_induced_subgraph induced_subgraph_def
-    subgraph_def assms by auto
   qed
+next 
+  show "{x} \<union> anticone G x \<union> verts (reduce_past G x) \<subseteq> verts G" using digraph.tips_in_verts 
+      digraph_axioms anticone_in_verts reduce_past_induced_subgraph induced_subgraph_def
+      subgraph_def assms by auto
+qed
 
 
 lemma (in DAG) verts_comp2:
   assumes "x \<in> tips G"
-  and "a \<in> verts G"
+    and "a \<in> verts G"
   obtains  "a = x" 
   | "a \<in> anticone G x"
   | "a \<in> past_nodes G x"
@@ -316,9 +316,9 @@ proof(cases a x rule:reachable1_cases)
   then show ?thesis
     by (metis assms(1) tips_not_referenced tips_tips) 
 next
-case two
+  case two
   then show ?thesis using past_nodes.simps wf_digraph.reachable1_in_verts(2) wf_digraph_axioms
-    mem_Collect_eq that(3)
+      mem_Collect_eq that(3)
     by (metis (no_types, lifting)) 
 next
   case nR
@@ -327,11 +327,11 @@ qed
 
 lemma (in DAG) verts_comp_dis:
   shows "{x} \<inter> (anticone G x) = {}" 
-  and " {x} \<inter> (verts (reduce_past G x)) = {}"
-  and "anticone G x \<inter> (verts (reduce_past G x)) = {}"
+    and " {x} \<inter> (verts (reduce_past G x)) = {}"
+    and "anticone G x \<inter> (verts (reduce_past G x)) = {}"
 proof(simp_all, simp add: cycle_free, safe) qed
 
- 
+
 lemma (in DAG) verts_size_comp:
   assumes  "x \<in> tips G"
   shows  "card (verts G) = 1 + card (anticone G x) + card (verts (reduce_past G x))"
@@ -341,7 +341,7 @@ proof -
   have f3: "finite (anticone G x)" using anticone.simps by auto
   have f4: "finite (verts (reduce_past G x))" by auto
   have c1: "card {x} + card (anticone G x) = card ({x} \<union> (anticone G x))" using card_Un_disjoint
-  verts_comp_dis by auto
+      verts_comp_dis by auto
   have "({x} \<union> (anticone G x)) \<inter> verts (reduce_past G x) = {}" using verts_comp_dis by auto
   then have " card ({x} \<union> (anticone G x) \<union> verts (reduce_past G x)) 
       = card {x} + card (anticone G x) + card (verts (reduce_past G x))

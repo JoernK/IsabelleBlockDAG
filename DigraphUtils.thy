@@ -20,20 +20,20 @@ lemma graph_equality:
 lemma (in digraph) del_vert_not_in_graph:
   assumes "b \<notin> verts G"
   shows "(pre_digraph.del_vert G b) = G"
-      proof -
-        have v: "verts (pre_digraph.del_vert G b) = verts G"
-          using assms(1)
-          by (simp add: pre_digraph.verts_del_vert) 
-        have "\<forall>e \<in> arcs G. tail G e \<noteq> b \<and> head G e \<noteq> b " using digraph_axioms
-         assms digraph.axioms(2) loopfree_digraph.axioms(1)
-          by auto 
-        then have " arcs G \<subseteq> arcs (pre_digraph.del_vert G b)"
-          using assms
-          by (simp add: pre_digraph.arcs_del_vert subsetI) 
-        then have e: "arcs G = arcs (pre_digraph.del_vert G b)"
-        by (simp add: pre_digraph.arcs_del_vert subset_antisym)
-        then show ?thesis using v by (simp add: pre_digraph.del_vert_simps)
-      qed 
+proof -
+  have v: "verts (pre_digraph.del_vert G b) = verts G"
+    using assms(1)
+    by (simp add: pre_digraph.verts_del_vert) 
+  have "\<forall>e \<in> arcs G. tail G e \<noteq> b \<and> head G e \<noteq> b " using digraph_axioms
+      assms digraph.axioms(2) loopfree_digraph.axioms(1)
+    by auto 
+  then have " arcs G \<subseteq> arcs (pre_digraph.del_vert G b)"
+    using assms
+    by (simp add: pre_digraph.arcs_del_vert subsetI) 
+  then have e: "arcs G = arcs (pre_digraph.del_vert G b)"
+    by (simp add: pre_digraph.arcs_del_vert subset_antisym)
+  then show ?thesis using v by (simp add: pre_digraph.del_vert_simps)
+qed 
 
 lemma del_arc_subgraph:
   assumes "subgraph H G"
@@ -43,7 +43,7 @@ lemma del_arc_subgraph:
 proof -
   have f1: "\<forall>p pa. subgraph p pa = ((verts p::'a set) \<subseteq> verts pa \<and> (arcs p::'b set) \<subseteq> arcs pa \<and> 
   wf_digraph pa \<and> wf_digraph p \<and> compatible pa p)"
-  using subgraph_def by blast
+    using subgraph_def by blast
   have "arcs H - {e2} \<subseteq> arcs G - {e2}" using assms(1)
     by auto
   then show ?thesis
@@ -54,8 +54,8 @@ qed
 lemma graph_nat_induct[consumes 0, case_names base step]: 
   assumes
 
- cases: "\<And>V. (digraph V \<Longrightarrow> card (verts V) = 0 \<Longrightarrow> P V)"
-  "\<And>W c. (\<And>V. (digraph V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V)) 
+cases: "\<And>V. (digraph V \<Longrightarrow> card (verts V) = 0 \<Longrightarrow> P V)"
+"\<And>W c. (\<And>V. (digraph V \<Longrightarrow> card (verts V) = c \<Longrightarrow> P V)) 
   \<Longrightarrow> (digraph W \<Longrightarrow> card (verts W) = (Suc c) \<Longrightarrow> P W)"
 shows "\<And>Z. digraph Z \<Longrightarrow> P Z"
 proof - 

@@ -75,7 +75,7 @@ Spectre core algorithm, $vote-Spectre V a b c$ returns
 \isacommand{function}\isamarkupfalse%
 \ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}{\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ int{\isachardoublequoteclose}\ \isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}\isanewline
+\ \ \ \ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}\isanewline
 \ \ if\ {\isacharparenleft}{\kern0pt}{\isasymnot}\ blockDAG\ V\ {\isasymor}\ a\ {\isasymnotin}\ verts\ V\ {\isasymor}\ b\ {\isasymnotin}\ verts\ V\ {\isasymor}\ c\ {\isasymnotin}\ verts\ V{\isacharparenright}{\kern0pt}\ then\ {\isadigit{0}}\ else\ \isanewline
 \ \ if\ {\isacharparenleft}{\kern0pt}b{\isacharequal}{\kern0pt}c{\isacharparenright}{\kern0pt}\ \ then\ {\isadigit{1}}\ else\ \isanewline
 \ \ if\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}a\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub V\isactrlesub \ b{\isacharparenright}{\kern0pt}\ {\isasymor}\ a\ {\isacharequal}{\kern0pt}\ b{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isasymnot}{\isacharparenleft}{\kern0pt}a\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub V\isactrlesub \ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ then\ {\isadigit{1}}\ \ else\isanewline
@@ -111,7 +111,7 @@ Spectre core algorithm, $vote-Spectre V a b c$ returns
 \isatagproof
 \isacommand{proof}\isamarkupfalse%
 \isanewline
-\isacommand{let}\isamarkupfalse%
+\ \ \isacommand{let}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}R\ {\isacharequal}{\kern0pt}\ {\isachardoublequoteopen}\ measures\ {\isacharbrackleft}{\kern0pt}{\isacharparenleft}{\kern0pt}\ {\isasymlambda}{\isacharparenleft}{\kern0pt}V{\isacharcomma}{\kern0pt}\ a{\isacharcomma}{\kern0pt}\ b{\isacharcomma}{\kern0pt}\ c{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharparenleft}{\kern0pt}card\ {\isacharparenleft}{\kern0pt}verts\ V{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharcomma}{\kern0pt}\ \ {\isacharparenleft}{\kern0pt}\ {\isasymlambda}{\isacharparenleft}{\kern0pt}V{\isacharcomma}{\kern0pt}\ a{\isacharcomma}{\kern0pt}\ b{\isacharcomma}{\kern0pt}\ c{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ card\ {\isacharbraceleft}{\kern0pt}e{\isachardot}{\kern0pt}\ e\ {\isasymrightarrow}\isactrlsup {\isacharasterisk}{\kern0pt}\isactrlbsub V\isactrlesub \ a{\isacharbraceright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharbrackright}{\kern0pt}\ {\isachardoublequoteclose}\ \ \isanewline
 \ \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}wf\ {\isacharquery}{\kern0pt}R{\isachardoublequoteclose}\isanewline
@@ -163,7 +163,7 @@ Spectre core algorithm, $vote-Spectre V a b c$ returns
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}x\ {\isasymin}\ future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ DAG{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}future\isanewline
-\ \ \ \ set{\isacharunderscore}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ bD\ subs\isanewline
+\ \ \ \ \ \ set{\isacharunderscore}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ bD\ subs\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
@@ -208,7 +208,7 @@ Spectre core algorithm, $vote-Spectre V a b c$ returns
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}e{\isachardot}{\kern0pt}\ e\ {\isasymrightarrow}\isactrlsup {\isacharasterisk}{\kern0pt}\isactrlbsub V\isactrlesub \ x{\isacharbraceright}{\kern0pt}\ {\isasymsubset}\ {\isacharbraceleft}{\kern0pt}e{\isachardot}{\kern0pt}\ e\ {\isasymrightarrow}\isactrlsup {\isacharasterisk}{\kern0pt}\isactrlbsub V\isactrlesub \ a{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ a{\isacharunderscore}{\kern0pt}not\isanewline
-\ \ subs\ bD{\isadigit{2}}\ a{\isacharunderscore}{\kern0pt}in\ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ psubsetI\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isacharunderscore}{\kern0pt}refl\isanewline
+\ \ \ \ \ \ subs\ bD{\isadigit{2}}\ a{\isacharunderscore}{\kern0pt}in\ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ psubsetI\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isacharunderscore}{\kern0pt}refl\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\ \isanewline
 \ \ \isacommand{then}\isamarkupfalse%
@@ -285,9 +285,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isacommand{lemma}\isamarkupfalse%
 \ sumlist{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}mono{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymforall}\ x\ {\isasymin}\ set\ L{\isachardot}{\kern0pt}\ x\ {\isasymge}\ {\isadigit{0}}\ {\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isasymexists}\ x\ {\isasymin}\ set\ L{\isachardot}{\kern0pt}\ x\ {\isachargreater}{\kern0pt}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}L\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ a\ b\ L\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isasymexists}\ x\ {\isasymin}\ set\ L{\isachardot}{\kern0pt}\ x\ {\isachargreater}{\kern0pt}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}L\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ a\ b\ L\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -336,33 +336,33 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \ nz\ sumlist{\isacharunderscore}{\kern0pt}break{\isachardot}{\kern0pt}simps\ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int{\isachardot}{\kern0pt}simps\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ auto\ \isanewline
-\ \ \ \ \isacommand{next}\isamarkupfalse%
+\ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ {\isadigit{2}}\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ \ be{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymexists}a{\isasymin}set\ L{\isachardot}{\kern0pt}\ {\isadigit{0}}\ {\isacharless}{\kern0pt}\ a{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ Cons\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ less{\isacharunderscore}{\kern0pt}int{\isacharunderscore}{\kern0pt}code{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ set{\isacharunderscore}{\kern0pt}ConsD{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}L\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ a\ b\ L\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\ \ \isacommand{using}\isamarkupfalse%
 \ Cons\ be\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ auto\ \isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ sum{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}def\ {\isadigit{2}}\ sumlist{\isacharunderscore}{\kern0pt}break{\isachardot}{\kern0pt}simps\ nz\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ auto\ \isanewline
-\ \ \ \ \isacommand{qed}\isamarkupfalse%
+\ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isacommand{qed}\isamarkupfalse%
 %
@@ -414,7 +414,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 %
 \endisadelimproof
-\ \ \isanewline
+\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ domain{\isacharunderscore}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}empty{\isacharcolon}{\kern0pt}\isanewline
@@ -437,13 +437,13 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 %
 \endisadelimproof
-\ \ \isanewline
-\ \ \isanewline
+\isanewline
+\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}casesAlt{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{fixes}\ V{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ a\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isachardoublequoteclose}\ \isakeyword{and}\ \ b\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isachardoublequoteclose}\ \isakeyword{and}\ c\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ a\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isachardoublequoteclose}\ \isakeyword{and}\ \ b\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isachardoublequoteclose}\ \isakeyword{and}\ c\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{obtains}\ {\isacharparenleft}{\kern0pt}no{\isacharunderscore}{\kern0pt}bD{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isasymnot}\ blockDAG\ V\ {\isasymor}\ a\ {\isasymnotin}\ verts\ V\ {\isasymor}\ b\ {\isasymnotin}\ verts\ V\ {\isasymor}\ c\ {\isasymnotin}\ verts\ V{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}equal{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}blockDAG\ V\ {\isasymand}\ a\ {\isasymin}\ verts\ V\ {\isasymand}\ b\ {\isasymin}\ verts\ V\ {\isasymand}\ c\ {\isasymin}\ verts\ V{\isacharparenright}{\kern0pt}\ {\isasymand}\ b\ {\isacharequal}{\kern0pt}\ c{\isachardoublequoteclose}\ \isanewline
 \ \ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}one{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}blockDAG\ V\ {\isasymand}\ a\ {\isasymin}\ verts\ V\ {\isasymand}\ b\ {\isasymin}\ verts\ V\ {\isasymand}\ c\ {\isasymin}\ verts\ V{\isacharparenright}{\kern0pt}\ {\isasymand}\isanewline
@@ -474,18 +474,18 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 %
 \endisadelimproof
-\ \ \isanewline
+\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}theo{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}P\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
 \ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
 \ \ \ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -503,7 +503,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \isanewline
 %
 \endisadelimproof
-\ \ \isanewline
+\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ domain{\isacharunderscore}{\kern0pt}Spectre{\isacharcolon}{\kern0pt}\isanewline
@@ -524,7 +524,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 %
 \endisadelimproof
-\ \isanewline
+\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ antisymmetric{\isacharunderscore}{\kern0pt}tie{\isacharunderscore}{\kern0pt}break{\isacharcolon}{\kern0pt}\isanewline
@@ -547,7 +547,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 %
 \endisadelimproof
 \isanewline
-\ \ \ \isanewline
+\isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ antisymmetric{\isacharunderscore}{\kern0pt}sumlist{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}b\ {\isasymnoteq}\ c\ {\isasymLongrightarrow}\ sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ l\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ sumlist{\isacharunderscore}{\kern0pt}break\ c\ b\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}x{\isachardot}{\kern0pt}\ {\isacharminus}{\kern0pt}x{\isacharparenright}{\kern0pt}\ l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteclose}\isanewline
@@ -585,7 +585,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 %
 \endisadelimproof
-\ \ \isanewline
+\isanewline
 \isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
@@ -605,7 +605,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ c\ b{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}cases\ a\ b\ c\ V\ rule{\isacharcolon}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}casesAlt{\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ no{\isacharunderscore}{\kern0pt}bD\isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -613,9 +613,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ fastforce\isanewline
 \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ equal\isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ {\isadigit{1}}\ \ \isacommand{by}\isamarkupfalse%
@@ -649,24 +649,24 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ ff{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ c\ b\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ c\ b\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
 \ \ \ \ {\isacharparenleft}{\kern0pt}{\isacharminus}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ three\ {\isadigit{1}}\ vote{\isacharunderscore}{\kern0pt}Spectre{\isachardot}{\kern0pt}simps\ map{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}conv\isanewline
-\ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}smt\ {\isacharparenleft}{\kern0pt}verit{\isacharcomma}{\kern0pt}\ ccfv{\isacharunderscore}{\kern0pt}SIG{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \ \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ {\isacharminus}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ uminus\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ map{\isacharunderscore}{\kern0pt}map\ \isacommand{by}\isamarkupfalse%
 \ auto\ \ \ \ \ \ \ \isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ c\ b\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
 \ \ \ \ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ \ antisymmetric{\isacharunderscore}{\kern0pt}sumlist\ {\isadigit{1}}\ ff{\isadigit{2}}\isanewline
-\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ verit{\isacharunderscore}{\kern0pt}minus{\isacharunderscore}{\kern0pt}simplify{\isacharparenleft}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -689,23 +689,23 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ ff{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ c\ b\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ c\ b\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
 \ \ \ \ {\isacharparenleft}{\kern0pt}{\isacharminus}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ four\ {\isadigit{1}}\ vote{\isacharunderscore}{\kern0pt}Spectre{\isachardot}{\kern0pt}simps\ map{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}conv\isanewline
-\ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}smt\ {\isacharparenleft}{\kern0pt}z{\isadigit{3}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \ \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ {\isacharminus}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ uminus\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ map{\isacharunderscore}{\kern0pt}map\ \isacommand{by}\isamarkupfalse%
 \ auto\ \ \ \ \ \ \ \isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ c\ b\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
 \ \ \ \ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ \ antisymmetric{\isacharunderscore}{\kern0pt}sumlist\ {\isadigit{1}}\ ff{\isadigit{2}}\isanewline
-\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ verit{\isacharunderscore}{\kern0pt}minus{\isacharunderscore}{\kern0pt}simplify{\isacharparenleft}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -728,9 +728,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ vote{\isacharunderscore}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}reflexive{\isacharcolon}{\kern0pt}\isanewline
-\isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}{\isasymforall}b\ {\isasymin}\ verts\ V{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ b\ a\ a\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}\ {\isachardoublequoteclose}%
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isasymforall}b\ {\isasymin}\ verts\ V{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ b\ a\ a\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}\ {\isachardoublequoteclose}%
 \isadelimproof
 \ %
 \endisadelimproof
@@ -749,9 +749,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}reflexive{\isacharcolon}{\kern0pt}\isanewline
-\isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ a\ a{\isachardoublequoteclose}\ \isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ a\ a{\isachardoublequoteclose}\ \isanewline
 %
 \isadelimproof
 \ \ %
@@ -800,7 +800,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ a\ a\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ a\ a{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}verts\ V{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ l{\isacharunderscore}{\kern0pt}def\ ne\ sumlist{\isacharunderscore}{\kern0pt}break{\isachardot}{\kern0pt}simps\ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int{\isachardot}{\kern0pt}simps\isanewline
-\ \ \ \ list{\isachardot}{\kern0pt}exhaust\ verit{\isacharunderscore}{\kern0pt}comp{\isacharunderscore}{\kern0pt}simplify{\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ snn\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ list{\isachardot}{\kern0pt}exhaust\ verit{\isacharunderscore}{\kern0pt}comp{\isacharunderscore}{\kern0pt}simplify{\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ snn\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \isacommand{qed}\isamarkupfalse%
 %
@@ -816,9 +816,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isacommand{lemma}\isamarkupfalse%
 \ vote{\isacharunderscore}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}exists{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}{\isasymexists}\ i\ {\isasymin}\ verts\ V{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ a\ b\ {\isasymnoteq}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isasymexists}\ i\ {\isasymin}\ verts\ V{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ a\ b\ {\isasymnoteq}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 %
@@ -868,9 +868,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}antisym{\isacharcolon}{\kern0pt}\ \isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ b{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ b{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ a\ b\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}{\isasymnot}\ {\isacharparenleft}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ b\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
@@ -894,7 +894,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ {\isachardoublequoteopen}wit\ {\isasymin}\ \ set\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}verts\ V{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ \ wit{\isacharunderscore}{\kern0pt}in\ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ fin{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}verts\ subs\isanewline
+\ \ \ \ \ \ fin{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}verts\ subs\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ fin{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}verts\ subs\ assms{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \isacommand{then}\isamarkupfalse%
@@ -907,7 +907,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \isacommand{have}\isamarkupfalse%
 \ ne{\isadigit{0}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymnot}\ zero{\isacharunderscore}{\kern0pt}list\ l{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ assms\ l{\isacharunderscore}{\kern0pt}def\ zero{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}sound\isanewline
-\ \ \ \ zero{\isacharunderscore}{\kern0pt}neq{\isacharunderscore}{\kern0pt}one\ wit{\isacharunderscore}{\kern0pt}in\isanewline
+\ \ \ \ \ \ zero{\isacharunderscore}{\kern0pt}neq{\isacharunderscore}{\kern0pt}one\ wit{\isacharunderscore}{\kern0pt}in\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
 \ \ \isacommand{then}\isamarkupfalse%
@@ -917,39 +917,39 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ auto\ \ \isanewline
 \ \ \isacommand{obtain}\isamarkupfalse%
 \ l{\isadigit{2}}\ \isakeyword{where}\ l{\isadigit{2}}{\isacharunderscore}{\kern0pt}def{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}l{\isadigit{2}}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ a{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}verts\ V{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \isacommand{have}\isamarkupfalse%
 \ minus{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}l{\isadigit{2}}\ {\isacharequal}{\kern0pt}\ map\ uminus\ l{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
+\ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ l{\isacharunderscore}{\kern0pt}def\ l{\isadigit{2}}{\isacharunderscore}{\kern0pt}def\ map{\isacharunderscore}{\kern0pt}map\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \isacommand{using}\isamarkupfalse%
 \ \ vote{\isacharunderscore}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}antisymmetric\ assms{\isacharparenleft}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ comp{\isacharunderscore}{\kern0pt}apply{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ ne{\isadigit{0}}{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymnot}\ zero{\isacharunderscore}{\kern0pt}list\ l{\isadigit{2}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ ne{\isadigit{0}}\ zero{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}sound\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \isacommand{by}\isamarkupfalse%
 \ fastforce\ \isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ anti{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ a\ b\ l\ {\isacharequal}{\kern0pt}\ {\isacharminus}{\kern0pt}\ sumlist{\isacharunderscore}{\kern0pt}break\ b\ a\ l{\isadigit{2}}{\isachardoublequoteclose}\ \isacommand{unfolding}\isamarkupfalse%
 \ minus\ \isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \isacommand{using}\isamarkupfalse%
 \ antisymmetric{\isacharunderscore}{\kern0pt}sumlist\ ne{\isadigit{0}}\ assms{\isacharparenleft}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}\ \isacommand{by}\isamarkupfalse%
 \ metis\isanewline
-\ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \isacommand{have}\isamarkupfalse%
 \ dm{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ b\ a\ l{\isadigit{2}}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ ne{\isadigit{0}}{\isadigit{2}}\ domain{\isacharunderscore}{\kern0pt}sumlist{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}empty\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharquery}{\kern0pt}thesis{\isachardoublequoteclose}\ \isacommand{unfolding}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}def\ \isacommand{using}\isamarkupfalse%
 \ anti\ l{\isacharunderscore}{\kern0pt}def\ dm\ l{\isadigit{2}}{\isacharunderscore}{\kern0pt}def\ \isanewline
-\ \ \ \ add{\isachardot}{\kern0pt}inverse{\isacharunderscore}{\kern0pt}inverse\ empty{\isacharunderscore}{\kern0pt}iff\ equal{\isacharunderscore}{\kern0pt}neg{\isacharunderscore}{\kern0pt}zero\ insert{\isacharunderscore}{\kern0pt}iff\ zero{\isacharunderscore}{\kern0pt}neq{\isacharunderscore}{\kern0pt}one\isanewline
+\ \ \ \ \ \ add{\isachardot}{\kern0pt}inverse{\isacharunderscore}{\kern0pt}inverse\ empty{\isacharunderscore}{\kern0pt}iff\ equal{\isacharunderscore}{\kern0pt}neg{\isacharunderscore}{\kern0pt}zero\ insert{\isacharunderscore}{\kern0pt}iff\ zero{\isacharunderscore}{\kern0pt}neq{\isacharunderscore}{\kern0pt}one\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis{\isacharparenright}{\kern0pt}\isanewline
 \isacommand{qed}\isamarkupfalse%
@@ -961,12 +961,12 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \ \isanewline
 %
 \endisadelimproof
-\ \ \isanewline
+\isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}total{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V\ {\isasymand}\ b\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ a\ b\ {\isasymor}\ Spectre{\isacharunderscore}{\kern0pt}Order\ V\ b\ a{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ V\ {\isasymand}\ b\ {\isasymin}\ verts\ V{\isachardoublequoteclose}\ \isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ a\ b\ {\isasymor}\ Spectre{\isacharunderscore}{\kern0pt}Order\ V\ b\ a{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 %
@@ -985,9 +985,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ V\ a\ b{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ eq\isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}reflexive\ assms\ \isacommand{by}\isamarkupfalse%
@@ -996,15 +996,15 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ neq\isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharquery}{\kern0pt}thesis{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}antisym\ notB\ assms\isanewline
-\ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
-\ \ \ \isacommand{qed}\isamarkupfalse%
+\ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \isacommand{qed}\isamarkupfalse%
+\isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
 {\isafoldproof}%
@@ -1109,7 +1109,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ {\isacharquery}{\kern0pt}case\ \isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}cases\ a\ b\ c\ V\ rule{\isacharcolon}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}casesAlt{\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ no{\isacharunderscore}{\kern0pt}bD\isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -1117,9 +1117,9 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ auto\isanewline
 \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ equal\isanewline
-\ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \ \isacommand{by}\isamarkupfalse%
 \ simp\isanewline
@@ -1165,20 +1165,20 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \ \ \ \ \ \ \ \ \ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ x\ b\ c\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ {\isadigit{1}}\ three\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \isacommand{obtain}\isamarkupfalse%
+\ \ \ \ \isacommand{obtain}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map\ \isakeyword{where}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ \isanewline
-\ \ \ \ \ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}\ \isanewline
+\ \ \ \ \ \ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \isacommand{consider}\isamarkupfalse%
+\ \ \ \ \isacommand{consider}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}zero{\isacharunderscore}{\kern0pt}list\ \ the{\isacharunderscore}{\kern0pt}map{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}\ {\isasymnot}\ zero{\isacharunderscore}{\kern0pt}list\ \ the{\isacharunderscore}{\kern0pt}map{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ {\isacharparenleft}{\kern0pt}n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}\ {\isasymnot}\ zero{\isacharunderscore}{\kern0pt}list\ \ the{\isacharunderscore}{\kern0pt}map{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isadigit{0}}{\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \isacommand{proof}\isamarkupfalse%
+\ \ \ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ zero{\isacharunderscore}{\kern0pt}l\isanewline
@@ -1189,56 +1189,56 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ auto\isanewline
 \ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ nem{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\isanewline
 \ \ \ \ \ \ \ \ \ \ \ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ zero{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}sound\isanewline
-\ \ \ \ \ \ \ \ \ \ zero{\isacharunderscore}{\kern0pt}list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ zero{\isacharunderscore}{\kern0pt}list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\ \ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ exune{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ \ {\isasymnoteq}\ {\isadigit{0}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l\ zero{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}sound\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\isanewline
-\ \ \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ all{\isadigit{0}}{\isadigit{1}}{\isacharunderscore}{\kern0pt}{\isadigit{1}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymforall}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isadigit{0}}{\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\ set{\isacharunderscore}{\kern0pt}map\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ all{\isadigit{1}}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ exune\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isachargreater}{\kern0pt}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ zero{\isacharunderscore}{\kern0pt}less{\isacharunderscore}{\kern0pt}one\ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{moreover}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{moreover}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymforall}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isasymge}\ {\isadigit{0}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ all{\isadigit{0}}{\isadigit{1}}{\isacharunderscore}{\kern0pt}{\isadigit{1}}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ empty{\isacharunderscore}{\kern0pt}iff\ insert{\isacharunderscore}{\kern0pt}iff\ less{\isacharunderscore}{\kern0pt}int{\isacharunderscore}{\kern0pt}code{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ not{\isacharunderscore}{\kern0pt}le{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}less\ zero{\isacharunderscore}{\kern0pt}le{\isacharunderscore}{\kern0pt}one{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{ultimately}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{ultimately}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ nem\ \isacommand{unfolding}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\ \isacommand{using}\isamarkupfalse%
 \ sumlist{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}mono\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \ \isanewline
-\ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
+\ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -1248,29 +1248,29 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ simp\ \ \isanewline
 \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ four\ \isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ all{\isadigit{0}}{\isadigit{1}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymforall}a{\isadigit{2}}{\isachardot}{\kern0pt}\ a{\isadigit{2}}\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\isanewline
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a{\isadigit{2}}\ b\ c\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isadigit{0}}{\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ {\isadigit{1}}\isanewline
-\ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\isanewline
-\ \ \ \ \ \isacommand{obtain}\isamarkupfalse%
+\ \ \ \ \isacommand{obtain}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map\ \isakeyword{where}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ \isanewline
-\ \ \ \ \ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \isacommand{consider}\isamarkupfalse%
+\ \ \ \ \isacommand{consider}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}zero{\isacharunderscore}{\kern0pt}list\ \ the{\isacharunderscore}{\kern0pt}map{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}\ {\isasymnot}\ zero{\isacharunderscore}{\kern0pt}list\ \ the{\isacharunderscore}{\kern0pt}map{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ {\isacharparenleft}{\kern0pt}n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}\ {\isasymnot}\ zero{\isacharunderscore}{\kern0pt}list\ \ the{\isacharunderscore}{\kern0pt}map{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}sumlist{\isacharunderscore}{\kern0pt}break\ b\ c\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isadigit{0}}{\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \isacommand{proof}\isamarkupfalse%
+\ \ \ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ zero{\isacharunderscore}{\kern0pt}l\isanewline
@@ -1281,66 +1281,66 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ auto\isanewline
 \ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ nem{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\isanewline
 \ \ \ \ \ \ \ \ \ \ \ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ zero{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}sound\isanewline
-\ \ \ \ \ \ \ \ \ \ zero{\isacharunderscore}{\kern0pt}list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ zero{\isacharunderscore}{\kern0pt}list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\ \ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ exune{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ \ {\isasymnoteq}\ {\isadigit{0}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ n{\isacharunderscore}{\kern0pt}zero{\isacharunderscore}{\kern0pt}l\ zero{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}sound\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\isanewline
-\ \ \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
 \ all{\isadigit{0}}{\isadigit{1}}{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymforall}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isadigit{0}}{\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\ set{\isacharunderscore}{\kern0pt}map\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ all{\isadigit{0}}{\isadigit{1}}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ exune\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isachargreater}{\kern0pt}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ zero{\isacharunderscore}{\kern0pt}less{\isacharunderscore}{\kern0pt}one\ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{moreover}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{moreover}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymforall}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isasymge}\ {\isadigit{0}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ all{\isadigit{0}}{\isadigit{1}}{\isacharunderscore}{\kern0pt}{\isadigit{2}}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ empty{\isacharunderscore}{\kern0pt}iff\ insert{\isacharunderscore}{\kern0pt}iff\ less{\isacharunderscore}{\kern0pt}int{\isacharunderscore}{\kern0pt}code{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ not{\isacharunderscore}{\kern0pt}le{\isacharunderscore}{\kern0pt}imp{\isacharunderscore}{\kern0pt}less\ zero{\isacharunderscore}{\kern0pt}le{\isacharunderscore}{\kern0pt}one{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{ultimately}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{ultimately}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ nem\ \isacommand{unfolding}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\ \isacommand{using}\isamarkupfalse%
 \ sumlist{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}mono\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \ \isanewline
-\ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
+\ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ vote{\isacharunderscore}{\kern0pt}Spectre{\isachardot}{\kern0pt}simps\isanewline
-\ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ four{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \isacommand{qed}\isamarkupfalse%
+\ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \isacommand{qed}\isamarkupfalse%
+\isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
 {\isafoldproof}%
@@ -1355,7 +1355,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Preserving{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ G{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ a{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ a{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}Spectre{\isacharunderscore}{\kern0pt}Order\ G\ a\ b{\isachardoublequoteclose}\ \isanewline
 %
 \isadelimproof
@@ -1369,7 +1369,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ set{\isacharunderscore}{\kern0pt}ordered{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}set\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}verts\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ verts\ G{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ assms{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ subs\ fin{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}verts\isanewline
-\ \ \ \ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \isacommand{have}\isamarkupfalse%
 \ a{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}a\ {\isasymin}\ verts\ G{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
@@ -1383,7 +1383,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ metis\ \isanewline
 \ \ \isacommand{obtain}\isamarkupfalse%
 \ the{\isacharunderscore}{\kern0pt}map\ \isakeyword{where}\ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ \isanewline
-\ \ \ \ \ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ G\ i\ a\ b{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}verts\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ {\isachardoublequoteopen}the{\isacharunderscore}{\kern0pt}map\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ vote{\isacharunderscore}{\kern0pt}Spectre\ G\ i\ a\ b{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}verts\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \isacommand{obtain}\isamarkupfalse%
 \ wit\ \isakeyword{where}\ wit{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}wit\ {\isasymin}\ verts\ G{\isachardoublequoteclose}\ \isakeyword{and}\ wit{\isacharunderscore}{\kern0pt}vote{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ G\ wit\ a\ b\ {\isasymnoteq}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
@@ -1397,7 +1397,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ the{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}in\ set{\isacharunderscore}{\kern0pt}map\ \isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ assms{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ fin{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}verts\ \isanewline
-\ \ subs\ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ wit{\isacharunderscore}{\kern0pt}in\ image{\isacharunderscore}{\kern0pt}iff\isanewline
+\ \ \ \ \ \ subs\ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ wit{\isacharunderscore}{\kern0pt}in\ image{\isacharunderscore}{\kern0pt}iff\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\ \isanewline
 \ \ \isacommand{then}\isamarkupfalse%
@@ -1417,7 +1417,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymexists}x\ {\isasymin}\ set\ the{\isacharunderscore}{\kern0pt}map{\isachardot}{\kern0pt}\ x\ {\isacharequal}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
 \ exune\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\ \isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
@@ -1453,8 +1453,8 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isacommand{lemma}\isamarkupfalse%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Preserving{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ G{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ a{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Relation\ G{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \ \ \isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ a{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Relation\ G{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \ \ \isanewline
 %
 \isadelimproof
 \ \ %
@@ -1465,8 +1465,8 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}def\isanewline
 \ \ \isacommand{using}\isamarkupfalse%
 \ assms\ \ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts\ subs\isanewline
-\ \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Preserving\isanewline
-\ \ SigmaI\ case{\isacharunderscore}{\kern0pt}prodI\ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ \isacommand{by}\isamarkupfalse%
+\ \ \ \ Spectre{\isacharunderscore}{\kern0pt}Order{\isacharunderscore}{\kern0pt}Preserving\isanewline
+\ \ \ \ SigmaI\ case{\isacharunderscore}{\kern0pt}prodI\ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ \isacommand{by}\isamarkupfalse%
 \ fastforce%
 \endisatagproof
 {\isafoldproof}%

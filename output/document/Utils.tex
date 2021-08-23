@@ -52,7 +52,7 @@ Show soundness of list-to-rel%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{lemma}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}equal{\isacharcolon}{\kern0pt}\ \isanewline
-{\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}{\isasymexists}k{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}nat{\isachardot}{\kern0pt}\ hd\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ b\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}{\isasymexists}k{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}nat{\isachardot}{\kern0pt}\ hd\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ b\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 %
@@ -128,17 +128,17 @@ Show soundness of list-to-rel%
 \ auto\ \isanewline
 \ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
 \ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{next}\isamarkupfalse%
+\ \ \isacommand{qed}\isamarkupfalse%
+\isanewline
+\isacommand{next}\isamarkupfalse%
 \isanewline
 \ \ \isacommand{fix}\isamarkupfalse%
 \ k\ \isanewline
 \ \ \isacommand{assume}\isamarkupfalse%
 \ {\isachardoublequoteopen}b\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isacharequal}{\kern0pt}\ hd\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isacharequal}{\kern0pt}\ hd\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}hd\ {\isacharparenleft}{\kern0pt}drop\ k\ L{\isacharparenright}{\kern0pt}{\isacharcomma}{\kern0pt}\ b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
@@ -164,22 +164,22 @@ Show soundness of list-to-rel%
 {\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ zero\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ Cons\ drop{\isacharunderscore}{\kern0pt}{\isadigit{0}}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \isacommand{next}\isamarkupfalse%
+\ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ more\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{obtain}\isamarkupfalse%
 \ k{\isadigit{2}}\ \isakeyword{where}\ k{\isadigit{2}}{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ \ {\isachardoublequoteopen}k\ {\isacharequal}{\kern0pt}\ Suc\ k{\isadigit{2}}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ gr{\isadigit{0}}{\isacharunderscore}{\kern0pt}implies{\isacharunderscore}{\kern0pt}Suc\ \isacommand{by}\isamarkupfalse%
 \ auto\ \isanewline
-\ \ \ \ \ \isacommand{show}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ Cons\ \isacommand{unfolding}\isamarkupfalse%
 \ k{\isadigit{2}}{\isacharunderscore}{\kern0pt}in\ drop{\isacharunderscore}{\kern0pt}Suc\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ \isacommand{by}\isamarkupfalse%
@@ -235,7 +235,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \isatagproof
 \isacommand{unfolding}\isamarkupfalse%
 \ linear{\isacharunderscore}{\kern0pt}order{\isacharunderscore}{\kern0pt}on{\isacharunderscore}{\kern0pt}def\ total{\isacharunderscore}{\kern0pt}on{\isacharunderscore}{\kern0pt}def\ partial{\isacharunderscore}{\kern0pt}order{\isacharunderscore}{\kern0pt}on{\isacharunderscore}{\kern0pt}def\ preorder{\isacharunderscore}{\kern0pt}on{\isacharunderscore}{\kern0pt}def\ refl{\isacharunderscore}{\kern0pt}on{\isacharunderscore}{\kern0pt}def\isanewline
-\ \ trans{\isacharunderscore}{\kern0pt}def\ antisym{\isacharunderscore}{\kern0pt}def\ \isanewline
+\ \ \ \ trans{\isacharunderscore}{\kern0pt}def\ antisym{\isacharunderscore}{\kern0pt}def\ \isanewline
 \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}safe{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{fix}\isamarkupfalse%
@@ -278,7 +278,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \ x\ y\ z\ \isanewline
 \ \ \isacommand{assume}\isamarkupfalse%
 \ as{\isadigit{1}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}y{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ \ as{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ z{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ \ as{\isadigit{2}}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ z{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}\ z{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
@@ -307,7 +307,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}case\ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ nor\isanewline
 \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -332,20 +332,20 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \ {\isachardoublequoteopen}{\isasymnot}\ distinct\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ simp\ \isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ Cons\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ yz\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ Cons{\isachardot}{\kern0pt}prems{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ SigmaD{\isadigit{1}}\ SigmaI\ UnI{\isadigit{1}}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}in{\isacharparenright}{\kern0pt}\ \ \isanewline
 \ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
@@ -367,7 +367,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \ x\ y\ \isanewline
 \ \ \isacommand{assume}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}\ y{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\isanewline
@@ -377,18 +377,18 @@ For every distinct L, list-to-rel L return a linear order on set L%
 {\isacharparenleft}{\kern0pt}induct\ L{\isacharcomma}{\kern0pt}\ simp{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}Cons\ a\ L{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{consider}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}nor{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}\ y{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}\ {\isasymtimes}\ set\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}\ {\isasymtimes}\ set\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
 \ \ \ \ \ \ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}xy{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}y{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L\ {\isasymand}\ {\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}\ {\isasymtimes}\ set\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
 \ \ \ \ \ \ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}yz{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L\ {\isasymand}\ {\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}\ y{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}\ {\isasymtimes}\ set\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}both{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L\ {\isasymand}\ {\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}y{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}case\ \isacommand{unfolding}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isachardot}{\kern0pt}simps\ \isanewline
-\ \ \ \ \ \ \isacommand{proof}\isamarkupfalse%
+\ \ \ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
 \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ nor\isanewline
@@ -396,7 +396,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \ \ \ \isacommand{next}\isamarkupfalse%
+\ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
 \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ xy\isanewline
@@ -405,44 +405,44 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \ {\isacharquery}{\kern0pt}thesis\isanewline
 \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ Cons{\isachardot}{\kern0pt}prems{\isacharparenleft}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\ SigmaD{\isadigit{1}}\ distinct{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}in\ singletonD{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{next}\isamarkupfalse%
+\ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ yz\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ Cons{\isachardot}{\kern0pt}prems{\isacharparenleft}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\ SigmaD{\isadigit{1}}\ distinct{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}in\ singletonD{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{next}\isamarkupfalse%
+\ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
 \ both\isanewline
 \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
 \ Cons\ \isacommand{by}\isamarkupfalse%
 \ auto\ \isanewline
-\ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
 \ \ \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \isacommand{next}\isamarkupfalse%
+\ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
-\ \ \ \ \isacommand{fix}\isamarkupfalse%
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{fix}\isamarkupfalse%
 \ x\ y\ \isanewline
-\ \ \ \ \isacommand{assume}\isamarkupfalse%
+\ \ \isacommand{assume}\isamarkupfalse%
 \ {\isachardoublequoteopen}x\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}y\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}x\ {\isasymnoteq}\ y{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymnotin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x{\isacharcomma}{\kern0pt}\ y{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ L{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isacommand{proof}\isamarkupfalse%
+\ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}induct\ L{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\ \isacommand{qed}\isamarkupfalse%
 \ \ \ \ \isanewline
-\ \ \isacommand{qed}\isamarkupfalse%
+\isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
 {\isafoldproof}%
