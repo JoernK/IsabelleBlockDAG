@@ -53,6 +53,14 @@ lemma (in blockDAG) genesis_in_verts:
   using is_genesis_node.simps genesis_node_def genesis_existAlt the1I2 genesis_unique_exists
   by metis 
 
+lemma (in blockDAG) genesis_reaches_nothing:
+  assumes "a \<rightarrow>\<^sup>+ b"
+  shows "\<not> is_genesis_node a"
+  using is_genesis_node.simps genesis_node_def genesis_existAlt cycle_free 
+    reachable1_reachable_trans  assms reachable1_in_verts(2)
+  by (metis) 
+  
+
 
 subsubsection \<open>Tips\<close>
 

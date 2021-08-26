@@ -16,19 +16,10 @@ subsection  \<open>Definitions\<close>
 text \<open>Function to check and break occuring ties\<close>
 fun tie_break_int:: "'a::linorder \<Rightarrow> 'a \<Rightarrow> int \<Rightarrow> int"
   where "tie_break_int a b i =
- (if i=0 then (if (b < a) then -1 else 1) else 
-              (if i > 0 then 1 else -1))"
+ (if i=0 then (if (b < a) then -1 else 1) else i)"
 
-text \<open>Function to check if all entries of a list are zero\<close>
-fun zero_list:: "int list \<Rightarrow> bool"
-  where "zero_list [] = True"
-  | "zero_list (x # xs) = ((x = 0) \<and> zero_list xs)" 
-
-text \<open>Function given a list of votes, sums them up if not only zeros, otherwise "no vote"\<close>
-  (* votes like virtual block, occurs if node a neither sees b nor c*)
-fun sumlist_break :: "'a::linorder \<Rightarrow>'a \<Rightarrow> int list \<Rightarrow> int"
-  where "sumlist_break a b L = (if (zero_list L) then 0 else
-   tie_break_int a b (sum_list L))"
+fun signum :: "int \<Rightarrow> int"
+  where "signum a =  (if a > 0 then 1 else if a < 0 then -1 else 0)"
 
 text \<open>Spectre core algorithm, $vote-Spectre V a b c$ returns 
      $1$ if a votes in favour of $b$ (or $b = c$),
@@ -41,11 +32,11 @@ function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Righta
   if (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 1  else
   if (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1 else
   if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
-   (sumlist_break b c (map (\<lambda>i.
- (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))
+   (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+ (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))))
  else 
-   sumlist_break b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))"
+   signum (sum_list (map (\<lambda>i.
+   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a)))))"
   by auto
 termination
 proof
@@ -101,8 +92,8 @@ qed
 
 text \<open>Given vote-Spectre calculate if $a < b$ for arbitrary nodes\<close>
 definition Spectre_Order :: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool"
-  where "Spectre_Order G a b = ( sumlist_break a b (map (\<lambda>i.
-   (vote_Spectre G i a b)) (sorted_list_of_set (verts G))) = 1)" 
+  where "Spectre_Order G a b = ( tie_break_int a b (signum ( sum_list (map (\<lambda>i.
+   (vote_Spectre G i a b)) (sorted_list_of_set (verts G))))) = 1)" 
 
 text \<open>Given Spectre-Order calculate the corresponding relation over the nodes of G\<close>
 definition Spectre_Order_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> ('a \<times> 'a) set"
@@ -110,20 +101,13 @@ definition Spectre_Order_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow
 
 subsection \<open>Lemmas\<close>
 
-lemma  zero_list_sound:
-  "zero_list L \<equiv> \<forall> a \<in> set L. a = 0"
-proof(induct L, auto) qed
-
 lemma sumlist_one_mono:
   assumes "\<forall> x \<in> set L. x \<ge> 0 "
     and "\<exists> x \<in> set L. x > 0"
-    and "L \<noteq> []"
-  shows "sumlist_break a b L = 1"
-  using assms
+  shows "signum (sum_list L) = 1"
+  using assms 
 proof(induct L, simp)
   case (Cons a2 L)
-  then have nz: "\<not> zero_list (a2 # L)" using assms
-    by (metis less_int_code(1) zero_list_sound)
   consider (bg) "a2 > 0" | "a2 = 0" using Cons
     by (metis le_less list.set_intros(1))
   then show ?case 
@@ -133,35 +117,24 @@ proof(induct L, simp)
       by (simp add: sum_list_nonneg)
     then have "sum_list (a2 # L) > 0" using bg sum_list_def
       by auto 
-    then show ?thesis using  nz sumlist_break.simps tie_break_int.simps
+    then show ?thesis using tie_break_int.simps
       by auto 
   next
     case 2
     then have  be: "\<exists>a\<in>set L. 0 < a" using Cons
       by (metis less_int_code(1) set_ConsD) 
     then have "L \<noteq> []" by auto
-    then have "sumlist_break a b L = 1"  using Cons be
-      by auto 
-    then show ?thesis using sum_list_def 2 sumlist_break.simps nz
-      by auto 
+    then show ?thesis using sum_list_def 2
+      using Cons.hyps Cons.prems(1) be by auto
   qed
 qed
 
+lemma domain_signum: "signum i \<in> {-1,0,1}" by simp
+
 lemma domain_tie_break:
-  shows "tie_break_int a b c \<in> {-1 ,1}"
-  using  tie_break_int.simps by simp
-
-lemma domain_sumlist:
-  shows "sumlist_break a b c  \<in> {-1 ,0 ,1}"
-  using  insertCI sumlist_break.elims domain_tie_break
-  by (metis insert_commute)
-
-
-lemma domain_sumlist_not_empty:
-  assumes "\<not> zero_list l"
-  shows "sumlist_break a b l  \<in> {-1, 1}"
-  using  sumlist_break.elims domain_tie_break assms
-  by metis
+  shows "tie_break_int a b (signum i) \<in> {-1 ,1}"
+  using  tie_break_int.simps
+  by auto 
 
 
 
@@ -190,10 +163,10 @@ lemma Spectre_theo:
   assumes "P 0"
     and "P 1"
     and "P (-1)" 
-    and "P (sumlist_break b c (map (\<lambda>i.
- (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set ((past_nodes V a)))))"
-    and "P (sumlist_break b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))"
+    and "P (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+ (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set ((past_nodes V a)))))))"
+    and "P  (signum (sum_list (map (\<lambda>i.
+   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a)))))"
   shows "P (vote_Spectre V a b c)"
   using assms vote_Spectre.simps
   by (metis (mono_tags, lifting)) 
@@ -201,7 +174,8 @@ lemma Spectre_theo:
 
 lemma domain_Spectre:
   shows "vote_Spectre V a b c \<in> {-1, 0, 1}"
-proof(rule Spectre_theo, simp, simp, simp, metis domain_sumlist, metis domain_sumlist) qed
+proof(rule Spectre_theo, auto) qed
+
 
 
 lemma antisymmetric_tie_break:
@@ -210,17 +184,13 @@ lemma antisymmetric_tie_break:
 
 
 lemma antisymmetric_sumlist:
-  shows "b \<noteq> c \<Longrightarrow> sumlist_break b c l = - sumlist_break c b (map (\<lambda>x. -x) l) "
-proof(induct l, simp)
-  case (Cons a l)
-  have "sum_list (map uminus (a # l)) = - sum_list  (a # l)"
-    by (metis map_ident map_map uminus_sum_list_map) 
-  moreover have "zero_list (map (\<lambda>x. -x) l) \<equiv> zero_list l"
-  proof(induct l, auto) qed
-  ultimately show ?case using sumlist_break.simps antisymmetric_tie_break Cons by auto
-qed
+  shows "sum_list (l::int list) = - sum_list (map (\<lambda>x. -x) l) "
+proof(induct l, auto) qed
 
 
+lemma antisymmetric_signum:
+  shows "signum i = - (signum (-i))"
+  by auto
 
 lemma vote_Spectre_antisymmetric: 
   shows "b \<noteq> c \<Longrightarrow> vote_Spectre V a b c = - (vote_Spectre V a c b)"
@@ -241,39 +211,43 @@ proof(induction V a b c rule: vote_Spectre.induct)
     then show ?thesis by fastforce
   next
     case three
-    then have ff: "vote_Spectre V a b c = (sumlist_break b c (map (\<lambda>i.
- (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))"
-      by (metis (mono_tags, lifting) vote_Spectre.elims) 
-    have ff2: "vote_Spectre V a c b = (sumlist_break c b (map (\<lambda>i.
-    (- vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))" 
-      using three 1 vote_Spectre.simps map_eq_conv
-      by (smt (verit, ccfv_SIG))
+    then have ff: "vote_Spectre V a b c = tie_break_int b c (signum (sum_list (map (\<lambda>i.
+ (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a)))))"
+      using vote_Spectre.simps 
+      by (metis (mono_tags, lifting)) 
+    have ff1: "vote_Spectre V a c b = tie_break_int c b (signum (sum_list (map (\<lambda>i.
+      (vote_Spectre (reduce_past V a) i c b)) (sorted_list_of_set (past_nodes V a)))))"
+      using vote_Spectre.simps three by fastforce 
+    then have ff2: "vote_Spectre V a c b = tie_break_int c b (signum (sum_list (map (\<lambda>i.
+    (- vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a)))))" 
+      using three 1 map_eq_conv ff
+      by (smt (verit, best))   
     have "(map (\<lambda>i. - vote_Spectre (reduce_past V a) i b c) (sorted_list_of_set (past_nodes V a)))
      = (map uminus (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c)
        (sorted_list_of_set (past_nodes V a))))" 
       using map_map by auto       
-    then have "vote_Spectre V a c b = - (sumlist_break b c (map (\<lambda>i.
-    (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))" 
-      using  antisymmetric_sumlist 1 ff2
+    then have "vote_Spectre V a c b = - (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+    (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))))" 
+      using  antisymmetric_sumlist 1 ff2 antisymmetric_signum antisymmetric_tie_break
       by (metis verit_minus_simplify(4)) 
     then show ?thesis using  ff
       by presburger 
   next
     case four
-    then have ff: "vote_Spectre V a b c = sumlist_break b c (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a)))"
+    then have ff: "vote_Spectre V a b c = signum (sum_list (map (\<lambda>i.
+   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))"
       using vote_Spectre.simps
       by (metis (mono_tags, lifting)) 
-    have ff2: "vote_Spectre V a c b = (sumlist_break c b (map (\<lambda>i.
+    then have ff2: "vote_Spectre V a c b =  signum (sum_list (map (\<lambda>i.
     (- vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))" 
       using four 1 vote_Spectre.simps map_eq_conv
-      by (smt (z3))
+      by (smt (z3)) 
     have "(map (\<lambda>i. - vote_Spectre V i b c) (sorted_list_of_set (future_nodes V a)))
      = (map uminus (map (\<lambda>i. vote_Spectre V i b c) (sorted_list_of_set (future_nodes V a))))" 
       using map_map by auto       
-    then have "vote_Spectre V a c b = - (sumlist_break b c (map (\<lambda>i.
-    (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a))))" 
-      using  antisymmetric_sumlist 1 ff2
+    then have "vote_Spectre V a c b = - ( signum (sum_list (map (\<lambda>i.
+    (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a)))))" 
+      using  antisymmetric_sumlist 1 ff2 antisymmetric_signum 
       by (metis verit_minus_simplify(4)) 
     then show ?thesis using ff
       by linarith 
@@ -300,14 +274,13 @@ proof -
   have ne: "l \<noteq> []"
     using  blockDAG.no_empty_blockDAG length_map
     by (metis assms(1) length_sorted_list_of_set less_numeral_extra(3) list.size(3) l_def)
-  then have snn: "\<not> zero_list l" using only_one
-    using zero_list.elims(2) by fastforce 
   have "sum_list l = card (verts V)" using ne only_one sum_list_map_eq_sum_count
     by (simp add: sum_list_triv)
   then have "sum_list l > 0" using blockDAG.no_empty_blockDAG assms(1) by simp
-  then show "sumlist_break a a (map (\<lambda>i. vote_Spectre V i a a) (sorted_list_of_set (verts V))) = 1"
-    using l_def ne sumlist_break.simps tie_break_int.simps
-      list.exhaust verit_comp_simplify1(1) snn by auto
+  then show "tie_break_int a a
+    (signum (sum_list (map (\<lambda>i. vote_Spectre V i a a) (sorted_list_of_set (verts V))))) = 1"
+    using l_def ne  tie_break_int.simps
+      list.exhaust verit_comp_simplify1(1) by auto
 qed
 
 
@@ -349,21 +322,17 @@ proof -
     by (simp add: fin_digraph.finite_verts subs assms(1)) 
   then have "vote_Spectre V wit a b \<in> set l" unfolding l_def
     by (metis (mono_tags, lifting) image_eqI list.set_map)
-  then have ne0: "\<not> zero_list l" using assms l_def zero_list_sound
-      zero_neq_one wit_in
-    by blast 
-  then have dm: "sumlist_break a b l \<in> {-1,1}" using domain_sumlist_not_empty by auto  
+  then have dm: "tie_break_int a b (signum (sum_list l)) \<in> {-1,1}"
+    by auto  
   obtain l2 where l2_def: "l2 = (map (\<lambda>i. vote_Spectre V i b a) (sorted_list_of_set (verts V)))"
     by auto
   have minus: "l2 = map uminus l"
     unfolding l_def l2_def map_map
     using  vote_Spectre_antisymmetric assms(4)
-    by (metis comp_apply) 
-  then have ne02: "\<not> zero_list l2" using ne0 zero_list_sound
-    by fastforce 
-  then have anti: "sumlist_break a b l = - sumlist_break b a l2" unfolding minus 
-    using antisymmetric_sumlist ne0 assms(4) by metis
-  have dm2: "sumlist_break b a l2 \<in> {-1,1}" using ne02 domain_sumlist_not_empty by auto
+    by (metis comp_apply)  
+  have anti: "tie_break_int a b (signum (sum_list l)) = 
+                   - tie_break_int b a (signum (sum_list l2))" unfolding minus 
+    using antisymmetric_sumlist antisymmetric_tie_break antisymmetric_signum assms(4) by metis
   then show "?thesis" unfolding Spectre_Order_def using anti l_def dm l2_def 
       add.inverse_inverse empty_iff equal_neg_zero insert_iff zero_neq_one
     by (metis)
@@ -432,84 +401,72 @@ proof(induction G a b c rule: vote_Spectre.induct)
       by (metis "local.1.prems" trancl_trans) 
   next
     case three
-    then have "b \<in> past_nodes V a" by auto
-    also have "c \<in> past_nodes V a" using three by auto
+    then have a_not_gen: "\<not> blockDAG.is_genesis_node V a"
+      using blockDAG.genesis_reaches_nothing
+      by metis
+    then have bD: "blockDAG (reduce_past V a)" using blockDAG.reduce_past_dagbased 
+    three by auto
+    have b_in2: "b \<in> past_nodes V a" using three by auto
+    also have c_in2: "c \<in> past_nodes V a" using three by auto
     ultimately have "c \<rightarrow>\<^sup>+\<^bsub>reduce_past V a\<^esub> b" using DAG.reduce_past_path2 three 1
       by (metis blockDAG.axioms(1)) 
-    then have all1:"\<forall>x. x \<in> set (sorted_list_of_set (past_nodes V a)) \<longrightarrow>
+    then have allsorted01:"\<forall>x. x \<in> set (sorted_list_of_set (past_nodes V a)) \<longrightarrow>
           vote_Spectre (reduce_past V a) x b c \<in> {0, 1}" using 1 three by auto
+    then have all01: "\<forall>x. x \<in> (past_nodes V a) \<longrightarrow>
+          vote_Spectre (reduce_past V a) x b c \<in> {0, 1}"
+      using  subs three sorted_list_of_set(1) DAG.finite_past
+      by metis 
+    obtain wit where wit_in: "wit \<in> past_nodes V a" 
+      and wit_vote: "vote_Spectre (reduce_past V a) wit b c \<noteq> 0"
+    using vote_Spectre_one_exists b_in2 c_in2 bD induce_subgraph_verts reduce_past.simps
+    by metis 
+    then have wit_vote1: "vote_Spectre (reduce_past V a) wit b c = 1" using all01
+      by blast 
     obtain the_map where the_map_in: 
-      "the_map = (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c) 
-    (sorted_list_of_set (past_nodes V a)))" by auto
-    consider (zero_l) "zero_list  the_map" |
-      (n_zero_l) " \<not> zero_list  the_map" by auto
-    then have "sumlist_break b c (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c) 
-      (sorted_list_of_set (past_nodes V a))) \<in> {0,1}"
-    proof(cases)
-      case zero_l
-      then show ?thesis unfolding the_map_in by auto
-    next
-      case n_zero_l
-      then have nem: "the_map
-           \<noteq> []" using zero_list_sound
-        zero_list.simps(1) the_map_in
-        by metis  
-      have exune: "\<exists>x \<in> set the_map. x  \<noteq> 0" using n_zero_l zero_list_sound the_map_in
-        by blast
+    "the_map = (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c) 
+               (sorted_list_of_set (past_nodes V a)))"
+      by auto  
       have all01_1: "\<forall>x \<in> set the_map. x \<in> {0,1}"
         unfolding the_map_in set_map 
-        using all1 
-        by blast
-      then have "\<exists>x \<in> set the_map. x = 1" using exune
-        by blast 
+        using allsorted01 by blast 
+      have "\<exists>x \<in> set the_map. x = 1"
+        unfolding the_map_in set_map 
+        using wit_in wit_vote1
+        sorted_list_of_set(1) DAG.finite_past bD subs
+        by (metis (no_types, lifting) image_iff three) 
       then have "\<exists>x \<in> set the_map. x > 0"
         using zero_less_one by blast 
       moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01_1
         by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
-      ultimately show ?thesis using nem unfolding the_map_in using sumlist_one_mono 
-        by blast  
-    qed
-    then show ?thesis using three
-      by simp  
+      ultimately have "signum (sum_list the_map) = 1" using sumlist_one_mono by simp
+      then have "tie_break_int b c (signum (sum_list the_map)) = 1" using tie_break_int.simps
+        by simp
+      then have "vote_Spectre V a b c = 1 " unfolding the_map_in using three vote_Spectre.simps
+        by simp
+      then show ?thesis by simp
   next
     case four 
     then have all01: "\<forall>a2. a2 \<in> set (sorted_list_of_set (future_nodes V a)) \<longrightarrow>
                               vote_Spectre V a2 b c \<in> {0,1}"
       using 1
       by metis
-    obtain the_map where the_map_in: 
-      "the_map = (map (\<lambda>i. vote_Spectre V i b c) (sorted_list_of_set (future_nodes V a)))" by auto
-    consider (zero_l) "zero_list  the_map" |
-      (n_zero_l) " \<not> zero_list  the_map" by auto
-    then have "sumlist_break b c (map (\<lambda>i. vote_Spectre V i b c) 
-      (sorted_list_of_set (future_nodes V a))) \<in> {0,1}"
-    proof(cases)
-      case zero_l
-      then show ?thesis unfolding the_map_in by auto
-    next
-      case n_zero_l
-      then have nem: "the_map
-           \<noteq> []" using zero_list_sound
-        zero_list.simps(1) the_map_in
-        by metis  
-      have exune: "\<exists>x \<in> set the_map. x  \<noteq> 0" using n_zero_l zero_list_sound the_map_in
-        by blast
-      have all01_2: "\<forall>x \<in> set the_map. x \<in> {0,1}"
-        unfolding the_map_in set_map 
-        using all01 
-        by blast 
-      then have "\<exists>x \<in> set the_map. x = 1" using exune
-        by blast 
-      then have "\<exists>x \<in> set the_map. x > 0"
-        using zero_less_one by blast 
-      moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01_2
-        by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
-      ultimately show ?thesis using nem unfolding the_map_in using sumlist_one_mono 
-        by blast  
-    qed
-    then show ?thesis using vote_Spectre.simps
-      by (simp add: four)
-  qed
+    have "\<forall>a2. a2 \<in> set (sorted_list_of_set (future_nodes V a)) 
+                \<longrightarrow> vote_Spectre V a2 b c \<ge> 0" 
+    proof safe
+      fix a2
+      assume " a2 \<in> set (sorted_list_of_set (future_nodes V a))"
+      then have "vote_Spectre V a2 b c \<in> {0, 1}" using all01 by auto
+      then show "vote_Spectre V a2 b c  \<ge> 0"
+        by fastforce
+    qed 
+    then have "(sum_list (map (\<lambda>i. vote_Spectre V i b c) 
+      (sorted_list_of_set (future_nodes V a)))) \<ge> 0" using sum_list_mono sum_list_0
+      by metis 
+    then have "signum (sum_list (map (\<lambda>i. vote_Spectre V i b c) 
+      (sorted_list_of_set (future_nodes V a)))) \<in> {0,1}" unfolding signum.simps
+      by simp 
+      then show ?thesis using four by simp 
+    qed 
 qed
 
 
@@ -547,9 +504,10 @@ proof -
     using zero_less_one by blast 
   moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01
     by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
-  ultimately show ?thesis unfolding the_map_in Spectre_Order_def using sumlist_one_mono
-      empty_iff set_empty
-    by (metis)
+   ultimately have "signum (sum_list the_map) = 1" using sumlist_one_mono by simp
+      then have "tie_break_int a b (signum (sum_list the_map)) = 1" using tie_break_int.simps
+        by simp
+   then show ?thesis unfolding the_map_in Spectre_Order_def by simp  
 qed
 
 
