@@ -122,6 +122,69 @@ proof(rule ccontr)
   then show False using as1 by auto
 qed
 
+
+lemma (in blockDAG) reached_by: 
+  assumes "v \<notin> tips G"
+  and  "v \<in> verts G"
+  shows "\<exists>t \<in> verts G. t \<rightarrow>\<^sup>+ v" 
+  using assms 
+  unfolding tips_def is_tip.simps
+  by auto 
+  
+lemma (in blockDAG) reached_by_tip: 
+  assumes "v \<notin> tips G"
+  and  "v \<in> verts G"
+shows "\<exists>t \<in> tips G. t \<rightarrow>\<^sup>+ v" 
+proof(rule ccontr)
+  assume as1: "\<not> (\<exists>t\<in>tips G. t \<rightarrow>\<^sup>+ v)"
+  then have "\<forall>w.  w \<rightarrow>\<^sup>+ v \<longrightarrow> \<not> is_tip G w" 
+    unfolding tips_def using reachable1_in_verts(1) CollectI
+    by blast 
+  then have contr: "\<forall>w.  w \<rightarrow>\<^sup>+ v \<longrightarrow>  (\<exists>y. y\<rightarrow>\<^sup>+w \<and>  y\<rightarrow>\<^sup>+v)"
+    using as1 reachable1_in_verts(1) reached_by trancl_trans 
+    by metis 
+  have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subseteq> {z. y \<rightarrow>\<^sup>+ z}"
+    using  Collect_mono trancl_trans
+    by metis
+  then have sub: "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subset> {z. y \<rightarrow>\<^sup>+ z}"
+    using cycle_free by auto
+  have part: "\<forall> x. {z. x \<rightarrow>\<^sup>+ z} \<subseteq> verts G" 
+    using reachable1_in_verts  by auto
+  then have fin: "\<forall> x. finite {z. x \<rightarrow>\<^sup>+ z}"
+    using finite_verts finite_subset
+    by metis 
+  then have trans: "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  card {z. x \<rightarrow>\<^sup>+ z} < card {z. y \<rightarrow>\<^sup>+ z}"
+    using sub psubset_card_mono by metis
+  then have inf: "\<forall>w.  w \<rightarrow>\<^sup>+ v \<longrightarrow> (\<exists>x. x \<rightarrow>\<^sup>+ v \<and> card  {z. x \<rightarrow>\<^sup>+ z} > card {z. w \<rightarrow>\<^sup>+ z})"
+    using fin contr genesis 
+      reachable1_in_verts(1)
+    by metis    
+  have all: "\<forall>k. \<exists>w \<in> verts G. w\<rightarrow>\<^sup>+v \<and>  card  {z. w \<rightarrow>\<^sup>+ z} > k" 
+  proof 
+    fix k 
+    show "\<exists>w \<in> verts G. w\<rightarrow>\<^sup>+v \<and>  card  {z. w \<rightarrow>\<^sup>+ z} > k"
+    proof(induct k )
+      case 0
+      then show ?case 
+        using inf neq0_conv assms(1) assms(2) local.trans reached_by contr
+        by (metis less_nat_zero_code)      
+    next
+      case (Suc k)
+      then show ?case
+        using Suc_lessI inf reachable1_in_verts(1)
+        by (metis)  
+    qed
+  qed
+  then have less: "\<exists>x \<in> verts G.  card (verts G) < card {z. x \<rightarrow>\<^sup>+ z}"
+    by blast 
+  also
+  have "\<forall>x. card  {z. x \<rightarrow>\<^sup>+ z} \<le> card (verts G)"
+    using fin part finite_verts not_le
+    by (simp add: card_mono) 
+  then show False
+    using less not_le by auto 
+qed
+
 lemma (in blockDAG) tips_unequal_gen:
   assumes "card( verts G) > 1"
     and "is_tip G p"

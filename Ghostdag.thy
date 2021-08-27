@@ -66,9 +66,12 @@ next
     by fastforce  
 qed
 
+
+
+
 text \<open>Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm\<close>
-fun GhostDAG_Relation :: "('a::linorder,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a rel"
-  where "GhostDAG_Relation G k = list_to_rel (snd (OrderDAG G k))"
+fun GhostDAG_Relation :: " nat \<Rightarrow> ('a::linorder,'b) pre_digraph \<Rightarrow> 'a rel"
+  where "GhostDAG_Relation k G = list_to_rel (snd (OrderDAG G k))"
 
 subsection\<open>Soundness\<close>
 
@@ -330,11 +333,6 @@ proof -
     by metis    
 qed
 
-
-
-
-
-
 subsubsection \<open>OrderDAG soundness\<close>
 
 lemma Verts_in_OrderDAG: 
@@ -563,14 +561,14 @@ lemma  OrderDAG_distinct:
 
 lemma GhostDAG_linear: 
   assumes "blockDAG G" 
-  shows "linear_order_on (verts G) (GhostDAG_Relation G k)"
+  shows "linear_order_on (verts G) (GhostDAG_Relation k G)"
   unfolding GhostDAG_Relation.simps 
   using list_order_linear OrderDAG_distinct OrderDAG_total assms by metis
 
 lemma GhostDAG_preserving:
   assumes "blockDAG G"
     and "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
-  shows "(y,x) \<in> GhostDAG_Relation G k"
+  shows "(y,x) \<in> GhostDAG_Relation k G"
   unfolding GhostDAG_Relation.simps using assms 
 proof(induct G k arbitrary: x y rule: OrderDAG.induct )
   case (1 G k)

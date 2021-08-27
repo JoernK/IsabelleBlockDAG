@@ -18,6 +18,7 @@ fun tie_break_int:: "'a::linorder \<Rightarrow> 'a \<Rightarrow> int \<Rightarro
   where "tie_break_int a b i =
  (if i=0 then (if (b < a) then -1 else 1) else i)"
 
+text \<open>Sign function with 0\<close>
 fun signum :: "int \<Rightarrow> int"
   where "signum a =  (if a > 0 then 1 else if a < 0 then -1 else 0)"
 
@@ -40,7 +41,7 @@ function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Righta
   by auto
 termination
 proof
-  let ?R = " measures [( \<lambda>(V, a, b, c). (card (verts V))),  ( \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a})] "  
+  let ?R = " measures [( \<lambda>(V, a, b, c). (card (verts V))),  ( \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a})]"  
   show "wf ?R"
     by simp 
 next 
@@ -405,7 +406,7 @@ proof(induction G a b c rule: vote_Spectre.induct)
       using blockDAG.genesis_reaches_nothing
       by metis
     then have bD: "blockDAG (reduce_past V a)" using blockDAG.reduce_past_dagbased 
-    three by auto
+        three by auto
     have b_in2: "b \<in> past_nodes V a" using three by auto
     also have c_in2: "c \<in> past_nodes V a" using three by auto
     ultimately have "c \<rightarrow>\<^sup>+\<^bsub>reduce_past V a\<^esub> b" using DAG.reduce_past_path2 three 1
@@ -418,32 +419,32 @@ proof(induction G a b c rule: vote_Spectre.induct)
       by metis 
     obtain wit where wit_in: "wit \<in> past_nodes V a" 
       and wit_vote: "vote_Spectre (reduce_past V a) wit b c \<noteq> 0"
-    using vote_Spectre_one_exists b_in2 c_in2 bD induce_subgraph_verts reduce_past.simps
-    by metis 
+      using vote_Spectre_one_exists b_in2 c_in2 bD induce_subgraph_verts reduce_past.simps
+      by metis 
     then have wit_vote1: "vote_Spectre (reduce_past V a) wit b c = 1" using all01
       by blast 
     obtain the_map where the_map_in: 
-    "the_map = (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c) 
+      "the_map = (map (\<lambda>i. vote_Spectre (reduce_past V a) i b c) 
                (sorted_list_of_set (past_nodes V a)))"
       by auto  
-      have all01_1: "\<forall>x \<in> set the_map. x \<in> {0,1}"
-        unfolding the_map_in set_map 
-        using allsorted01 by blast 
-      have "\<exists>x \<in> set the_map. x = 1"
-        unfolding the_map_in set_map 
-        using wit_in wit_vote1
+    have all01_1: "\<forall>x \<in> set the_map. x \<in> {0,1}"
+      unfolding the_map_in set_map 
+      using allsorted01 by blast 
+    have "\<exists>x \<in> set the_map. x = 1"
+      unfolding the_map_in set_map 
+      using wit_in wit_vote1
         sorted_list_of_set(1) DAG.finite_past bD subs
-        by (metis (no_types, lifting) image_iff three) 
-      then have "\<exists>x \<in> set the_map. x > 0"
-        using zero_less_one by blast 
-      moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01_1
-        by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
-      ultimately have "signum (sum_list the_map) = 1" using sumlist_one_mono by simp
-      then have "tie_break_int b c (signum (sum_list the_map)) = 1" using tie_break_int.simps
-        by simp
-      then have "vote_Spectre V a b c = 1 " unfolding the_map_in using three vote_Spectre.simps
-        by simp
-      then show ?thesis by simp
+      by (metis (no_types, lifting) image_iff three) 
+    then have "\<exists>x \<in> set the_map. x > 0"
+      using zero_less_one by blast 
+    moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01_1
+      by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
+    ultimately have "signum (sum_list the_map) = 1" using sumlist_one_mono by simp
+    then have "tie_break_int b c (signum (sum_list the_map)) = 1" using tie_break_int.simps
+      by simp
+    then have "vote_Spectre V a b c = 1 " unfolding the_map_in using three vote_Spectre.simps
+      by simp
+    then show ?thesis by simp
   next
     case four 
     then have all01: "\<forall>a2. a2 \<in> set (sorted_list_of_set (future_nodes V a)) \<longrightarrow>
@@ -465,8 +466,8 @@ proof(induction G a b c rule: vote_Spectre.induct)
     then have "signum (sum_list (map (\<lambda>i. vote_Spectre V i b c) 
       (sorted_list_of_set (future_nodes V a)))) \<in> {0,1}" unfolding signum.simps
       by simp 
-      then show ?thesis using four by simp 
-    qed 
+    then show ?thesis using four by simp 
+  qed 
 qed
 
 
@@ -504,10 +505,10 @@ proof -
     using zero_less_one by blast 
   moreover have "\<forall>x \<in> set the_map. x \<ge> 0" using all01
     by (metis empty_iff insert_iff less_int_code(1) not_le_imp_less zero_le_one) 
-   ultimately have "signum (sum_list the_map) = 1" using sumlist_one_mono by simp
-      then have "tie_break_int a b (signum (sum_list the_map)) = 1" using tie_break_int.simps
-        by simp
-   then show ?thesis unfolding the_map_in Spectre_Order_def by simp  
+  ultimately have "signum (sum_list the_map) = 1" using sumlist_one_mono by simp
+  then have "tie_break_int a b (signum (sum_list the_map)) = 1" using tie_break_int.simps
+    by simp
+  then show ?thesis unfolding the_map_in Spectre_Order_def by simp  
 qed
 
 
@@ -519,4 +520,13 @@ lemma Spectre_Order_Relation_Preserving:
   using assms  wf_digraph.reachable1_in_verts subs
     Spectre_Order_Preserving
     SigmaI case_prodI mem_Collect_eq by fastforce 
+
+definition (in blockDAG) test:: "int"
+  where "test = 1" 
+
+
+lemma [code]:  "blockDAG.test = 1" sorry
+
+
 end
+
