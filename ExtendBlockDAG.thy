@@ -34,6 +34,11 @@ lemma (in Append_One) append_verts:
   "verts G_A = verts G \<union> {app}"
   unfolding GG_A  pre_digraph.verts_del_vert using app_in app_notin by auto
 
+lemma (in Append_One) append_verts_cases: 
+  assumes "a \<in> verts G_A"
+  obtains (a_in_G) "a \<in> verts G" | (a_eq_app) "a = app"
+  using append_verts assms by auto
+
 lemma (in Append_One) append_subarcs_leq: 
   "arcs G \<subseteq> arcs G_A"
   unfolding GG_A  pre_digraph.arcs_del_vert using app_in app_notin 
@@ -101,7 +106,12 @@ lemma (in Append_One) append_in_tips:
   using app_in new_node append_is_tip CollectI
   by metis
 
+lemma (in Append_One) append_greater_1:
+"card (verts G_A) > 1"
+  unfolding append_verts 
+  using app_notin no_empty_blockDAG by auto
 
+  
 
 subsection \<open>Honest-Append-One Lemmas\<close>
 
@@ -147,5 +157,36 @@ proof safe
   qed
 qed
 
+lemma (in Honest_Append_One) reduce_append:
+  "reduce_past G_A app = G"
+  unfolding reduce_past.simps past_nodes.simps 
+proof -
+  have "{b \<in> verts G. app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b} = verts G"
+    using reaches_all by auto
+  moreover have "{b \<in> verts G. app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b} = {b \<in> verts G_A. app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b}"
+    unfolding append_verts using append_is_tip by fastforce
+  ultimately have "{b \<in> verts G_A. app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b} = verts G" by simp 
+  then show "G_A \<restriction> {b \<in> verts G_A. app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b} = G " 
+    unfolding induce_subgraph_def 
+    using append_induced_subgraph induced_subgraph_def 
+    append_head append_tail
+    by (metis (no_types, lifting) Collect_cong app_notin arcs_del_vert
+        del_vert_def del_vert_not_in_graph verts_del_vert) 
+qed
 
+lemma (in Honest_Append_One) append_no_anticone:
+  "anticone G_A app = {}"
+  unfolding anticone.simps
+proof safe
+  fix x 
+  assume  "x \<in> verts G_A"
+  and  "app \<noteq> x"
+  and as: "(app, x) \<notin> (arcs_ends G_A)\<^sup>+ "
+  then have "x \<in> verts G" 
+    using append_verts by auto
+  then have "app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> x"
+    using reaches_all by auto
+  then show "x \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app" 
+    using as by auto
+qed
 end
