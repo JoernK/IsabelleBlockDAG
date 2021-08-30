@@ -96,6 +96,10 @@ lemma tips_tips:
   assumes "x \<in> tips G"
   shows "is_tip G x" using tips_def CollectD assms(1) by metis
 
+lemma tip_in_verts: 
+  assumes "x \<in> tips G"
+  shows "x \<in> verts G" using tips_def CollectD assms(1) by metis
+
 subsubsection \<open>Anticone\<close>
 
 lemma (in DAG) tips_anticone:

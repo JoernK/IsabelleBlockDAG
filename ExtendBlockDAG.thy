@@ -20,10 +20,10 @@ locale Honest_Append_One = Append_One +
 
 
 locale Append_One_Honest_Dishonest = Honest_Append_One + 
-  fixes G_AB  (structure)
-  and dis_n::'a
-  assumes "Append_One G_A G_AB dis_n"
-
+  fixes G_AB :: "('a, 'b) pre_digraph" (structure)
+  and dis::'a
+  assumes app_two:"Append_One G_A G_AB dis"
+  and dis_n_app: "\<not> dis \<rightarrow>\<^bsub>G_AB\<^esub> app"
 
 subsection \<open>Append-One Lemmas\<close>
 
@@ -37,8 +37,6 @@ proof(auto)
 qed
 
   
-
-
 lemma (in Append_One) append_subverts:            
   "verts G \<subset> verts G_A"
   unfolding GG_A  pre_digraph.verts_del_vert using app_in app_notin by auto
@@ -223,30 +221,7 @@ lemma (in Append_One) append_in_tips:
 lemma (in Append_One) append_greater_1:
 "card (verts G_A) > 1"
   unfolding append_verts 
-  using app_notin no_empty_blockDAG by auto
-
-
-lemma append_diff_sorted_set:
-  assumes "a \<in> A"
-  and "finite A"
-shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
-   (sorted_list_of_set (A - {a}))) 
-  = sum_list ((map P)(sorted_list_of_set (A))) - (P a)"
-proof -
-  let ?L1 =  "(sorted_list_of_set (A))"
-  have d_1: "distinct ?L1" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
-   then have s_1: "sum_list ((map P) ?L1) 
-  = sum P (set ?L1)" using sum_list_distinct_conv_sum_set by metis
-  let ?L2 = " (sorted_list_of_set (A - {a}))"
-  have d_2: "distinct ?L2" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
-  then have s_2: "sum_list ((map P) ?L2) 
-  = sum P (set ?L2)" using sum_list_distinct_conv_sum_set by metis
-  have s_3: "sum P (set ?L2) = sum P (set ?L1) - (P a)"
-    using assms sorted_list_of_set(1)
-    by (simp add: sum_diff1) 
-  show ?thesis
-    unfolding s_1 s_2 s_3 by simp
-qed    
+  using app_notin no_empty_blockDAG by auto  
 
 lemma (in Append_One) append_reduce_some:
   assumes "a \<in> verts G"
@@ -394,5 +369,57 @@ proof safe
   then show "x \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app" 
     using as by auto
 qed
+
+subsection \<open>Honest-Dishonest-Append-One Lemmas\<close>
+
+lemma (in Append_One_Honest_Dishonest) app_dis_not_reached:
+  shows "\<not> dis \<rightarrow>\<^sup>+\<^bsub>G_AB\<^esub> app" 
+proof(rule ccontr, cases dis app "(arcs_ends G_AB)" rule: converse_trancl_induct, auto)
+  fix y
+  assume y_d: "y \<rightarrow>\<^bsub>G_AB\<^esub> app"
+  interpret D1: Append_One G_A G_AB dis using app_two by simp
+  interpret B3: blockDAG G_AB using D1.bD_A by auto
+  have "y \<in> verts G_AB" using y_d B3.wellformed by auto
+  then consider "y = dis" |  "y \<in> verts G_A" using D1.append_verts by auto
+  then show False
+  proof(cases)
+    case 1
+    then have "dis \<rightarrow>\<^bsub>G_AB\<^esub> app" using y_d by auto
+    then show ?thesis using dis_n_app by auto
+  next
+    case 2
+    then have "y \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app" using D1.reachable1_preserve y_d by blast 
+    then show ?thesis using append_not_reached_all by auto
+  qed 
+qed   
+
+
+lemma (in Append_One_Honest_Dishonest) append_is_only_tip:
+  "tips G_AB = {app,dis}"
+proof safe
+  interpret A2: Append_One G_A G_AB dis using app_two by auto
+  show "dis \<in> tips G_AB " using A2.append_in_tips by simp
+  show "app \<in> tips G_AB " unfolding tips_def is_tip.simps A2.append_verts
+    using app_dis_not_reached reachable1_preserve append_not_reached
+     A2.reachable1_preserve app_in
+    by simp 
+  fix x 
+  assume as1: "x \<in> tips G_AB"
+  and app_x: "x \<noteq> app"
+  have "x \<notin> verts G"
+  proof 
+    assume x_vG: "x \<in> verts G"
+    then have "x \<in> verts G_A" using append_verts by auto 
+    then have "app \<rightarrow>\<^sup>+\<^bsub>G_AB\<^esub> x" using A2.reachable1_preserve reaches_all x_vG app_in
+      by simp 
+    then have "x \<notin> tips G_AB"
+      by (metis A2.append_verts_in app_in is_tip.elims(2) tips_tips)
+    then show False using as1 by simp
+  qed
+  then show "x = dis" unfolding 
+  append_verts_diff A2.append_verts_diff using app_x as1 tip_in_verts by force
+qed
+
+
 
 end

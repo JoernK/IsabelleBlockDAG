@@ -188,6 +188,30 @@ lemma antisymmetric_signum:
   shows "signum i = - (signum (-i))"
   by auto
 
+
+
+lemma append_diff_sorted_set:
+  assumes "a \<in> A"
+  and "finite A"
+shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+   (sorted_list_of_set (A - {a}))) 
+  = sum_list ((map P)(sorted_list_of_set (A))) - (P a)"
+proof -
+  let ?L1 =  "(sorted_list_of_set (A))"
+  have d_1: "distinct ?L1" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
+   then have s_1: "sum_list ((map P) ?L1) 
+  = sum P (set ?L1)" using sum_list_distinct_conv_sum_set by metis
+  let ?L2 = " (sorted_list_of_set (A - {a}))"
+  have d_2: "distinct ?L2" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
+  then have s_2: "sum_list ((map P) ?L2) 
+  = sum P (set ?L2)" using sum_list_distinct_conv_sum_set by metis
+  have s_3: "sum P (set ?L2) = sum P (set ?L1) - (P a)"
+    using assms sorted_list_of_set(1)
+    by (simp add: sum_diff1) 
+  show ?thesis
+    unfolding s_1 s_2 s_3 by simp
+qed  
+
 lemma vote_Spectre_one_exists:
   assumes "blockDAG V"
     and "a \<in> verts V" 
