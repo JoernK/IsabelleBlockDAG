@@ -20,9 +20,7 @@ definition One_Appending_Robust:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<
          (\<forall>G G' G'' a b c d. Append_One_Honest_Dishonest G G' a G'' b
           \<longrightarrow> ((c,d) \<in> (A G) \<longrightarrow> (c,d) \<in> (A G'')))"
 
-lemma "Order_Preserving SPECTRE"
-  unfolding Order_Preserving_def 
-  using SPECTRE_Preserving by auto 
+
 
 
 end

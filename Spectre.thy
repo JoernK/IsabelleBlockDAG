@@ -215,13 +215,5 @@ proof
   qed
 qed
 
-
-definition (in blockDAG) test:: "int"
-  where "test = 1" 
-
-
-lemma [code]:  "blockDAG.test = 1" sorry
-
-
 end
 

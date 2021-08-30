@@ -184,8 +184,8 @@ GHOSTDAG ordering algorithm%
 Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{fun}\isamarkupfalse%
-\ GhostDAG{\isacharunderscore}{\kern0pt}Relation\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ nat\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{where}\ {\isachardoublequoteopen}GhostDAG{\isacharunderscore}{\kern0pt}Relation\ G\ k\ {\isacharequal}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}OrderDAG\ G\ k{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\ GHOSTDAG\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}\ nat\ {\isasymRightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}GHOSTDAG\ k\ G\ {\isacharequal}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}OrderDAG\ G\ k{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
 \isadelimdocument
 %
 \endisadelimdocument
@@ -1630,382 +1630,6 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 \endisadelimproof
 \isanewline
 \isanewline
-\isacommand{lemma}\isamarkupfalse%
-\ GhostDAG{\isacharunderscore}{\kern0pt}linear{\isacharcolon}{\kern0pt}\ \isanewline
-\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ G{\isachardoublequoteclose}\ \isanewline
-\ \ \isakeyword{shows}\ {\isachardoublequoteopen}linear{\isacharunderscore}{\kern0pt}order{\isacharunderscore}{\kern0pt}on\ {\isacharparenleft}{\kern0pt}verts\ G{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}GhostDAG{\isacharunderscore}{\kern0pt}Relation\ G\ k{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-%
-\isadelimproof
-\ \ %
-\endisadelimproof
-%
-\isatagproof
-\isacommand{unfolding}\isamarkupfalse%
-\ GhostDAG{\isacharunderscore}{\kern0pt}Relation{\isachardot}{\kern0pt}simps\ \isanewline
-\ \ \isacommand{using}\isamarkupfalse%
-\ list{\isacharunderscore}{\kern0pt}order{\isacharunderscore}{\kern0pt}linear\ OrderDAG{\isacharunderscore}{\kern0pt}distinct\ OrderDAG{\isacharunderscore}{\kern0pt}total\ assms\ \isacommand{by}\isamarkupfalse%
-\ metis%
-\endisatagproof
-{\isafoldproof}%
-%
-\isadelimproof
-\isanewline
-%
-\endisadelimproof
-\isanewline
-\isacommand{lemma}\isamarkupfalse%
-\ GhostDAG{\isacharunderscore}{\kern0pt}preserving{\isacharcolon}{\kern0pt}\isanewline
-\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ G{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}x\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ y{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ GhostDAG{\isacharunderscore}{\kern0pt}Relation\ G\ k{\isachardoublequoteclose}\isanewline
-%
-\isadelimproof
-\ \ %
-\endisadelimproof
-%
-\isatagproof
-\isacommand{unfolding}\isamarkupfalse%
-\ GhostDAG{\isacharunderscore}{\kern0pt}Relation{\isachardot}{\kern0pt}simps\ \isacommand{using}\isamarkupfalse%
-\ assms\ \isanewline
-\isacommand{proof}\isamarkupfalse%
-{\isacharparenleft}{\kern0pt}induct\ G\ k\ arbitrary{\isacharcolon}{\kern0pt}\ x\ y\ rule{\isacharcolon}{\kern0pt}\ OrderDAG{\isachardot}{\kern0pt}induct\ {\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{case}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}{\isadigit{1}}\ G\ k{\isacharparenright}{\kern0pt}\isanewline
-\ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}case\ \isacommand{proof}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}cases\ G\ rule{\isacharcolon}{\kern0pt}\ OrderDAG{\isacharunderscore}{\kern0pt}casesAlt{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{case}\isamarkupfalse%
-\ ntB\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
-\ {\isadigit{1}}\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \isacommand{next}\isamarkupfalse%
-\isanewline
-\ \ \ \ \isacommand{case}\isamarkupfalse%
-\ one\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymnot}\ x\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ y{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ subs\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts\ {\isadigit{1}}\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ DAG{\isachardot}{\kern0pt}cycle{\isacharunderscore}{\kern0pt}free\ OrderDAG{\isacharunderscore}{\kern0pt}casesAlt\ blockDAG{\isachardot}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}less\isanewline
-\ \ \ \ \ \ \ \ \ \ blockDAG{\isachardot}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past{\isacharunderscore}{\kern0pt}dagbased\ blockDAG{\isachardot}{\kern0pt}unique{\isacharunderscore}{\kern0pt}genesis\ less{\isacharunderscore}{\kern0pt}one\ not{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}less{\isacharunderscore}{\kern0pt}zero{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
-\ {\isadigit{1}}\ \isacommand{by}\isamarkupfalse%
-\ simp\isanewline
-\ \ \isacommand{next}\isamarkupfalse%
-\ \ \isanewline
-\ \ \ \ \isacommand{case}\isamarkupfalse%
-\ more\isanewline
-\ \ \ \ \isacommand{obtain}\isamarkupfalse%
-\ pp\ \isakeyword{where}\ pp{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}pp\ {\isacharequal}{\kern0pt}\ \ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\ {\isacharparenleft}{\kern0pt}OrderDAG\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ G\ i{\isacharparenright}{\kern0pt}\ k{\isacharcomma}{\kern0pt}\ i{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}tips\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
-\ blockDAG{\isachardot}{\kern0pt}tips{\isacharunderscore}{\kern0pt}exist\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \ \ \isacommand{have}\isamarkupfalse%
-\ backw{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}OrderDAG\ G\ k{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}fold\ {\isacharparenleft}{\kern0pt}app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end\ G\ k{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}anticone\ G\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ OrderDAG{\isachardot}{\kern0pt}simps\ less{\isacharunderscore}{\kern0pt}irrefl{\isacharunderscore}{\kern0pt}nat\ more\ pp{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}mono{\isacharunderscore}{\kern0pt}tags{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \isacommand{obtain}\isamarkupfalse%
-\ S\ \isakeyword{where}\ s{\isacharunderscore}{\kern0pt}in{\isacharcolon}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}anticone\ G\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ S{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
-\ simp\isanewline
-\ \ \ \ \isacommand{obtain}\isamarkupfalse%
-\ t\ \isakeyword{where}\ t{\isacharunderscore}{\kern0pt}in\ {\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ t{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
-\ simp\isanewline
-\ \ \ \ \isacommand{obtain}\isamarkupfalse%
-\ ma\ \isakeyword{where}\ ma{\isacharunderscore}{\kern0pt}def{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}ma\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
-\ simp\isanewline
-\ \ \ \ \isacommand{have}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}vert{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}ma\ {\isasymin}\ verts\ G{\isachardoublequoteclose}\ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\ \isacommand{using}\isamarkupfalse%
-\ chosen{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ digraph{\isachardot}{\kern0pt}tips{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts\isanewline
-\ \ \ \ \ \ \ \ more{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ subs\ subsetD\ pp{\isacharunderscore}{\kern0pt}in\ \isacommand{by}\isamarkupfalse%
-\ blast\ \isanewline
-\ \ \ \ \isacommand{have}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}tip{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}tip\ G\ ma{\isachardoublequoteclose}\ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ chosen{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ more\ pp{\isacharunderscore}{\kern0pt}in\ \ tips{\isacharunderscore}{\kern0pt}tips\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}no{\isacharunderscore}{\kern0pt}types{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \ \ \ \ \ \ \ \ \ \isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ no{\isacharunderscore}{\kern0pt}gen{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymnot}\ blockDAG{\isachardot}{\kern0pt}is{\isacharunderscore}{\kern0pt}genesis{\isacharunderscore}{\kern0pt}node\ G\ ma{\isachardoublequoteclose}\ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\ \ \isacommand{using}\isamarkupfalse%
-\ pp{\isacharunderscore}{\kern0pt}in\ \isanewline
-\ \ \ \ \ \ \ \ blockDAG{\isachardot}{\kern0pt}tips{\isacharunderscore}{\kern0pt}unequal{\isacharunderscore}{\kern0pt}gen\ more\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ metis\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ red{\isacharunderscore}{\kern0pt}bd{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}blockDAG\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ G\ ma{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \ \isanewline
-\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ blockDAG{\isachardot}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past{\isacharunderscore}{\kern0pt}dagbased\ more\ ma{\isacharunderscore}{\kern0pt}vert\ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \ \ \isacommand{consider}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}ind{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma\ {\isasymand}\ y\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ {\isacharbar}{\kern0pt}{\isacharparenleft}{\kern0pt}x{\isacharunderscore}{\kern0pt}in{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymnotin}\ \ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma\ {\isasymand}\ y\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ {\isacharbar}{\kern0pt}{\isacharparenleft}{\kern0pt}y{\isacharunderscore}{\kern0pt}in{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymin}\ \ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma\ {\isasymand}\ y\ {\isasymnotin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ {\isacharbar}{\kern0pt}{\isacharparenleft}{\kern0pt}both{\isacharunderscore}{\kern0pt}nin{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymnotin}\ \ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma\ {\isasymand}\ y\ {\isasymnotin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{proof}\isamarkupfalse%
-{\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ ind\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}x\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub reduce{\isacharunderscore}{\kern0pt}past\ G\ ma\isactrlesub \ y{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
-\ DAG{\isachardot}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past{\isacharunderscore}{\kern0pt}path{\isadigit{2}}\ more\ \ \isanewline
-\ \ \ \ \ \ \ \ \ \ {\isadigit{1}}\ subs\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{moreover}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}tips{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}\ ma\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}tips\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ chosen{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ pp{\isacharunderscore}{\kern0pt}in\ more{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \ \ \ \ \isacommand{ultimately}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}OrderDAG\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ G\ ma{\isacharparenright}{\kern0pt}\ k{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ more\ {\isadigit{1}}\ ind\ less{\isacharunderscore}{\kern0pt}numeral{\isacharunderscore}{\kern0pt}extra{\isacharparenleft}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}\ ma{\isacharunderscore}{\kern0pt}def\ red{\isacharunderscore}{\kern0pt}bd\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}fst\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ chosen{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{6}}{\isacharparenright}{\kern0pt}\ pp{\isacharunderscore}{\kern0pt}in\ {\isadigit{1}}\ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\ \isacommand{by}\isamarkupfalse%
-\ fastforce\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ rel{\isacharunderscore}{\kern0pt}base{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple{\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple{\isachardot}{\kern0pt}simps\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}mono\ prod{\isachardot}{\kern0pt}collapse\ snd{\isacharunderscore}{\kern0pt}conv\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ metis\ \isanewline
-\isanewline
-\ \ \ \ \ \ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ \ ma{\isacharunderscore}{\kern0pt}def\ backw\ s{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ rel{\isacharunderscore}{\kern0pt}base\ \ \isacommand{unfolding}\isamarkupfalse%
-\ t{\isacharunderscore}{\kern0pt}in\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ fold{\isacharunderscore}{\kern0pt}app{\isacharunderscore}{\kern0pt}mono{\isacharunderscore}{\kern0pt}rel\ prod{\isachardot}{\kern0pt}collapse\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ metis\ \ \ \ \ \ \ \isanewline
-\ \ \ \ \isacommand{next}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}y\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}OrderDAG\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ G\ ma{\isacharparenright}{\kern0pt}\ k{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ reduce{\isacharunderscore}{\kern0pt}past{\isachardot}{\kern0pt}simps\ \isacommand{using}\isamarkupfalse%
-\ induce{\isacharunderscore}{\kern0pt}subgraph{\isacharunderscore}{\kern0pt}verts\ Verts{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}OrderDAG\ \isanewline
-\ \ \ \ \ \ \ \ \ \ more\ red{\isacharunderscore}{\kern0pt}bd\ reduce{\isacharunderscore}{\kern0pt}past{\isachardot}{\kern0pt}elims\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ y{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}base{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}y\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}fst\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ ma{\isacharunderscore}{\kern0pt}def\ \isacommand{using}\isamarkupfalse%
-\ chosen{\isacharunderscore}{\kern0pt}map{\isacharunderscore}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{6}}{\isacharparenright}{\kern0pt}\ more\ pp{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ fastforce\ \isanewline
-\ \ \ \ \ \ \isacommand{consider}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}x{\isacharunderscore}{\kern0pt}t{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ ma{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}x{\isacharunderscore}{\kern0pt}ant{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymin}\ anticone\ G\ ma{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
-\ DAG{\isachardot}{\kern0pt}verts{\isacharunderscore}{\kern0pt}comp{\isadigit{2}}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ subs\ {\isadigit{1}}\ \ ma{\isacharunderscore}{\kern0pt}tip\ ma{\isacharunderscore}{\kern0pt}vert\ \isanewline
-\ \ \ \ \ \ \ \ \ \ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ tips{\isacharunderscore}{\kern0pt}def\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ x{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}no{\isacharunderscore}{\kern0pt}types{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{proof}\isamarkupfalse%
-{\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}t\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}t\ ma{\isacharunderscore}{\kern0pt}def\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ y{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}base\ add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple{\isachardot}{\kern0pt}simps\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}append\ prod{\isachardot}{\kern0pt}collapse\ sndI\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ metis\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{unfolding}\isamarkupfalse%
-\ \ ma{\isacharunderscore}{\kern0pt}def\ backw\ s{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ t{\isacharunderscore}{\kern0pt}in\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ fold{\isacharunderscore}{\kern0pt}app{\isacharunderscore}{\kern0pt}mono{\isacharunderscore}{\kern0pt}rel\ prod{\isachardot}{\kern0pt}collapse\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ metis\ \ \ \ \ \isanewline
-\ \ \ \ \ \ \isacommand{next}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}ant\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}x\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}anticone\ G\ ma{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ more\ subs\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ DAG{\isachardot}{\kern0pt}anticon{\isacharunderscore}{\kern0pt}finite{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{moreover}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}y\ {\isasymin}\ set\ {\isacharparenleft}{\kern0pt}snd\ {\isacharparenleft}{\kern0pt}add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple\ {\isacharparenleft}{\kern0pt}choose{\isacharunderscore}{\kern0pt}max{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}set\ pp{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ \ add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple{\isacharunderscore}{\kern0pt}mono\ in{\isacharunderscore}{\kern0pt}mono\ prod{\isachardot}{\kern0pt}collapse\ y{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}base\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}mono{\isacharunderscore}{\kern0pt}tags{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{ultimately}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{unfolding}\isamarkupfalse%
-\ backw\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ fold{\isacharunderscore}{\kern0pt}app{\isacharunderscore}{\kern0pt}app{\isacharunderscore}{\kern0pt}rel\ ma{\isacharunderscore}{\kern0pt}def\ prod{\isachardot}{\kern0pt}collapse\ top{\isacharunderscore}{\kern0pt}sort{\isacharunderscore}{\kern0pt}con{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
-\ \ \ \ \isacommand{next}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ y{\isacharunderscore}{\kern0pt}in\isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}y\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma{\isachardoublequoteclose}\ \isacommand{unfolding}\isamarkupfalse%
-\ past{\isacharunderscore}{\kern0pt}nodes{\isachardot}{\kern0pt}simps\ \isacommand{using}\isamarkupfalse%
-\ {\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharcomma}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \ \ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ subs\ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ trancl{\isacharunderscore}{\kern0pt}trans\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}mono{\isacharunderscore}{\kern0pt}tags{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
-\ y{\isacharunderscore}{\kern0pt}in\ \isacommand{by}\isamarkupfalse%
-\ simp\ \isanewline
-\ \ \ \ \isacommand{next}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ both{\isacharunderscore}{\kern0pt}nin\isanewline
-\ \ \ \ \ \ \isacommand{consider}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}x{\isacharunderscore}{\kern0pt}t{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ ma{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isacharparenleft}{\kern0pt}x{\isacharunderscore}{\kern0pt}ant{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymin}\ anticone\ G\ ma{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
-\ DAG{\isachardot}{\kern0pt}verts{\isacharunderscore}{\kern0pt}comp{\isadigit{2}}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ subs\ {\isadigit{1}}\ \ ma{\isacharunderscore}{\kern0pt}tip\ ma{\isacharunderscore}{\kern0pt}vert\ \isanewline
-\ \ \ \ \ \ \ \ \ \ mem{\isacharunderscore}{\kern0pt}Collect{\isacharunderscore}{\kern0pt}eq\ tips{\isacharunderscore}{\kern0pt}def\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ both{\isacharunderscore}{\kern0pt}nin\isanewline
-\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}no{\isacharunderscore}{\kern0pt}types{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{proof}\isamarkupfalse%
-{\isacharparenleft}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}t\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}y\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G\ ma{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
-\ {\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\ more\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ past{\isacharunderscore}{\kern0pt}nodes{\isachardot}{\kern0pt}simps\ \isacommand{unfolding}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}t\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ subs\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{using}\isamarkupfalse%
-\ both{\isacharunderscore}{\kern0pt}nin\ \isacommand{by}\isamarkupfalse%
-\ simp\ \isanewline
-\ \ \ \ \ \ \isacommand{next}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
-\ y{\isacharunderscore}{\kern0pt}ina{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}y\ {\isasymin}\ anticone\ G\ ma{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{proof}\isamarkupfalse%
-{\isacharparenleft}{\kern0pt}rule\ ccontr{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{assume}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymnot}\ y\ {\isasymin}\ anticone\ G\ ma\ {\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}y\ {\isacharequal}{\kern0pt}\ ma{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
-\ anticone{\isachardot}{\kern0pt}simps\ \isacommand{using}\isamarkupfalse%
-\ subs\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}reachable{\isadigit{1}}{\isacharunderscore}{\kern0pt}in{\isacharunderscore}{\kern0pt}verts{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ {\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharcomma}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ ma{\isacharunderscore}{\kern0pt}tip\ both{\isacharunderscore}{\kern0pt}nin\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ fastforce\ \ \isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}x\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ ma{\isachardoublequoteclose}\ \isacommand{using}\isamarkupfalse%
-\ {\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\ \isacommand{by}\isamarkupfalse%
-\ auto\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ False\ \isacommand{using}\isamarkupfalse%
-\ subs\ \ {\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ wf{\isacharunderscore}{\kern0pt}digraph{\isachardot}{\kern0pt}tips{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}referenced\ ma{\isacharunderscore}{\kern0pt}tip{\isacharparenright}{\kern0pt}\ \ \isanewline
-\ \ \ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
-\ x{\isacharunderscore}{\kern0pt}ant\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}x{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}anticone\ G\ ma{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ y{\isacharunderscore}{\kern0pt}ina\ DAG{\isachardot}{\kern0pt}anticon{\isacharunderscore}{\kern0pt}finite\ subs\ {\isadigit{1}}{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharcomma}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}\ sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ top{\isacharunderscore}{\kern0pt}sort{\isacharunderscore}{\kern0pt}rel\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ metis\isanewline
-\ \ \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
-\ \isacommand{show}\isamarkupfalse%
-\ {\isacharquery}{\kern0pt}thesis\ \isacommand{unfolding}\isamarkupfalse%
-\ backw\ ma{\isacharunderscore}{\kern0pt}def\ \ \isacommand{using}\isamarkupfalse%
-\isanewline
-\ \ \ \ \ \ \ \ \ \ \ \ fold{\isacharunderscore}{\kern0pt}app{\isacharunderscore}{\kern0pt}mono\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}mono{\isadigit{2}}\isanewline
-\ \ \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ old{\isachardot}{\kern0pt}prod{\isachardot}{\kern0pt}exhaust{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
-\ \ \ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
-\ \ \isacommand{qed}\isamarkupfalse%
-\isanewline
-\isacommand{qed}\isamarkupfalse%
-%
-\endisatagproof
-{\isafoldproof}%
-%
-\isadelimproof
-\isanewline
-%
-\endisadelimproof
-\isanewline
 \isanewline
 \isanewline
 \isanewline
@@ -2116,1331 +1740,980 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 %:%172=66%:%
 %:%173=66%:%
 %:%174=67%:%
-%:%184=69%:%
-%:%186=70%:%
-%:%187=70%:%
-%:%188=71%:%
-%:%195=73%:%
-%:%205=75%:%
-%:%206=75%:%
-%:%207=76%:%
-%:%208=77%:%
-%:%209=78%:%
-%:%212=79%:%
-%:%216=79%:%
-%:%217=79%:%
-%:%218=79%:%
-%:%232=83%:%
-%:%242=85%:%
-%:%243=85%:%
-%:%244=86%:%
-%:%247=87%:%
-%:%251=87%:%
-%:%252=87%:%
-%:%253=87%:%
-%:%258=87%:%
-%:%261=88%:%
-%:%262=89%:%
-%:%263=89%:%
-%:%264=90%:%
-%:%267=91%:%
-%:%271=91%:%
-%:%272=91%:%
-%:%273=91%:%
-%:%278=91%:%
-%:%281=92%:%
-%:%282=93%:%
-%:%283=93%:%
-%:%284=94%:%
-%:%291=95%:%
-%:%292=95%:%
-%:%307=98%:%
-%:%317=100%:%
-%:%318=100%:%
-%:%319=101%:%
-%:%320=102%:%
-%:%323=103%:%
-%:%327=103%:%
-%:%328=103%:%
-%:%329=104%:%
-%:%330=104%:%
-%:%335=104%:%
-%:%338=105%:%
-%:%339=106%:%
-%:%340=106%:%
-%:%341=107%:%
-%:%344=108%:%
-%:%348=108%:%
-%:%349=108%:%
-%:%350=109%:%
-%:%351=109%:%
-%:%356=109%:%
-%:%359=110%:%
-%:%360=111%:%
-%:%361=112%:%
-%:%362=112%:%
-%:%363=113%:%
-%:%366=114%:%
-%:%370=114%:%
-%:%371=114%:%
-%:%372=115%:%
-%:%373=115%:%
-%:%378=115%:%
-%:%381=116%:%
-%:%382=117%:%
-%:%383=117%:%
-%:%384=118%:%
-%:%387=119%:%
-%:%391=119%:%
-%:%392=119%:%
-%:%393=120%:%
-%:%394=120%:%
-%:%399=120%:%
-%:%402=121%:%
-%:%403=122%:%
-%:%404=122%:%
-%:%405=123%:%
-%:%406=124%:%
-%:%407=125%:%
-%:%410=126%:%
-%:%414=126%:%
-%:%415=126%:%
-%:%416=127%:%
-%:%417=127%:%
-%:%418=127%:%
-%:%423=127%:%
-%:%426=128%:%
-%:%427=129%:%
-%:%428=130%:%
-%:%429=130%:%
-%:%430=131%:%
-%:%431=132%:%
-%:%434=133%:%
-%:%438=133%:%
-%:%439=133%:%
-%:%440=134%:%
-%:%441=134%:%
-%:%446=134%:%
-%:%449=135%:%
-%:%450=136%:%
-%:%451=137%:%
-%:%452=138%:%
-%:%453=138%:%
-%:%454=139%:%
-%:%461=140%:%
-%:%462=140%:%
-%:%477=145%:%
-%:%487=147%:%
-%:%488=147%:%
-%:%489=148%:%
-%:%490=149%:%
-%:%491=150%:%
-%:%494=151%:%
-%:%498=151%:%
-%:%499=151%:%
-%:%500=152%:%
-%:%501=152%:%
-%:%506=152%:%
-%:%509=153%:%
-%:%510=154%:%
-%:%511=155%:%
-%:%512=155%:%
-%:%513=156%:%
-%:%515=156%:%
-%:%519=156%:%
-%:%520=156%:%
-%:%534=159%:%
-%:%544=160%:%
-%:%545=160%:%
-%:%546=161%:%
-%:%547=162%:%
-%:%550=163%:%
-%:%554=163%:%
-%:%555=163%:%
-%:%556=164%:%
-%:%557=164%:%
-%:%558=165%:%
-%:%559=165%:%
-%:%560=165%:%
-%:%561=165%:%
-%:%562=166%:%
-%:%563=166%:%
-%:%564=167%:%
-%:%565=167%:%
-%:%566=167%:%
-%:%567=167%:%
-%:%568=168%:%
-%:%569=168%:%
-%:%570=169%:%
-%:%571=169%:%
-%:%572=170%:%
-%:%573=170%:%
-%:%574=171%:%
-%:%575=172%:%
-%:%576=172%:%
-%:%577=172%:%
-%:%578=172%:%
-%:%579=172%:%
-%:%580=173%:%
-%:%595=176%:%
-%:%605=178%:%
-%:%606=178%:%
-%:%607=179%:%
-%:%608=180%:%
-%:%615=181%:%
-%:%616=181%:%
-%:%617=182%:%
-%:%618=182%:%
-%:%619=183%:%
-%:%620=183%:%
-%:%621=183%:%
-%:%622=183%:%
-%:%623=184%:%
-%:%624=184%:%
-%:%625=185%:%
-%:%626=185%:%
-%:%627=186%:%
-%:%628=186%:%
-%:%629=186%:%
-%:%630=186%:%
-%:%631=186%:%
-%:%632=187%:%
-%:%633=187%:%
-%:%634=188%:%
-%:%640=188%:%
-%:%643=189%:%
-%:%644=190%:%
-%:%645=190%:%
-%:%646=191%:%
-%:%653=192%:%
-%:%654=192%:%
-%:%655=193%:%
-%:%656=193%:%
-%:%657=194%:%
-%:%658=194%:%
-%:%659=194%:%
-%:%660=194%:%
-%:%661=194%:%
-%:%662=195%:%
-%:%663=195%:%
-%:%664=196%:%
-%:%670=196%:%
-%:%673=197%:%
-%:%674=198%:%
-%:%675=199%:%
-%:%676=199%:%
-%:%677=200%:%
-%:%678=201%:%
-%:%681=202%:%
-%:%685=202%:%
-%:%686=202%:%
-%:%687=203%:%
-%:%688=203%:%
-%:%693=203%:%
-%:%696=204%:%
-%:%697=205%:%
-%:%698=205%:%
-%:%699=206%:%
-%:%700=207%:%
-%:%703=208%:%
-%:%707=208%:%
-%:%708=208%:%
-%:%709=208%:%
-%:%710=208%:%
-%:%715=208%:%
-%:%718=209%:%
-%:%719=210%:%
-%:%720=210%:%
-%:%721=211%:%
-%:%722=212%:%
-%:%723=213%:%
-%:%726=214%:%
-%:%730=214%:%
-%:%731=214%:%
-%:%732=214%:%
-%:%733=215%:%
-%:%734=215%:%
-%:%739=215%:%
-%:%742=216%:%
-%:%743=217%:%
-%:%744=218%:%
-%:%745=218%:%
-%:%746=219%:%
-%:%749=220%:%
-%:%753=220%:%
-%:%754=220%:%
-%:%755=220%:%
-%:%760=220%:%
-%:%763=221%:%
-%:%764=222%:%
-%:%765=223%:%
-%:%766=223%:%
-%:%767=224%:%
-%:%768=225%:%
-%:%771=226%:%
-%:%775=226%:%
-%:%776=226%:%
-%:%777=227%:%
-%:%778=227%:%
-%:%779=228%:%
-%:%780=228%:%
-%:%781=229%:%
-%:%782=229%:%
-%:%783=229%:%
-%:%784=230%:%
-%:%785=230%:%
-%:%786=231%:%
-%:%787=231%:%
-%:%788=232%:%
-%:%789=232%:%
-%:%790=233%:%
-%:%796=233%:%
-%:%799=234%:%
-%:%800=235%:%
-%:%801=235%:%
-%:%802=236%:%
-%:%803=237%:%
-%:%806=238%:%
-%:%810=238%:%
-%:%811=238%:%
-%:%812=239%:%
-%:%813=239%:%
-%:%818=239%:%
-%:%821=240%:%
-%:%822=241%:%
-%:%823=241%:%
-%:%824=242%:%
-%:%825=243%:%
-%:%826=244%:%
-%:%829=245%:%
-%:%833=245%:%
-%:%834=245%:%
-%:%835=246%:%
-%:%836=246%:%
-%:%837=247%:%
-%:%838=247%:%
-%:%839=248%:%
-%:%840=248%:%
-%:%841=248%:%
-%:%842=249%:%
-%:%843=249%:%
-%:%844=250%:%
-%:%845=250%:%
-%:%846=251%:%
-%:%847=251%:%
-%:%848=252%:%
-%:%854=252%:%
-%:%857=253%:%
-%:%858=254%:%
-%:%859=254%:%
-%:%860=255%:%
-%:%861=256%:%
-%:%862=257%:%
-%:%863=258%:%
-%:%870=259%:%
-%:%871=259%:%
-%:%872=260%:%
-%:%873=260%:%
-%:%874=261%:%
-%:%875=261%:%
-%:%876=261%:%
-%:%877=262%:%
-%:%878=262%:%
-%:%879=262%:%
-%:%880=263%:%
-%:%881=264%:%
-%:%882=265%:%
-%:%883=265%:%
-%:%884=266%:%
-%:%885=266%:%
-%:%886=266%:%
-%:%887=267%:%
-%:%888=267%:%
-%:%889=268%:%
-%:%890=268%:%
-%:%891=269%:%
-%:%892=269%:%
-%:%893=270%:%
-%:%894=270%:%
-%:%895=271%:%
-%:%896=271%:%
-%:%897=272%:%
-%:%898=272%:%
-%:%899=273%:%
-%:%900=273%:%
-%:%901=274%:%
-%:%902=274%:%
-%:%903=274%:%
-%:%904=274%:%
-%:%905=275%:%
-%:%906=275%:%
-%:%907=276%:%
-%:%908=276%:%
-%:%909=277%:%
-%:%910=277%:%
-%:%911=277%:%
-%:%912=277%:%
-%:%913=278%:%
-%:%914=278%:%
-%:%915=279%:%
-%:%916=279%:%
-%:%917=280%:%
-%:%918=280%:%
-%:%919=281%:%
-%:%920=281%:%
-%:%921=281%:%
-%:%922=282%:%
-%:%923=282%:%
-%:%924=282%:%
-%:%925=282%:%
-%:%926=282%:%
-%:%927=283%:%
-%:%928=283%:%
-%:%929=283%:%
-%:%930=284%:%
-%:%931=284%:%
-%:%932=284%:%
-%:%933=285%:%
-%:%939=285%:%
-%:%942=286%:%
-%:%943=287%:%
-%:%944=288%:%
-%:%945=288%:%
-%:%946=289%:%
-%:%947=290%:%
-%:%950=291%:%
-%:%954=291%:%
-%:%955=291%:%
-%:%956=292%:%
-%:%957=292%:%
-%:%963=292%:%
-%:%966=293%:%
-%:%967=294%:%
-%:%968=294%:%
-%:%969=295%:%
-%:%970=296%:%
-%:%971=297%:%
-%:%972=298%:%
-%:%973=299%:%
-%:%974=300%:%
-%:%975=301%:%
-%:%976=302%:%
-%:%977=303%:%
-%:%978=304%:%
-%:%985=305%:%
-%:%986=305%:%
-%:%987=306%:%
-%:%988=306%:%
-%:%989=307%:%
-%:%990=307%:%
-%:%991=307%:%
-%:%992=308%:%
-%:%993=308%:%
-%:%994=308%:%
-%:%995=309%:%
-%:%996=310%:%
-%:%997=311%:%
-%:%998=311%:%
-%:%999=312%:%
-%:%1000=312%:%
-%:%1001=312%:%
-%:%1002=313%:%
-%:%1003=313%:%
-%:%1004=314%:%
-%:%1005=314%:%
-%:%1006=315%:%
-%:%1007=315%:%
-%:%1008=315%:%
-%:%1009=316%:%
-%:%1010=316%:%
-%:%1011=316%:%
-%:%1012=317%:%
-%:%1013=317%:%
-%:%1014=317%:%
-%:%1015=318%:%
-%:%1016=318%:%
-%:%1017=318%:%
-%:%1018=319%:%
-%:%1019=319%:%
-%:%1020=319%:%
-%:%1021=320%:%
-%:%1022=320%:%
-%:%1023=321%:%
-%:%1024=321%:%
-%:%1025=322%:%
-%:%1026=322%:%
-%:%1027=323%:%
-%:%1028=323%:%
-%:%1029=323%:%
-%:%1030=323%:%
-%:%1031=324%:%
-%:%1032=324%:%
-%:%1033=325%:%
-%:%1034=325%:%
-%:%1035=326%:%
-%:%1036=326%:%
-%:%1037=327%:%
-%:%1038=327%:%
-%:%1039=328%:%
-%:%1040=328%:%
-%:%1041=328%:%
-%:%1042=329%:%
-%:%1043=329%:%
-%:%1044=330%:%
-%:%1045=330%:%
-%:%1046=331%:%
-%:%1061=338%:%
-%:%1071=340%:%
-%:%1072=340%:%
-%:%1073=341%:%
-%:%1074=342%:%
-%:%1075=343%:%
-%:%1078=344%:%
-%:%1082=344%:%
-%:%1083=344%:%
-%:%1084=345%:%
-%:%1085=345%:%
-%:%1086=346%:%
-%:%1087=346%:%
-%:%1088=347%:%
-%:%1089=347%:%
-%:%1090=347%:%
-%:%1091=347%:%
-%:%1092=348%:%
-%:%1093=348%:%
-%:%1094=349%:%
-%:%1095=349%:%
-%:%1096=349%:%
-%:%1097=349%:%
-%:%1098=350%:%
-%:%1099=350%:%
-%:%1100=350%:%
-%:%1101=351%:%
-%:%1102=351%:%
-%:%1103=352%:%
-%:%1104=352%:%
-%:%1105=353%:%
-%:%1106=353%:%
-%:%1107=353%:%
-%:%1108=354%:%
-%:%1109=354%:%
-%:%1110=354%:%
-%:%1111=355%:%
-%:%1112=355%:%
-%:%1113=355%:%
-%:%1114=355%:%
-%:%1115=356%:%
-%:%1116=357%:%
-%:%1117=357%:%
-%:%1118=358%:%
-%:%1119=358%:%
-%:%1120=359%:%
-%:%1121=359%:%
-%:%1122=360%:%
-%:%1123=360%:%
-%:%1124=361%:%
-%:%1125=361%:%
-%:%1126=361%:%
-%:%1127=362%:%
-%:%1128=362%:%
-%:%1129=363%:%
-%:%1130=363%:%
-%:%1131=364%:%
-%:%1132=364%:%
-%:%1133=364%:%
-%:%1134=365%:%
-%:%1135=365%:%
-%:%1136=365%:%
-%:%1137=366%:%
-%:%1138=366%:%
-%:%1139=367%:%
-%:%1140=367%:%
-%:%1141=368%:%
-%:%1142=368%:%
-%:%1143=369%:%
-%:%1144=369%:%
-%:%1145=370%:%
-%:%1146=370%:%
-%:%1147=370%:%
-%:%1148=370%:%
-%:%1149=371%:%
-%:%1150=371%:%
-%:%1151=371%:%
-%:%1152=371%:%
-%:%1153=372%:%
-%:%1154=372%:%
-%:%1155=372%:%
-%:%1156=372%:%
-%:%1157=373%:%
-%:%1158=373%:%
-%:%1159=374%:%
-%:%1160=374%:%
-%:%1161=375%:%
-%:%1162=375%:%
-%:%1163=376%:%
-%:%1164=376%:%
-%:%1165=377%:%
-%:%1166=377%:%
-%:%1167=378%:%
-%:%1168=378%:%
-%:%1169=378%:%
-%:%1170=379%:%
-%:%1171=380%:%
-%:%1172=380%:%
-%:%1173=381%:%
-%:%1174=381%:%
-%:%1175=381%:%
-%:%1176=382%:%
-%:%1177=383%:%
-%:%1178=383%:%
-%:%1179=384%:%
-%:%1180=384%:%
-%:%1181=385%:%
-%:%1182=385%:%
-%:%1183=385%:%
-%:%1184=385%:%
-%:%1185=385%:%
-%:%1186=386%:%
-%:%1187=386%:%
-%:%1188=387%:%
-%:%1189=387%:%
-%:%1190=388%:%
-%:%1191=388%:%
-%:%1192=389%:%
-%:%1193=389%:%
-%:%1194=389%:%
-%:%1195=390%:%
-%:%1196=390%:%
-%:%1198=392%:%
-%:%1199=393%:%
-%:%1200=393%:%
-%:%1201=394%:%
-%:%1202=394%:%
-%:%1203=395%:%
-%:%1204=395%:%
-%:%1205=395%:%
-%:%1206=395%:%
-%:%1207=396%:%
-%:%1208=396%:%
-%:%1209=397%:%
-%:%1210=397%:%
-%:%1211=398%:%
-%:%1212=398%:%
-%:%1213=399%:%
-%:%1214=399%:%
-%:%1215=399%:%
-%:%1216=400%:%
-%:%1217=400%:%
-%:%1218=400%:%
-%:%1219=401%:%
-%:%1220=401%:%
-%:%1221=401%:%
-%:%1222=402%:%
-%:%1223=402%:%
-%:%1224=402%:%
-%:%1225=403%:%
-%:%1226=403%:%
-%:%1227=403%:%
-%:%1228=404%:%
-%:%1229=404%:%
-%:%1230=405%:%
-%:%1231=405%:%
-%:%1232=406%:%
-%:%1233=406%:%
-%:%1234=406%:%
-%:%1235=407%:%
-%:%1236=408%:%
-%:%1237=408%:%
-%:%1238=409%:%
-%:%1239=409%:%
-%:%1240=409%:%
-%:%1241=410%:%
-%:%1242=411%:%
-%:%1243=411%:%
-%:%1244=411%:%
-%:%1245=412%:%
-%:%1246=412%:%
-%:%1247=412%:%
-%:%1248=413%:%
-%:%1249=413%:%
-%:%1250=414%:%
-%:%1251=414%:%
-%:%1252=414%:%
-%:%1253=415%:%
-%:%1254=415%:%
-%:%1255=415%:%
-%:%1257=417%:%
-%:%1258=418%:%
-%:%1259=418%:%
-%:%1260=419%:%
-%:%1261=419%:%
-%:%1262=419%:%
-%:%1264=421%:%
-%:%1265=421%:%
-%:%1266=422%:%
-%:%1267=422%:%
-%:%1268=423%:%
-%:%1269=423%:%
-%:%1270=423%:%
-%:%1271=424%:%
-%:%1272=424%:%
-%:%1273=425%:%
-%:%1274=426%:%
-%:%1275=426%:%
-%:%1276=427%:%
-%:%1277=427%:%
-%:%1278=428%:%
-%:%1279=428%:%
-%:%1280=429%:%
-%:%1286=429%:%
-%:%1289=430%:%
-%:%1290=431%:%
-%:%1291=432%:%
-%:%1292=432%:%
-%:%1293=433%:%
-%:%1294=434%:%
-%:%1297=435%:%
-%:%1301=435%:%
-%:%1302=435%:%
-%:%1303=436%:%
-%:%1304=436%:%
-%:%1305=437%:%
-%:%1306=437%:%
-%:%1307=438%:%
-%:%1308=438%:%
-%:%1309=439%:%
-%:%1310=440%:%
-%:%1311=440%:%
-%:%1312=441%:%
-%:%1313=441%:%
-%:%1314=441%:%
-%:%1315=442%:%
-%:%1316=442%:%
-%:%1317=443%:%
-%:%1318=443%:%
-%:%1319=444%:%
-%:%1320=444%:%
-%:%1321=444%:%
-%:%1322=444%:%
-%:%1323=444%:%
-%:%1324=445%:%
-%:%1325=445%:%
-%:%1326=446%:%
-%:%1327=446%:%
-%:%1328=447%:%
-%:%1329=447%:%
-%:%1330=447%:%
-%:%1331=447%:%
-%:%1332=448%:%
-%:%1333=448%:%
-%:%1334=448%:%
-%:%1335=449%:%
-%:%1336=449%:%
-%:%1337=450%:%
-%:%1338=450%:%
-%:%1339=451%:%
-%:%1340=451%:%
-%:%1341=451%:%
-%:%1342=452%:%
-%:%1343=452%:%
-%:%1344=453%:%
-%:%1345=453%:%
-%:%1346=453%:%
-%:%1347=453%:%
-%:%1348=454%:%
-%:%1349=454%:%
-%:%1350=455%:%
-%:%1351=455%:%
-%:%1352=456%:%
-%:%1353=456%:%
-%:%1354=457%:%
-%:%1355=457%:%
-%:%1356=457%:%
-%:%1357=458%:%
-%:%1358=458%:%
-%:%1360=460%:%
-%:%1361=460%:%
-%:%1362=460%:%
-%:%1363=461%:%
-%:%1364=461%:%
-%:%1365=462%:%
-%:%1366=462%:%
-%:%1367=462%:%
-%:%1368=463%:%
-%:%1369=464%:%
-%:%1370=464%:%
-%:%1371=465%:%
-%:%1372=465%:%
-%:%1373=466%:%
-%:%1374=466%:%
-%:%1375=466%:%
-%:%1376=467%:%
-%:%1377=468%:%
-%:%1378=468%:%
-%:%1379=468%:%
-%:%1380=469%:%
-%:%1381=469%:%
-%:%1382=469%:%
-%:%1383=469%:%
-%:%1384=470%:%
-%:%1385=470%:%
-%:%1386=471%:%
-%:%1387=471%:%
-%:%1388=471%:%
-%:%1389=471%:%
-%:%1390=472%:%
-%:%1391=473%:%
-%:%1392=473%:%
-%:%1393=474%:%
-%:%1394=474%:%
-%:%1395=475%:%
-%:%1396=475%:%
-%:%1397=476%:%
-%:%1398=476%:%
-%:%1399=476%:%
-%:%1400=477%:%
-%:%1401=477%:%
-%:%1402=478%:%
-%:%1403=478%:%
-%:%1404=479%:%
-%:%1405=480%:%
-%:%1406=480%:%
-%:%1407=480%:%
-%:%1408=480%:%
-%:%1409=481%:%
-%:%1410=481%:%
-%:%1411=482%:%
-%:%1412=482%:%
-%:%1413=482%:%
-%:%1414=482%:%
-%:%1415=482%:%
-%:%1416=483%:%
-%:%1417=484%:%
-%:%1418=484%:%
-%:%1419=485%:%
-%:%1420=485%:%
-%:%1421=486%:%
-%:%1422=486%:%
-%:%1423=486%:%
-%:%1424=486%:%
-%:%1425=487%:%
-%:%1426=487%:%
-%:%1427=488%:%
-%:%1428=488%:%
-%:%1429=489%:%
-%:%1430=489%:%
-%:%1431=489%:%
-%:%1432=490%:%
-%:%1433=490%:%
-%:%1434=491%:%
-%:%1435=491%:%
-%:%1436=492%:%
-%:%1437=492%:%
-%:%1438=492%:%
-%:%1439=492%:%
-%:%1440=493%:%
-%:%1441=494%:%
-%:%1442=494%:%
-%:%1443=495%:%
-%:%1444=495%:%
-%:%1445=495%:%
-%:%1446=495%:%
-%:%1447=496%:%
-%:%1448=496%:%
-%:%1449=497%:%
-%:%1450=497%:%
-%:%1451=498%:%
-%:%1452=498%:%
-%:%1453=499%:%
-%:%1454=499%:%
-%:%1455=500%:%
-%:%1456=500%:%
-%:%1457=501%:%
-%:%1463=501%:%
-%:%1466=502%:%
-%:%1467=503%:%
-%:%1468=504%:%
-%:%1469=504%:%
-%:%1470=505%:%
-%:%1477=506%:%
-%:%1478=506%:%
-%:%1479=507%:%
-%:%1480=507%:%
-%:%1481=508%:%
-%:%1482=508%:%
-%:%1483=508%:%
-%:%1484=508%:%
-%:%1485=509%:%
-%:%1486=509%:%
-%:%1487=510%:%
-%:%1488=510%:%
-%:%1489=510%:%
-%:%1490=510%:%
-%:%1491=510%:%
-%:%1492=511%:%
-%:%1493=511%:%
-%:%1494=512%:%
-%:%1495=512%:%
-%:%1496=513%:%
-%:%1497=513%:%
-%:%1498=513%:%
-%:%1499=513%:%
-%:%1500=513%:%
-%:%1501=514%:%
-%:%1502=514%:%
-%:%1503=515%:%
-%:%1504=515%:%
-%:%1505=516%:%
-%:%1506=516%:%
-%:%1507=516%:%
-%:%1508=517%:%
-%:%1509=517%:%
-%:%1510=518%:%
-%:%1511=518%:%
-%:%1512=518%:%
-%:%1513=518%:%
-%:%1514=519%:%
-%:%1515=519%:%
-%:%1516=520%:%
-%:%1517=521%:%
-%:%1518=521%:%
-%:%1519=522%:%
-%:%1520=522%:%
-%:%1521=522%:%
-%:%1523=524%:%
-%:%1524=524%:%
-%:%1525=525%:%
-%:%1526=525%:%
-%:%1527=526%:%
-%:%1528=526%:%
-%:%1529=526%:%
-%:%1530=527%:%
-%:%1531=527%:%
-%:%1532=528%:%
-%:%1533=528%:%
-%:%1534=528%:%
-%:%1535=529%:%
-%:%1536=529%:%
-%:%1537=530%:%
-%:%1538=530%:%
-%:%1539=530%:%
-%:%1540=530%:%
-%:%1541=531%:%
-%:%1542=532%:%
-%:%1543=532%:%
-%:%1544=533%:%
-%:%1545=533%:%
-%:%1546=533%:%
-%:%1547=534%:%
-%:%1548=535%:%
-%:%1549=535%:%
-%:%1550=535%:%
-%:%1551=536%:%
-%:%1552=536%:%
-%:%1553=536%:%
-%:%1554=537%:%
-%:%1555=538%:%
-%:%1556=538%:%
-%:%1557=539%:%
-%:%1558=539%:%
-%:%1559=540%:%
-%:%1560=540%:%
-%:%1561=540%:%
-%:%1562=541%:%
-%:%1563=541%:%
-%:%1564=542%:%
-%:%1565=542%:%
-%:%1566=542%:%
-%:%1567=542%:%
-%:%1568=543%:%
-%:%1569=543%:%
-%:%1570=544%:%
-%:%1571=545%:%
-%:%1572=545%:%
-%:%1573=546%:%
-%:%1574=546%:%
-%:%1575=547%:%
-%:%1576=547%:%
-%:%1577=548%:%
-%:%1583=548%:%
-%:%1586=549%:%
-%:%1587=550%:%
-%:%1588=550%:%
-%:%1589=551%:%
-%:%1590=552%:%
-%:%1593=553%:%
-%:%1597=553%:%
-%:%1598=553%:%
-%:%1599=554%:%
-%:%1600=554%:%
-%:%1605=554%:%
-%:%1608=555%:%
-%:%1609=556%:%
-%:%1610=556%:%
-%:%1611=557%:%
-%:%1612=558%:%
-%:%1615=559%:%
-%:%1619=559%:%
-%:%1620=559%:%
-%:%1621=560%:%
-%:%1622=561%:%
-%:%1623=561%:%
-%:%1628=561%:%
-%:%1631=562%:%
-%:%1632=563%:%
-%:%1633=564%:%
-%:%1634=564%:%
-%:%1635=565%:%
-%:%1636=566%:%
-%:%1639=567%:%
-%:%1643=567%:%
-%:%1644=567%:%
-%:%1645=568%:%
-%:%1646=568%:%
-%:%1647=568%:%
-%:%1652=568%:%
-%:%1655=569%:%
-%:%1656=570%:%
-%:%1657=570%:%
-%:%1658=571%:%
-%:%1659=572%:%
-%:%1660=573%:%
-%:%1663=574%:%
-%:%1667=574%:%
-%:%1668=574%:%
-%:%1669=574%:%
-%:%1670=575%:%
-%:%1671=575%:%
-%:%1672=576%:%
-%:%1673=576%:%
-%:%1674=577%:%
-%:%1675=577%:%
-%:%1676=577%:%
-%:%1677=577%:%
-%:%1678=578%:%
-%:%1679=578%:%
-%:%1680=579%:%
-%:%1681=579%:%
-%:%1682=579%:%
-%:%1683=579%:%
-%:%1684=579%:%
-%:%1685=580%:%
-%:%1686=580%:%
-%:%1687=581%:%
-%:%1688=581%:%
-%:%1689=582%:%
-%:%1690=582%:%
-%:%1691=582%:%
-%:%1692=583%:%
-%:%1693=583%:%
-%:%1694=584%:%
-%:%1695=584%:%
-%:%1696=585%:%
-%:%1697=586%:%
-%:%1698=586%:%
-%:%1699=586%:%
-%:%1700=586%:%
-%:%1701=586%:%
-%:%1702=587%:%
-%:%1703=587%:%
-%:%1704=588%:%
-%:%1705=588%:%
-%:%1706=589%:%
-%:%1707=589%:%
-%:%1708=590%:%
-%:%1709=590%:%
-%:%1710=590%:%
-%:%1711=591%:%
-%:%1712=591%:%
-%:%1715=594%:%
-%:%1716=595%:%
-%:%1717=595%:%
-%:%1718=596%:%
-%:%1719=596%:%
-%:%1720=597%:%
-%:%1721=597%:%
-%:%1722=598%:%
-%:%1723=598%:%
-%:%1724=599%:%
-%:%1725=599%:%
-%:%1726=599%:%
-%:%1727=600%:%
-%:%1728=600%:%
-%:%1729=600%:%
-%:%1730=601%:%
-%:%1731=601%:%
-%:%1732=601%:%
-%:%1733=601%:%
-%:%1734=602%:%
-%:%1735=602%:%
-%:%1736=603%:%
-%:%1737=603%:%
-%:%1738=603%:%
-%:%1739=604%:%
-%:%1740=604%:%
-%:%1741=605%:%
-%:%1742=605%:%
-%:%1743=606%:%
-%:%1744=606%:%
-%:%1745=606%:%
-%:%1746=606%:%
-%:%1747=606%:%
-%:%1748=607%:%
-%:%1749=608%:%
-%:%1750=608%:%
-%:%1751=609%:%
-%:%1752=609%:%
-%:%1753=609%:%
-%:%1754=610%:%
-%:%1755=610%:%
-%:%1756=610%:%
-%:%1757=611%:%
-%:%1758=611%:%
-%:%1759=612%:%
-%:%1760=612%:%
-%:%1761=613%:%
-%:%1762=614%:%
-%:%1763=615%:%
-%:%1764=615%:%
-%:%1765=616%:%
-%:%1766=616%:%
-%:%1767=616%:%
-%:%1768=616%:%
-%:%1769=617%:%
-%:%1770=617%:%
-%:%1771=618%:%
-%:%1772=618%:%
-%:%1773=618%:%
-%:%1774=618%:%
-%:%1775=619%:%
-%:%1776=620%:%
-%:%1777=620%:%
-%:%1778=621%:%
-%:%1779=621%:%
-%:%1780=621%:%
-%:%1781=622%:%
-%:%1782=622%:%
-%:%1783=623%:%
-%:%1784=623%:%
-%:%1785=623%:%
-%:%1786=624%:%
-%:%1787=624%:%
-%:%1788=624%:%
-%:%1789=625%:%
-%:%1790=625%:%
-%:%1791=626%:%
-%:%1792=626%:%
-%:%1793=627%:%
-%:%1794=627%:%
-%:%1795=628%:%
-%:%1796=628%:%
-%:%1797=628%:%
-%:%1798=629%:%
-%:%1799=629%:%
-%:%1800=629%:%
-%:%1801=629%:%
-%:%1802=630%:%
-%:%1803=630%:%
-%:%1804=630%:%
-%:%1805=631%:%
-%:%1806=631%:%
-%:%1807=632%:%
-%:%1808=632%:%
-%:%1809=633%:%
-%:%1810=634%:%
-%:%1811=634%:%
-%:%1812=635%:%
-%:%1813=635%:%
-%:%1814=636%:%
-%:%1815=636%:%
-%:%1816=636%:%
-%:%1817=637%:%
-%:%1818=637%:%
-%:%1819=638%:%
-%:%1820=638%:%
-%:%1821=639%:%
-%:%1822=639%:%
-%:%1823=640%:%
-%:%1824=640%:%
-%:%1825=641%:%
-%:%1826=641%:%
-%:%1827=641%:%
-%:%1828=642%:%
-%:%1829=642%:%
-%:%1830=642%:%
-%:%1831=643%:%
-%:%1832=644%:%
-%:%1833=644%:%
-%:%1834=645%:%
-%:%1835=645%:%
-%:%1836=645%:%
-%:%1837=646%:%
-%:%1838=646%:%
-%:%1839=646%:%
-%:%1840=647%:%
-%:%1841=647%:%
-%:%1842=648%:%
-%:%1843=648%:%
-%:%1844=648%:%
-%:%1845=649%:%
-%:%1846=650%:%
-%:%1847=651%:%
-%:%1848=651%:%
-%:%1849=652%:%
-%:%1850=652%:%
-%:%1851=652%:%
-%:%1852=652%:%
-%:%1853=653%:%
-%:%1854=653%:%
-%:%1855=654%:%
-%:%1856=654%:%
-%:%1857=654%:%
-%:%1858=655%:%
-%:%1859=655%:%
-%:%1860=656%:%
-%:%1861=656%:%
-%:%1862=657%:%
-%:%1863=657%:%
-%:%1864=658%:%
-%:%1865=658%:%
-%:%1866=658%:%
-%:%1867=658%:%
-%:%1868=659%:%
-%:%1869=659%:%
-%:%1870=660%:%
-%:%1871=660%:%
-%:%1872=661%:%
-%:%1873=661%:%
-%:%1874=662%:%
-%:%1875=662%:%
-%:%1876=663%:%
-%:%1877=663%:%
-%:%1878=664%:%
-%:%1879=664%:%
-%:%1880=664%:%
-%:%1881=665%:%
-%:%1882=665%:%
-%:%1883=666%:%
-%:%1884=666%:%
-%:%1885=667%:%
-%:%1886=667%:%
-%:%1887=667%:%
-%:%1888=668%:%
-%:%1889=668%:%
-%:%1890=669%:%
-%:%1891=669%:%
-%:%1892=670%:%
-%:%1893=670%:%
-%:%1894=670%:%
-%:%1895=670%:%
-%:%1896=671%:%
-%:%1897=671%:%
-%:%1898=672%:%
-%:%1899=672%:%
-%:%1900=673%:%
-%:%1901=673%:%
-%:%1902=674%:%
-%:%1903=674%:%
-%:%1904=675%:%
-%:%1905=675%:%
-%:%1906=675%:%
-%:%1907=675%:%
-%:%1908=675%:%
-%:%1909=676%:%
-%:%1910=677%:%
-%:%1911=677%:%
-%:%1912=678%:%
-%:%1913=678%:%
-%:%1914=678%:%
-%:%1915=678%:%
-%:%1916=678%:%
-%:%1917=679%:%
-%:%1918=679%:%
-%:%1919=680%:%
-%:%1920=680%:%
-%:%1921=681%:%
-%:%1922=681%:%
-%:%1923=681%:%
-%:%1924=682%:%
-%:%1925=683%:%
-%:%1926=684%:%
-%:%1927=684%:%
-%:%1928=685%:%
-%:%1929=685%:%
-%:%1930=685%:%
-%:%1931=685%:%
-%:%1932=686%:%
-%:%1933=686%:%
-%:%1934=687%:%
-%:%1935=687%:%
-%:%1936=687%:%
-%:%1937=688%:%
-%:%1938=688%:%
-%:%1939=689%:%
-%:%1940=689%:%
-%:%1941=690%:%
-%:%1942=690%:%
-%:%1943=690%:%
-%:%1944=690%:%
-%:%1945=690%:%
-%:%1946=691%:%
-%:%1947=691%:%
-%:%1948=692%:%
-%:%1949=692%:%
-%:%1950=693%:%
-%:%1951=693%:%
-%:%1952=694%:%
-%:%1953=694%:%
-%:%1954=695%:%
-%:%1955=695%:%
-%:%1956=695%:%
-%:%1957=696%:%
-%:%1958=696%:%
-%:%1959=696%:%
-%:%1960=697%:%
-%:%1961=698%:%
-%:%1962=698%:%
-%:%1963=699%:%
-%:%1964=699%:%
-%:%1965=699%:%
-%:%1966=699%:%
-%:%1967=699%:%
-%:%1968=700%:%
-%:%1969=700%:%
-%:%1970=700%:%
-%:%1971=700%:%
-%:%1972=701%:%
-%:%1973=701%:%
-%:%1974=702%:%
-%:%1975=702%:%
-%:%1976=703%:%
-%:%1977=703%:%
-%:%1978=704%:%
-%:%1979=704%:%
-%:%1980=704%:%
-%:%1981=705%:%
-%:%1982=705%:%
-%:%1983=706%:%
-%:%1984=706%:%
-%:%1985=707%:%
-%:%1986=707%:%
-%:%1987=707%:%
-%:%1988=707%:%
-%:%1989=707%:%
-%:%1990=708%:%
-%:%1991=709%:%
-%:%1992=709%:%
-%:%1993=710%:%
-%:%1994=710%:%
-%:%1995=711%:%
-%:%1996=711%:%
-%:%1997=712%:%
-%:%1998=712%:%
-%:%1999=713%:%
-%:%2005=713%:%
-%:%2008=714%:%
-%:%2009=715%:%
-%:%2010=716%:%
-%:%2011=717%:%
-%:%2014=718%:%
-%:%2019=719%:%
+%:%184=72%:%
+%:%186=73%:%
+%:%187=73%:%
+%:%188=74%:%
+%:%195=76%:%
+%:%205=78%:%
+%:%206=78%:%
+%:%207=79%:%
+%:%208=80%:%
+%:%209=81%:%
+%:%212=82%:%
+%:%216=82%:%
+%:%217=82%:%
+%:%218=82%:%
+%:%232=86%:%
+%:%242=88%:%
+%:%243=88%:%
+%:%244=89%:%
+%:%247=90%:%
+%:%251=90%:%
+%:%252=90%:%
+%:%253=90%:%
+%:%258=90%:%
+%:%261=91%:%
+%:%262=92%:%
+%:%263=92%:%
+%:%264=93%:%
+%:%267=94%:%
+%:%271=94%:%
+%:%272=94%:%
+%:%273=94%:%
+%:%278=94%:%
+%:%281=95%:%
+%:%282=96%:%
+%:%283=96%:%
+%:%284=97%:%
+%:%291=98%:%
+%:%292=98%:%
+%:%307=101%:%
+%:%317=103%:%
+%:%318=103%:%
+%:%319=104%:%
+%:%320=105%:%
+%:%323=106%:%
+%:%327=106%:%
+%:%328=106%:%
+%:%329=107%:%
+%:%330=107%:%
+%:%335=107%:%
+%:%338=108%:%
+%:%339=109%:%
+%:%340=109%:%
+%:%341=110%:%
+%:%344=111%:%
+%:%348=111%:%
+%:%349=111%:%
+%:%350=112%:%
+%:%351=112%:%
+%:%356=112%:%
+%:%359=113%:%
+%:%360=114%:%
+%:%361=115%:%
+%:%362=115%:%
+%:%363=116%:%
+%:%366=117%:%
+%:%370=117%:%
+%:%371=117%:%
+%:%372=118%:%
+%:%373=118%:%
+%:%378=118%:%
+%:%381=119%:%
+%:%382=120%:%
+%:%383=120%:%
+%:%384=121%:%
+%:%387=122%:%
+%:%391=122%:%
+%:%392=122%:%
+%:%393=123%:%
+%:%394=123%:%
+%:%399=123%:%
+%:%402=124%:%
+%:%403=125%:%
+%:%404=125%:%
+%:%405=126%:%
+%:%406=127%:%
+%:%407=128%:%
+%:%410=129%:%
+%:%414=129%:%
+%:%415=129%:%
+%:%416=130%:%
+%:%417=130%:%
+%:%418=130%:%
+%:%423=130%:%
+%:%426=131%:%
+%:%427=132%:%
+%:%428=133%:%
+%:%429=133%:%
+%:%430=134%:%
+%:%431=135%:%
+%:%434=136%:%
+%:%438=136%:%
+%:%439=136%:%
+%:%440=137%:%
+%:%441=137%:%
+%:%446=137%:%
+%:%449=138%:%
+%:%450=139%:%
+%:%451=140%:%
+%:%452=141%:%
+%:%453=141%:%
+%:%454=142%:%
+%:%461=143%:%
+%:%462=143%:%
+%:%477=148%:%
+%:%487=150%:%
+%:%488=150%:%
+%:%489=151%:%
+%:%490=152%:%
+%:%491=153%:%
+%:%494=154%:%
+%:%498=154%:%
+%:%499=154%:%
+%:%500=155%:%
+%:%501=155%:%
+%:%506=155%:%
+%:%509=156%:%
+%:%510=157%:%
+%:%511=158%:%
+%:%512=158%:%
+%:%513=159%:%
+%:%515=159%:%
+%:%519=159%:%
+%:%520=159%:%
+%:%534=162%:%
+%:%544=163%:%
+%:%545=163%:%
+%:%546=164%:%
+%:%547=165%:%
+%:%550=166%:%
+%:%554=166%:%
+%:%555=166%:%
+%:%556=167%:%
+%:%557=167%:%
+%:%558=168%:%
+%:%559=168%:%
+%:%560=168%:%
+%:%561=168%:%
+%:%562=169%:%
+%:%563=169%:%
+%:%564=170%:%
+%:%565=170%:%
+%:%566=170%:%
+%:%567=170%:%
+%:%568=171%:%
+%:%569=171%:%
+%:%570=172%:%
+%:%571=172%:%
+%:%572=173%:%
+%:%573=173%:%
+%:%574=174%:%
+%:%575=175%:%
+%:%576=175%:%
+%:%577=175%:%
+%:%578=175%:%
+%:%579=175%:%
+%:%580=176%:%
+%:%595=179%:%
+%:%605=181%:%
+%:%606=181%:%
+%:%607=182%:%
+%:%608=183%:%
+%:%615=184%:%
+%:%616=184%:%
+%:%617=185%:%
+%:%618=185%:%
+%:%619=186%:%
+%:%620=186%:%
+%:%621=186%:%
+%:%622=186%:%
+%:%623=187%:%
+%:%624=187%:%
+%:%625=188%:%
+%:%626=188%:%
+%:%627=189%:%
+%:%628=189%:%
+%:%629=189%:%
+%:%630=189%:%
+%:%631=189%:%
+%:%632=190%:%
+%:%633=190%:%
+%:%634=191%:%
+%:%640=191%:%
+%:%643=192%:%
+%:%644=193%:%
+%:%645=193%:%
+%:%646=194%:%
+%:%653=195%:%
+%:%654=195%:%
+%:%655=196%:%
+%:%656=196%:%
+%:%657=197%:%
+%:%658=197%:%
+%:%659=197%:%
+%:%660=197%:%
+%:%661=197%:%
+%:%662=198%:%
+%:%663=198%:%
+%:%664=199%:%
+%:%670=199%:%
+%:%673=200%:%
+%:%674=201%:%
+%:%675=202%:%
+%:%676=202%:%
+%:%677=203%:%
+%:%678=204%:%
+%:%681=205%:%
+%:%685=205%:%
+%:%686=205%:%
+%:%687=206%:%
+%:%688=206%:%
+%:%693=206%:%
+%:%696=207%:%
+%:%697=208%:%
+%:%698=208%:%
+%:%699=209%:%
+%:%700=210%:%
+%:%703=211%:%
+%:%707=211%:%
+%:%708=211%:%
+%:%709=211%:%
+%:%710=211%:%
+%:%715=211%:%
+%:%718=212%:%
+%:%719=213%:%
+%:%720=213%:%
+%:%721=214%:%
+%:%722=215%:%
+%:%723=216%:%
+%:%726=217%:%
+%:%730=217%:%
+%:%731=217%:%
+%:%732=217%:%
+%:%733=218%:%
+%:%734=218%:%
+%:%739=218%:%
+%:%742=219%:%
+%:%743=220%:%
+%:%744=221%:%
+%:%745=221%:%
+%:%746=222%:%
+%:%749=223%:%
+%:%753=223%:%
+%:%754=223%:%
+%:%755=223%:%
+%:%760=223%:%
+%:%763=224%:%
+%:%764=225%:%
+%:%765=226%:%
+%:%766=226%:%
+%:%767=227%:%
+%:%768=228%:%
+%:%771=229%:%
+%:%775=229%:%
+%:%776=229%:%
+%:%777=230%:%
+%:%778=230%:%
+%:%779=231%:%
+%:%780=231%:%
+%:%781=232%:%
+%:%782=232%:%
+%:%783=232%:%
+%:%784=233%:%
+%:%785=233%:%
+%:%786=234%:%
+%:%787=234%:%
+%:%788=235%:%
+%:%789=235%:%
+%:%790=236%:%
+%:%796=236%:%
+%:%799=237%:%
+%:%800=238%:%
+%:%801=238%:%
+%:%802=239%:%
+%:%803=240%:%
+%:%806=241%:%
+%:%810=241%:%
+%:%811=241%:%
+%:%812=242%:%
+%:%813=242%:%
+%:%818=242%:%
+%:%821=243%:%
+%:%822=244%:%
+%:%823=244%:%
+%:%824=245%:%
+%:%825=246%:%
+%:%826=247%:%
+%:%829=248%:%
+%:%833=248%:%
+%:%834=248%:%
+%:%835=249%:%
+%:%836=249%:%
+%:%837=250%:%
+%:%838=250%:%
+%:%839=251%:%
+%:%840=251%:%
+%:%841=251%:%
+%:%842=252%:%
+%:%843=252%:%
+%:%844=253%:%
+%:%845=253%:%
+%:%846=254%:%
+%:%847=254%:%
+%:%848=255%:%
+%:%854=255%:%
+%:%857=256%:%
+%:%858=257%:%
+%:%859=257%:%
+%:%860=258%:%
+%:%861=259%:%
+%:%862=260%:%
+%:%863=261%:%
+%:%870=262%:%
+%:%871=262%:%
+%:%872=263%:%
+%:%873=263%:%
+%:%874=264%:%
+%:%875=264%:%
+%:%876=264%:%
+%:%877=265%:%
+%:%878=265%:%
+%:%879=265%:%
+%:%880=266%:%
+%:%881=267%:%
+%:%882=268%:%
+%:%883=268%:%
+%:%884=269%:%
+%:%885=269%:%
+%:%886=269%:%
+%:%887=270%:%
+%:%888=270%:%
+%:%889=271%:%
+%:%890=271%:%
+%:%891=272%:%
+%:%892=272%:%
+%:%893=273%:%
+%:%894=273%:%
+%:%895=274%:%
+%:%896=274%:%
+%:%897=275%:%
+%:%898=275%:%
+%:%899=276%:%
+%:%900=276%:%
+%:%901=277%:%
+%:%902=277%:%
+%:%903=277%:%
+%:%904=277%:%
+%:%905=278%:%
+%:%906=278%:%
+%:%907=279%:%
+%:%908=279%:%
+%:%909=280%:%
+%:%910=280%:%
+%:%911=280%:%
+%:%912=280%:%
+%:%913=281%:%
+%:%914=281%:%
+%:%915=282%:%
+%:%916=282%:%
+%:%917=283%:%
+%:%918=283%:%
+%:%919=284%:%
+%:%920=284%:%
+%:%921=284%:%
+%:%922=285%:%
+%:%923=285%:%
+%:%924=285%:%
+%:%925=285%:%
+%:%926=285%:%
+%:%927=286%:%
+%:%928=286%:%
+%:%929=286%:%
+%:%930=287%:%
+%:%931=287%:%
+%:%932=287%:%
+%:%933=288%:%
+%:%939=288%:%
+%:%942=289%:%
+%:%943=290%:%
+%:%944=291%:%
+%:%945=291%:%
+%:%946=292%:%
+%:%947=293%:%
+%:%950=294%:%
+%:%954=294%:%
+%:%955=294%:%
+%:%956=295%:%
+%:%957=295%:%
+%:%963=295%:%
+%:%966=296%:%
+%:%967=297%:%
+%:%968=297%:%
+%:%969=298%:%
+%:%970=299%:%
+%:%971=300%:%
+%:%972=301%:%
+%:%973=302%:%
+%:%974=303%:%
+%:%975=304%:%
+%:%976=305%:%
+%:%977=306%:%
+%:%978=307%:%
+%:%985=308%:%
+%:%986=308%:%
+%:%987=309%:%
+%:%988=309%:%
+%:%989=310%:%
+%:%990=310%:%
+%:%991=310%:%
+%:%992=311%:%
+%:%993=311%:%
+%:%994=311%:%
+%:%995=312%:%
+%:%996=313%:%
+%:%997=314%:%
+%:%998=314%:%
+%:%999=315%:%
+%:%1000=315%:%
+%:%1001=315%:%
+%:%1002=316%:%
+%:%1003=316%:%
+%:%1004=317%:%
+%:%1005=317%:%
+%:%1006=318%:%
+%:%1007=318%:%
+%:%1008=318%:%
+%:%1009=319%:%
+%:%1010=319%:%
+%:%1011=319%:%
+%:%1012=320%:%
+%:%1013=320%:%
+%:%1014=320%:%
+%:%1015=321%:%
+%:%1016=321%:%
+%:%1017=321%:%
+%:%1018=322%:%
+%:%1019=322%:%
+%:%1020=322%:%
+%:%1021=323%:%
+%:%1022=323%:%
+%:%1023=324%:%
+%:%1024=324%:%
+%:%1025=325%:%
+%:%1026=325%:%
+%:%1027=326%:%
+%:%1028=326%:%
+%:%1029=326%:%
+%:%1030=326%:%
+%:%1031=327%:%
+%:%1032=327%:%
+%:%1033=328%:%
+%:%1034=328%:%
+%:%1035=329%:%
+%:%1036=329%:%
+%:%1037=330%:%
+%:%1038=330%:%
+%:%1039=331%:%
+%:%1040=331%:%
+%:%1041=331%:%
+%:%1042=332%:%
+%:%1043=332%:%
+%:%1044=333%:%
+%:%1045=333%:%
+%:%1046=334%:%
+%:%1061=336%:%
+%:%1071=338%:%
+%:%1072=338%:%
+%:%1073=339%:%
+%:%1074=340%:%
+%:%1075=341%:%
+%:%1078=342%:%
+%:%1082=342%:%
+%:%1083=342%:%
+%:%1084=343%:%
+%:%1085=343%:%
+%:%1086=344%:%
+%:%1087=344%:%
+%:%1088=345%:%
+%:%1089=345%:%
+%:%1090=345%:%
+%:%1091=345%:%
+%:%1092=346%:%
+%:%1093=346%:%
+%:%1094=347%:%
+%:%1095=347%:%
+%:%1096=347%:%
+%:%1097=347%:%
+%:%1098=348%:%
+%:%1099=348%:%
+%:%1100=348%:%
+%:%1101=349%:%
+%:%1102=349%:%
+%:%1103=350%:%
+%:%1104=350%:%
+%:%1105=351%:%
+%:%1106=351%:%
+%:%1107=351%:%
+%:%1108=352%:%
+%:%1109=352%:%
+%:%1110=352%:%
+%:%1111=353%:%
+%:%1112=353%:%
+%:%1113=353%:%
+%:%1114=353%:%
+%:%1115=354%:%
+%:%1116=355%:%
+%:%1117=355%:%
+%:%1118=356%:%
+%:%1119=356%:%
+%:%1120=357%:%
+%:%1121=357%:%
+%:%1122=358%:%
+%:%1123=358%:%
+%:%1124=359%:%
+%:%1125=359%:%
+%:%1126=359%:%
+%:%1127=360%:%
+%:%1128=360%:%
+%:%1129=361%:%
+%:%1130=361%:%
+%:%1131=362%:%
+%:%1132=362%:%
+%:%1133=362%:%
+%:%1134=363%:%
+%:%1135=363%:%
+%:%1136=363%:%
+%:%1137=364%:%
+%:%1138=364%:%
+%:%1139=365%:%
+%:%1140=365%:%
+%:%1141=366%:%
+%:%1142=366%:%
+%:%1143=367%:%
+%:%1144=367%:%
+%:%1145=368%:%
+%:%1146=368%:%
+%:%1147=368%:%
+%:%1148=368%:%
+%:%1149=369%:%
+%:%1150=369%:%
+%:%1151=369%:%
+%:%1152=369%:%
+%:%1153=370%:%
+%:%1154=370%:%
+%:%1155=370%:%
+%:%1156=370%:%
+%:%1157=371%:%
+%:%1158=371%:%
+%:%1159=372%:%
+%:%1160=372%:%
+%:%1161=373%:%
+%:%1162=373%:%
+%:%1163=374%:%
+%:%1164=374%:%
+%:%1165=375%:%
+%:%1166=375%:%
+%:%1167=376%:%
+%:%1168=376%:%
+%:%1169=376%:%
+%:%1170=377%:%
+%:%1171=378%:%
+%:%1172=378%:%
+%:%1173=379%:%
+%:%1174=379%:%
+%:%1175=379%:%
+%:%1176=380%:%
+%:%1177=381%:%
+%:%1178=381%:%
+%:%1179=382%:%
+%:%1180=382%:%
+%:%1181=383%:%
+%:%1182=383%:%
+%:%1183=383%:%
+%:%1184=383%:%
+%:%1185=383%:%
+%:%1186=384%:%
+%:%1187=384%:%
+%:%1188=385%:%
+%:%1189=385%:%
+%:%1190=386%:%
+%:%1191=386%:%
+%:%1192=387%:%
+%:%1193=387%:%
+%:%1194=387%:%
+%:%1195=388%:%
+%:%1196=388%:%
+%:%1198=390%:%
+%:%1199=391%:%
+%:%1200=391%:%
+%:%1201=392%:%
+%:%1202=392%:%
+%:%1203=393%:%
+%:%1204=393%:%
+%:%1205=393%:%
+%:%1206=393%:%
+%:%1207=394%:%
+%:%1208=394%:%
+%:%1209=395%:%
+%:%1210=395%:%
+%:%1211=396%:%
+%:%1212=396%:%
+%:%1213=397%:%
+%:%1214=397%:%
+%:%1215=397%:%
+%:%1216=398%:%
+%:%1217=398%:%
+%:%1218=398%:%
+%:%1219=399%:%
+%:%1220=399%:%
+%:%1221=399%:%
+%:%1222=400%:%
+%:%1223=400%:%
+%:%1224=400%:%
+%:%1225=401%:%
+%:%1226=401%:%
+%:%1227=401%:%
+%:%1228=402%:%
+%:%1229=402%:%
+%:%1230=403%:%
+%:%1231=403%:%
+%:%1232=404%:%
+%:%1233=404%:%
+%:%1234=404%:%
+%:%1235=405%:%
+%:%1236=406%:%
+%:%1237=406%:%
+%:%1238=407%:%
+%:%1239=407%:%
+%:%1240=407%:%
+%:%1241=408%:%
+%:%1242=409%:%
+%:%1243=409%:%
+%:%1244=409%:%
+%:%1245=410%:%
+%:%1246=410%:%
+%:%1247=410%:%
+%:%1248=411%:%
+%:%1249=411%:%
+%:%1250=412%:%
+%:%1251=412%:%
+%:%1252=412%:%
+%:%1253=413%:%
+%:%1254=413%:%
+%:%1255=413%:%
+%:%1257=415%:%
+%:%1258=416%:%
+%:%1259=416%:%
+%:%1260=417%:%
+%:%1261=417%:%
+%:%1262=417%:%
+%:%1264=419%:%
+%:%1265=419%:%
+%:%1266=420%:%
+%:%1267=420%:%
+%:%1268=421%:%
+%:%1269=421%:%
+%:%1270=421%:%
+%:%1271=422%:%
+%:%1272=422%:%
+%:%1273=423%:%
+%:%1274=424%:%
+%:%1275=424%:%
+%:%1276=425%:%
+%:%1277=425%:%
+%:%1278=426%:%
+%:%1279=426%:%
+%:%1280=427%:%
+%:%1286=427%:%
+%:%1289=428%:%
+%:%1290=429%:%
+%:%1291=430%:%
+%:%1292=430%:%
+%:%1293=431%:%
+%:%1294=432%:%
+%:%1297=433%:%
+%:%1301=433%:%
+%:%1302=433%:%
+%:%1303=434%:%
+%:%1304=434%:%
+%:%1305=435%:%
+%:%1306=435%:%
+%:%1307=436%:%
+%:%1308=436%:%
+%:%1309=437%:%
+%:%1310=438%:%
+%:%1311=438%:%
+%:%1312=439%:%
+%:%1313=439%:%
+%:%1314=439%:%
+%:%1315=440%:%
+%:%1316=440%:%
+%:%1317=441%:%
+%:%1318=441%:%
+%:%1319=442%:%
+%:%1320=442%:%
+%:%1321=442%:%
+%:%1322=442%:%
+%:%1323=442%:%
+%:%1324=443%:%
+%:%1325=443%:%
+%:%1326=444%:%
+%:%1327=444%:%
+%:%1328=445%:%
+%:%1329=445%:%
+%:%1330=445%:%
+%:%1331=445%:%
+%:%1332=446%:%
+%:%1333=446%:%
+%:%1334=446%:%
+%:%1335=447%:%
+%:%1336=447%:%
+%:%1337=448%:%
+%:%1338=448%:%
+%:%1339=449%:%
+%:%1340=449%:%
+%:%1341=449%:%
+%:%1342=450%:%
+%:%1343=450%:%
+%:%1344=451%:%
+%:%1345=451%:%
+%:%1346=451%:%
+%:%1347=451%:%
+%:%1348=452%:%
+%:%1349=452%:%
+%:%1350=453%:%
+%:%1351=453%:%
+%:%1352=454%:%
+%:%1353=454%:%
+%:%1354=455%:%
+%:%1355=455%:%
+%:%1356=455%:%
+%:%1357=456%:%
+%:%1358=456%:%
+%:%1360=458%:%
+%:%1361=458%:%
+%:%1362=458%:%
+%:%1363=459%:%
+%:%1364=459%:%
+%:%1365=460%:%
+%:%1366=460%:%
+%:%1367=460%:%
+%:%1368=461%:%
+%:%1369=462%:%
+%:%1370=462%:%
+%:%1371=463%:%
+%:%1372=463%:%
+%:%1373=464%:%
+%:%1374=464%:%
+%:%1375=464%:%
+%:%1376=465%:%
+%:%1377=466%:%
+%:%1378=466%:%
+%:%1379=466%:%
+%:%1380=467%:%
+%:%1381=467%:%
+%:%1382=467%:%
+%:%1383=467%:%
+%:%1384=468%:%
+%:%1385=468%:%
+%:%1386=469%:%
+%:%1387=469%:%
+%:%1388=469%:%
+%:%1389=469%:%
+%:%1390=470%:%
+%:%1391=471%:%
+%:%1392=471%:%
+%:%1393=472%:%
+%:%1394=472%:%
+%:%1395=473%:%
+%:%1396=473%:%
+%:%1397=474%:%
+%:%1398=474%:%
+%:%1399=474%:%
+%:%1400=475%:%
+%:%1401=475%:%
+%:%1402=476%:%
+%:%1403=476%:%
+%:%1404=477%:%
+%:%1405=478%:%
+%:%1406=478%:%
+%:%1407=478%:%
+%:%1408=478%:%
+%:%1409=479%:%
+%:%1410=479%:%
+%:%1411=480%:%
+%:%1412=480%:%
+%:%1413=480%:%
+%:%1414=480%:%
+%:%1415=480%:%
+%:%1416=481%:%
+%:%1417=482%:%
+%:%1418=482%:%
+%:%1419=483%:%
+%:%1420=483%:%
+%:%1421=484%:%
+%:%1422=484%:%
+%:%1423=484%:%
+%:%1424=484%:%
+%:%1425=485%:%
+%:%1426=485%:%
+%:%1427=486%:%
+%:%1428=486%:%
+%:%1429=487%:%
+%:%1430=487%:%
+%:%1431=487%:%
+%:%1432=488%:%
+%:%1433=488%:%
+%:%1434=489%:%
+%:%1435=489%:%
+%:%1436=490%:%
+%:%1437=490%:%
+%:%1438=490%:%
+%:%1439=490%:%
+%:%1440=491%:%
+%:%1441=492%:%
+%:%1442=492%:%
+%:%1443=493%:%
+%:%1444=493%:%
+%:%1445=493%:%
+%:%1446=493%:%
+%:%1447=494%:%
+%:%1448=494%:%
+%:%1449=495%:%
+%:%1450=495%:%
+%:%1451=496%:%
+%:%1452=496%:%
+%:%1453=497%:%
+%:%1454=497%:%
+%:%1455=498%:%
+%:%1456=498%:%
+%:%1457=499%:%
+%:%1463=499%:%
+%:%1466=500%:%
+%:%1467=501%:%
+%:%1468=502%:%
+%:%1469=502%:%
+%:%1470=503%:%
+%:%1477=504%:%
+%:%1478=504%:%
+%:%1479=505%:%
+%:%1480=505%:%
+%:%1481=506%:%
+%:%1482=506%:%
+%:%1483=506%:%
+%:%1484=506%:%
+%:%1485=507%:%
+%:%1486=507%:%
+%:%1487=508%:%
+%:%1488=508%:%
+%:%1489=508%:%
+%:%1490=508%:%
+%:%1491=508%:%
+%:%1492=509%:%
+%:%1493=509%:%
+%:%1494=510%:%
+%:%1495=510%:%
+%:%1496=511%:%
+%:%1497=511%:%
+%:%1498=511%:%
+%:%1499=511%:%
+%:%1500=511%:%
+%:%1501=512%:%
+%:%1502=512%:%
+%:%1503=513%:%
+%:%1504=513%:%
+%:%1505=514%:%
+%:%1506=514%:%
+%:%1507=514%:%
+%:%1508=515%:%
+%:%1509=515%:%
+%:%1510=516%:%
+%:%1511=516%:%
+%:%1512=516%:%
+%:%1513=516%:%
+%:%1514=517%:%
+%:%1515=517%:%
+%:%1516=518%:%
+%:%1517=519%:%
+%:%1518=519%:%
+%:%1519=520%:%
+%:%1520=520%:%
+%:%1521=520%:%
+%:%1523=522%:%
+%:%1524=522%:%
+%:%1525=523%:%
+%:%1526=523%:%
+%:%1527=524%:%
+%:%1528=524%:%
+%:%1529=524%:%
+%:%1530=525%:%
+%:%1531=525%:%
+%:%1532=526%:%
+%:%1533=526%:%
+%:%1534=526%:%
+%:%1535=527%:%
+%:%1536=527%:%
+%:%1537=528%:%
+%:%1538=528%:%
+%:%1539=528%:%
+%:%1540=528%:%
+%:%1541=529%:%
+%:%1542=530%:%
+%:%1543=530%:%
+%:%1544=531%:%
+%:%1545=531%:%
+%:%1546=531%:%
+%:%1547=532%:%
+%:%1548=533%:%
+%:%1549=533%:%
+%:%1550=533%:%
+%:%1551=534%:%
+%:%1552=534%:%
+%:%1553=534%:%
+%:%1554=535%:%
+%:%1555=536%:%
+%:%1556=536%:%
+%:%1557=537%:%
+%:%1558=537%:%
+%:%1559=538%:%
+%:%1560=538%:%
+%:%1561=538%:%
+%:%1562=539%:%
+%:%1563=539%:%
+%:%1564=540%:%
+%:%1565=540%:%
+%:%1566=540%:%
+%:%1567=540%:%
+%:%1568=541%:%
+%:%1569=541%:%
+%:%1570=542%:%
+%:%1571=543%:%
+%:%1572=543%:%
+%:%1573=544%:%
+%:%1574=544%:%
+%:%1575=545%:%
+%:%1576=545%:%
+%:%1577=546%:%
+%:%1583=546%:%
+%:%1586=547%:%
+%:%1587=548%:%
+%:%1588=548%:%
+%:%1589=549%:%
+%:%1590=550%:%
+%:%1593=551%:%
+%:%1597=551%:%
+%:%1598=551%:%
+%:%1599=552%:%
+%:%1600=552%:%
+%:%1605=552%:%
+%:%1608=553%:%
+%:%1609=554%:%
+%:%1610=554%:%
+%:%1611=555%:%
+%:%1612=556%:%
+%:%1615=557%:%
+%:%1619=557%:%
+%:%1620=557%:%
+%:%1621=558%:%
+%:%1622=559%:%
+%:%1623=559%:%
+%:%1628=559%:%
+%:%1631=560%:%
+%:%1632=561%:%
+%:%1633=562%:%
+%:%1634=563%:%
+%:%1635=564%:%
+%:%1638=565%:%
+%:%1643=566%:%

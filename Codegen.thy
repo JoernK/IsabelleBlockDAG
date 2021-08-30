@@ -4,7 +4,7 @@
 
 
 theory Codegen
-  imports blockDAG Spectre Ghostdag
+  imports blockDAG Spectre Ghostdag ExtendblockDAG
 begin
 
 section \<open>Code Generation\<close>
@@ -73,14 +73,29 @@ export_code top_sort anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_
  SpectreOrder_Int OrderDAG_Int
  in Haskell module_name DAGS file "code/" 
 
-(**notepad begin
+notepad begin
   let ?G = "\<lparr>verts = {1::int,2,3,4,5,6,7,8,9,10}, arcs = {(2,1),(3,1),(4,1),
   (5,2),(6,3),(7,4),(8,5),(8,3),(9,6),(9,4),(10,7),(10,2)}, tail = fst, head = snd\<rparr>"
-  let ?a2 = "2"
-  let ?b4 = "3"
-  let ?c6 = "4"
+  let ?a = "2"
+  let ?b = "3"
+  let ?c = "4"
   value "blockDAG ?G"
-  value "SpectreOrder ?G ?a2 ?b4 \<and> SpectreOrder ?G ?b4 ?c6 \<and> \<not> SpectreOrder ?G ?a2 ?c6"
+  value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"
 end
-**)
+
+
+subsection \<open>Extend Graph\<close>
+
+  
+declare  pre_digraph.del_vert_def [code]
+declare Append_One_axioms_def [code] 
+declare Honest_Append_One_axioms_def[code] 
+declare Append_One_def [code] 
+declare Honest_Append_One_def [code] 
+declare Append_One_Honest_Dishonest_axioms_def [code]
+declare Append_One_Honest_Dishonest_def [code]
+
+
+
+
 end

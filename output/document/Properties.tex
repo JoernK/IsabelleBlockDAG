@@ -1,0 +1,95 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Properties}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Properties\isanewline
+\ \ \isakeyword{imports}\ blockDAG\ ExtendblockDAG\ Spectre\ Ghostdag\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ Linear{\isacharunderscore}{\kern0pt}Order{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}Linear{\isacharunderscore}{\kern0pt}Order\ A\ {\isasymequiv}\ {\isacharparenleft}{\kern0pt}{\isasymforall}G{\isachardot}{\kern0pt}\ blockDAG\ G\ \ {\isasymlongrightarrow}\ linear{\isacharunderscore}{\kern0pt}order{\isacharunderscore}{\kern0pt}on\ {\isacharparenleft}{\kern0pt}verts\ G{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ Order{\isacharunderscore}{\kern0pt}Preserving{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool\ {\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}Order{\isacharunderscore}{\kern0pt}Preserving\ A\ {\isasymequiv}\ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ a\ b{\isachardot}{\kern0pt}\ blockDAG\ G\ {\isasymlongrightarrow}\ a\ {\isasymrightarrow}\isactrlsup {\isacharplus}{\kern0pt}\isactrlbsub G\isactrlesub \ b\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}a{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Monotone{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool\ {\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Monotone\ A\ {\isasymequiv}\isanewline
+\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharprime}{\kern0pt}\ a\ b\ c{\isachardot}{\kern0pt}\ Honest{\isacharunderscore}{\kern0pt}Append{\isacharunderscore}{\kern0pt}One\ G\ G{\isacharprime}{\kern0pt}\ a\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharprime}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Robust{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool\ {\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Robust\ A\ {\isasymequiv}\isanewline
+\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharprime}{\kern0pt}\ G{\isacharprime}{\kern0pt}{\isacharprime}{\kern0pt}\ a\ b\ c\ d{\isachardot}{\kern0pt}\ Append{\isacharunderscore}{\kern0pt}One{\isacharunderscore}{\kern0pt}Honest{\isacharunderscore}{\kern0pt}Dishonest\ G\ G{\isacharprime}{\kern0pt}\ a\ G{\isacharprime}{\kern0pt}{\isacharprime}{\kern0pt}\ b\isanewline
+\ \ \ \ \ \ \ \ \ \ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}c{\isacharcomma}{\kern0pt}d{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}c{\isacharcomma}{\kern0pt}d{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharprime}{\kern0pt}{\isacharprime}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=/cygdrive/c/DAGModelling/Isabelle/Properties.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%18=3%:%
+%:%21=4%:%
+%:%22=5%:%
+%:%23=5%:%
+%:%24=6%:%
+%:%25=7%:%
+%:%26=8%:%
+%:%27=9%:%
+%:%28=9%:%
+%:%29=10%:%
+%:%30=11%:%
+%:%31=12%:%
+%:%32=13%:%
+%:%33=13%:%
+%:%34=14%:%
+%:%35=15%:%
+%:%36=16%:%
+%:%37=17%:%
+%:%38=18%:%
+%:%39=18%:%
+%:%40=19%:%
+%:%42=21%:%
+%:%43=22%:%
+%:%44=23%:%
+%:%45=24%:%
+%:%48=25%:%
+%:%53=26%:%

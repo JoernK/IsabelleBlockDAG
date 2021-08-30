@@ -104,12 +104,13 @@ lemma Spectre_Order_Preserving:
     and "b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
   shows "Spectre_Order G a b" 
 proof - 
+  interpret B: blockDAG "G" using assms(1) by auto
   have set_ordered: "set (sorted_list_of_set (verts G)) = verts G"
     using assms(1) subs fin_digraph.finite_verts
       sorted_list_of_set by auto
-  have a_in: "a \<in> verts G" using wf_digraph.reachable1_in_verts(2) assms subs
+  have a_in: "a \<in> verts G" using B.reachable1_in_verts(2) assms(2)
     by metis 
-  have b_in: "b \<in> verts G" using wf_digraph.reachable1_in_verts(1) assms subs
+  have b_in: "b \<in> verts G" using B.reachable1_in_verts(1) assms(2)
     by metis 
   obtain the_map where the_map_in: 
     "the_map = (map (\<lambda>i. vote_Spectre G i a b) (sorted_list_of_set (verts G)))" by auto
@@ -118,7 +119,7 @@ proof -
     by blast 
   have "(vote_Spectre G wit a b) \<in> set the_map" 
     unfolding the_map_in set_map 
-    using assms(1) fin_digraph.finite_verts 
+    using B.blockDAG_axioms fin_digraph.finite_verts 
       subs sorted_list_of_set(1) wit_in image_iff
     by metis 
   then have exune: "\<exists>x \<in> set the_map. x \<noteq> 0"
@@ -148,6 +149,9 @@ lemma SPECTRE_Preserving:
     Spectre_Order_Preserving
     SigmaI case_prodI mem_Collect_eq by fastforce 
 
+lemma "Order_Preserving SPECTRE"
+  unfolding Order_Preserving_def 
+  using SPECTRE_Preserving by auto 
 
 lemma vote_Spectre_antisymmetric: 
   shows "b \<noteq> c \<Longrightarrow> vote_Spectre V a b c = - (vote_Spectre V a c b)"
@@ -312,108 +316,53 @@ lemma SPECTRE_antisym:
   unfolding antisym_def SPECTRE_def 
   using Spectre_Order_antisym assms by fastforce
 
-lemma SPECTRE_not_trans:
-  shows "\<exists>G. blockDAG G \<and> \<not> trans (SPECTRE G)" 
-  unfolding trans_def SPECTRE_def 
-proof 
-  let ?G = "\<lparr>verts = {1::int,2,3,4,5,6,7,8,9,10}, arcs = {(2,1),(3,1),(4,1),
-  (5,2),(6,3),(7,4),(8,5),(8,3),(9,6),(9,4),(10,7),(10,2)}, tail = fst, head = snd\<rparr>"
-  let ?a = "2"
-  let ?b = "3"
-  let ?c = "4"
-  have vert_G: "verts ?G = {1,2,3,4,5,6,7,8,9,10}" by simp
-  have tail_G: "tail ?G = fst" by simp
-  have head_G: "head ?G = snd" by simp
-  have arc_G: "\<And>e. arc_to_ends ?G e = e" unfolding arc_to_ends_def by simp
-  then have arcs_G: "arcs_ends ?G = {(2,1),(3,1),(4,1),
-  (5,2),(6,3),(7,4),(8,5),(8,3),(9,6),(9,4),(10,7),(10,2)}" unfolding arcs_ends_def by simp
-  have wf_G: "wf_digraph ?G" unfolding wf_digraph_def 
-  proof(safe, auto) qed
-  then have "fin_digraph ?G" unfolding fin_digraph_def fin_digraph_axioms_def
-    by simp
-  moreover have "loopfree_digraph ?G" unfolding loopfree_digraph_def loopfree_digraph_axioms_def
-    using wf_G by simp
-  moreover have " nomulti_digraph ?G" unfolding nomulti_digraph_def nomulti_digraph_axioms_def
-    arc_to_ends_def using wf_G by simp
-  ultimately have d_G: "digraph ?G" unfolding digraph_def by simp
-  obtain E where E_in: "E = {(2::int,1::int),(3,1),(4,1),
-  (5,2),(6,3),(7,4),(8,5),(8,3),(9,6),(9,4),(10,7),(10,2)}" by simp
-  have dag_G: "DAG ?G" unfolding DAG_def DAG_axioms_def arcs_G     
-  proof (safe, rule d_G)
-    fix v::int
-    have le: "\<forall> a b. (a,b) \<in> E \<longrightarrow> b < a" unfolding E_in by simp
-    have "acyclic (E\<^sup>+)"
-    proof(rule acyclicI_order)
-      let ?f = id
-      fix a b ::int
-      assume "(a,b) \<in> (E\<^sup>+)"
-      then show "?f a > ?f b" unfolding id_def 
-      proof(induct  rule: trancl_induct )
-      case (base y)
-      then show ?case unfolding E_in proof(cases, auto) qed
-      next
-        case (step y z)
-        then have "z < y" using le by simp
-      then show ?case using step(3) by simp
-    qed
-  qed
-  then have "\<forall> x. (x,x) \<notin> E\<^sup>+ "
-    unfolding acyclic_def by simp
-  then show "(v, v)
-         \<in> {(2, 1), (3, 1), (4, 1), (5, 2), (6, 3), (7, 4), (8, 5), (8, 3), (9, 6), (9, 4), (10, 7),
-             (10, 2)}\<^sup>+ \<Longrightarrow>
-         False" unfolding E_in by auto
-qed
-  have E_c: "(card E - 1) = 11" unfolding E_in by simp 
-  have sss: "{i. 0 < i \<and> i \<le> Suc 11} = {1,2,3,4,5,6,7,8,9,10,11,12}" 
-  proof(standard, simp_all, standard)
-    fix x::nat
-    assume x_in: "x \<in>  {i. 0 < i \<and> i \<le> 12}"
-    then have "0 < x \<and> x < 13" by auto
-    then have "x \<in> {1,2,3,4,5,6,7,8,9} \<or> 9 < x \<and> x < 13" by auto
-    then have "x \<in> {1,2,3,4,5,6,7,8,9,10,11,12} \<or> 13 < x \<and> x < 13" by auto
-    then have "x \<in> {1,2,3,4,5,6,7,8,9,10,11,12}" by auto
-    then show "x \<in> {Suc 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}"
-      using x_in by auto
-  qed
-  have "finite E" using E_in by simp
-  moreover have 
-    "ntrancl 11 E = {(2::int, 1), (3, 1), (4, 1), (5, 2), (6, 3), (7, 4), (8, 5), (8, 3), (9, 6), (9, 4), (10, 7),
-             (10, 2), (5,1),(6,1),(7,1),(8,2),(9,3),(10,4),(10,1),(8,1),(9,1)}" 
-    unfolding E_in unfolding ntrancl_def sss image_def sorry
-    using  funpow_code_def 
-  have " E \<union> {(5,1),(6,1),(7,1),(8,2),(9,3),(10,4)} \<subseteq>  E\<^sup>+"
-    unfolding E_in by (simp add: r_into_trancl', auto)
-      (induct rule:  trancl_into_trancl , auto)+ 
-  then have  tr_ex: "E \<union> {(5,1),(6,1),(7,1),(8,2),(9,3),(10,4)} \<union> {(10,1),(8,1),(9,1)} \<subseteq>  E\<^sup>+"  
-  unfolding E_in by (simp add: r_into_trancl', auto) 
-  have "blockDAG ?G"  
-    unfolding blockDAG_def blockDAG_axioms_def
-  proof(safe, rule dag_G)
-    show "\<exists>p\<in>verts ?G. \<forall>r. r \<in> verts ?G \<longrightarrow> r \<rightarrow>\<^sup>+\<^bsub>?G\<^esub> p \<or> r = p"
-    proof
-      let ?p = 1 
-      show "?p \<in> verts ?G" by simp
-      show "\<forall>r. r \<in> verts ?G \<longrightarrow> r \<rightarrow>\<^sup>+\<^bsub>?G\<^esub> ?p \<or> r = ?p"
-      proof(safe)
-        fix r
-        assume "r \<in> verts ?G"
-        and "r \<noteq> 1"
-        then have r_in: "r \<in> {2,3,4,5,6,7,8,9,10}"
-          by simp
-        then consider 
-           "r = 2" | "r = 3" | "r = 4" | "r = 5" | "r = 6" | "r = 7" | "r = 8" | "r = 9" | "r = 10"
-          by auto
-        then show "(r,1) \<in> (arcs_ends ?G)^+" 
-          using  tr_ex 
-          unfolding E_in arcs_G proof(cases, auto) qed
-      qed
-    qed
-  next
-    fix u v a b 
-  have "blockDAG ?G" sorry*)
-    
-  have "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c" sorry
-  oops
 
+lemma Spectre_equals_vote_Spectre_honest:
+  assumes "Honest_Append_One G G_A a"
+  and "b \<in> verts G"
+  and "c \<in> verts G"
+shows "Spectre_Order G b c \<longleftrightarrow> vote_Spectre G_A a b c = 1"
+proof -
+  interpret H: Append_One "G" "G_A" "a" using assms(1) Honest_Append_One_def by metis
+  have b_in: "b \<in> verts G_A" using H.append_verts_in assms(2) by metis
+  have c_in: "c \<in> verts G_A" using H.append_verts_in assms(3) by metis
+  have re_all: "\<forall>v\<in>verts G. a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> v" using Honest_Append_One.reaches_all assms(1) by metis
+  then have r_ab: "a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b" using assms(2) by simp
+  have r_ac: "a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c" using re_all assms(3) by simp
+  consider (b_c_eq) "b = c" | (not_b_c_eq) "\<not> b = c" by auto 
+  then show ?thesis
+  proof(cases)
+    case b_c_eq
+    then have "Spectre_Order G b c" using Spectre_Order_reflexive Append_One_def
+        H.Append_One_axioms assms
+      by metis
+    moreover have "vote_Spectre G_A a b c = 1" using vote_Spectre_reflexive 
+      using H.bD_A H.app_in b_in b_c_eq by metis
+    ultimately show ?thesis by simp
+  next
+    case not_b_c_eq
+    then have "vote_Spectre G_A a b c = (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+   (vote_Spectre (reduce_past G_A a) i b c)) (sorted_list_of_set (past_nodes G_A a))))))"
+      using vote_Spectre.simps Append_One.bD_A Honest_Append_One_def assms r_ab r_ac 
+        Append_One.app_in b_in c_in
+        map_eq_conv by fastforce 
+    then have the_eq: "vote_Spectre G_A a b c = (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+   (vote_Spectre G i b c)) (sorted_list_of_set (verts G))))))"
+      using Honest_Append_One.reduce_append Honest_Append_One.append_past_all 
+      assms(1) by metis
+    show ?thesis 
+      unfolding the_eq Spectre_Order_def by simp 
+  qed
+qed
+
+lemma Spectre_Order_Appending_Mono:
+  assumes "Honest_Append_One G G_A app"
+  and "a \<in> verts G"
+  and "b \<in> verts G"
+  and "c \<in> verts G"
+  and "Spectre_Order G b c"
+shows "vote_Spectre G a b c \<le> vote_Spectre G_A a b c"
+proof -
+  interpret H: Append_One  using assms(1) Honest_Append_One_def by metis
+  have "app \<in> verts G_A" using H.app_in oops
 end 

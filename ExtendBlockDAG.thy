@@ -1,4 +1,4 @@
-theory ExtendBlockDAG
+theory ExtendblockDAG
   imports blockDAG
 begin
 
@@ -13,19 +13,30 @@ assumes bD_A: "blockDAG G_A"
   and app_in: "app \<in> verts G_A"
   and app_notin: "app \<notin> verts G"
   and GG_A : "G = pre_digraph.del_vert G_A app"
-  and new_node: "\<forall>b. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app"
+  and new_node: "\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app"
 
 locale Honest_Append_One = Append_One +
   assumes ref_tips: "\<forall>t \<in> tips G. app \<rightarrow>\<^bsub>G_A\<^esub> t"  
 
+
 locale Append_One_Honest_Dishonest = Honest_Append_One + 
   fixes G_AB  (structure)
   and dis_n::'a
-  assumes "Append_One G G_AB dis_n"
+  assumes "Append_One G_A G_AB dis_n"
 
 
 subsection \<open>Append-One Lemmas\<close>
 
+lemma (in Append_One) new_node_alt:
+  "(\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app) \<longleftrightarrow> (\<forall>b. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app)" 
+proof(auto)
+  fix b
+  assume a1: "\<forall>b\<in>verts G_A. (b, app) \<notin> arcs_ends G_A"
+  and a2: "b \<rightarrow>\<^bsub>G_A\<^esub> app"
+  then have "b \<in> verts G_A" using wf_digraph.adj_in_verts(1) bD_A subs by metis
+  then show "False" using a1 a2 by auto
+qed
+  
 lemma (in Append_One) append_subverts: 
   "verts G \<subset> verts G_A"
   unfolding GG_A  pre_digraph.verts_del_vert using app_in app_notin by auto
@@ -33,6 +44,16 @@ lemma (in Append_One) append_subverts:
 lemma (in Append_One) append_verts: 
   "verts G_A = verts G \<union> {app}"
   unfolding GG_A  pre_digraph.verts_del_vert using app_in app_notin by auto
+
+lemma (in Append_One) append_verts_in: 
+  assumes "a \<in> verts G"
+  shows "a \<in> verts G_A"
+  unfolding append_verts
+  by (simp add: assms) 
+
+lemma (in Append_One) append_verts_diff: 
+  shows "verts G = verts G_A - {app}"
+  using append_verts app_in app_notin by auto
 
 lemma (in Append_One) append_verts_cases: 
   assumes "a \<in> verts G_A"
@@ -50,8 +71,8 @@ proof
   show  "arcs G \<subseteq> arcs G_A" using append_subarcs_leq by simp
   obtain gen where gen_rec: " app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> gen" using bD_A blockDAG.genesis app_in
       app_notin append_subverts
-      genesis_in_verts new_node psubsetD tranclE
-    by (metis) 
+      genesis_in_verts new_node psubsetD tranclE new_node_alt
+    by (metis (mono_tags, lifting))
   then obtain walk where walk_in: " pre_digraph.awalk G_A app walk gen \<and> walk \<noteq> []" 
     using wf_digraph.reachable1_awalk bD_A subs
     by metis 
@@ -94,10 +115,16 @@ proof
       Un_insert_right app_notin insertE)  
 qed
 
+lemma (in Append_One) append_not_reached:
+"\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app"
+  using tranclE wf_digraph.reachable1_in_verts(2) bD_A subs new_node
+  by metis  
+
+
 lemma (in Append_One) append_is_tip:
 "is_tip G_A app"
   unfolding is_tip.simps 
-  using app_in new_node  tranclE
+  using app_in new_node append_not_reached
   by metis
 
 lemma (in Append_One) append_in_tips:
@@ -111,7 +138,30 @@ lemma (in Append_One) append_greater_1:
   unfolding append_verts 
   using app_notin no_empty_blockDAG by auto
 
-  
+
+lemma append_diff_sorted_set:
+  assumes "a \<in> A"
+  and "finite A"
+shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+   (sorted_list_of_set (A - {a}))) 
+  = sum_list ((map P)(sorted_list_of_set (A))) - (P a)"
+proof -
+  let ?L1 =  "(sorted_list_of_set (A))"
+  have d_1: "distinct ?L1" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
+   then have s_1: "sum_list ((map P) ?L1) 
+  = sum P (set ?L1)" using sum_list_distinct_conv_sum_set by metis
+  let ?L2 = " (sorted_list_of_set (A - {a}))"
+  have d_2: "distinct ?L2" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
+  then have s_2: "sum_list ((map P) ?L2) 
+  = sum P (set ?L2)" using sum_list_distinct_conv_sum_set by metis
+  have s_3: "sum P (set ?L2) = sum P (set ?L1) - (P a)"
+    using assms sorted_list_of_set(1)
+    by (simp add: sum_diff1) 
+  show ?thesis
+    unfolding s_1 s_2 s_3 by simp
+qed    
+
+
 
 subsection \<open>Honest-Append-One Lemmas\<close>
 
@@ -139,6 +189,12 @@ proof
     ultimately show ?thesis using trancl_trans by auto 
   qed
 qed
+
+lemma (in Honest_Append_One) append_past_all:
+  "past_nodes G_A app = verts G"
+  unfolding past_nodes.simps append_verts 
+  using reaches_all DAG.cycle_free bD_A subs
+  by fastforce 
 
 lemma (in Honest_Append_One) append_is_only_tip:
   "tips G_A = {app}"

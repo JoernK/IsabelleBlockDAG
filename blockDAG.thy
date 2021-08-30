@@ -11,7 +11,11 @@ section  \<open>blockDAGs\<close>
 locale blockDAG = DAG  +
   assumes genesis:  "\<exists>p \<in> verts G. \<forall>r. r \<in> verts G  \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p \<or> r = p)"       
     and only_new: "\<forall>e. (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
+begin 
 
+lemma bD: "blockDAG G" using blockDAG_axioms by simp
+
+end
 
 subsection  \<open>Functions and Definitions\<close>
 
@@ -59,7 +63,7 @@ lemma (in blockDAG) genesis_reaches_nothing:
   using is_genesis_node.simps genesis_node_def genesis_existAlt cycle_free 
     reachable1_reachable_trans  assms reachable1_in_verts(2)
   by (metis) 
-  
+
 
 
 subsubsection \<open>Tips\<close>
@@ -125,16 +129,16 @@ qed
 
 lemma (in blockDAG) reached_by: 
   assumes "v \<notin> tips G"
-  and  "v \<in> verts G"
+    and  "v \<in> verts G"
   shows "\<exists>t \<in> verts G. t \<rightarrow>\<^sup>+ v" 
   using assms 
   unfolding tips_def is_tip.simps
   by auto 
-  
+
 lemma (in blockDAG) reached_by_tip: 
   assumes "v \<notin> tips G"
-  and  "v \<in> verts G"
-shows "\<exists>t \<in> tips G. t \<rightarrow>\<^sup>+ v" 
+    and  "v \<in> verts G"
+  shows "\<exists>t \<in> tips G. t \<rightarrow>\<^sup>+ v" 
 proof(rule ccontr)
   assume as1: "\<not> (\<exists>t\<in>tips G. t \<rightarrow>\<^sup>+ v)"
   then have "\<forall>w.  w \<rightarrow>\<^sup>+ v \<longrightarrow> \<not> is_tip G w" 
@@ -406,6 +410,8 @@ proof -
     by (simp add: psubset_card_mono)
 qed 
 
+
+
 (* unnecessary
 lemma (in blockDAG) genesisGraph:
   fixes a 
@@ -501,7 +507,7 @@ next
                          \<or> aaa (past_nodes G a) (Collect (reachable G r)) \<in> past_nodes G a"
             by (simp add: reachable_in_verts(2))
           then have "Collect (reachable G r) \<subseteq> past_nodes G a"
-            using f2 by (meson subsetI)
+            using f2 by (metis subsetI)
           then show ?thesis
             using con  induce_reachable_preserves_paths reachable_induce_ss reduce_past.simps
             by (metis (no_types))
@@ -919,8 +925,8 @@ lemma (in blockDAG) blockDAG_cases:
   using blockDAG_cases_one blockDAG_cases_more
     blockDAG_size_cases by auto
 
-lemma blockDAG_induct[consumes 1, case_names fund base step]:
-  assumes base: "blockDAG G"
+lemma blockDAG_induct[consumes 1, case_names base step]:
+  assumes fund: "blockDAG G"
   assumes cases: "\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
     "\<And>H::('a,'b) pre_digraph. 
    (\<And>b::'a. blockDAG (pre_digraph.del_vert H b) \<Longrightarrow> b \<in> verts H \<Longrightarrow> P(pre_digraph.del_vert H b))
@@ -994,18 +1000,20 @@ lemma genesis_nodeAlt_one_sound:
     and one: "card (verts G) = 1"
   shows "blockDAG.is_genesis_node G (genesis_nodeAlt G)" 
 proof -
+  interpret B: blockDAG "G" using assms(1) by simp
   have exone: "\<exists>! x. x \<in> (verts G)"
-    using bD one blockDAG.genesis_in_verts blockDAG.genesis_unique_exists blockDAG.reduce_less
-      blockDAG.reduce_past_dagbased less_nat_zero_code less_one by metis 
+    using  one B.genesis_in_verts B.genesis_unique_exists B.reduce_less
+      B.reduce_past_dagbased less_nat_zero_code less_one B.gen_gen B.gen_graph_all_one singleton_iff
+    by (metis)  
   then have "sorted_list_of_set (verts G) \<noteq> []"
     by (metis card.infinite card_0_eq finite.emptyI one 
         sorted_list_of_set_empty sorted_list_of_set_inject zero_neq_one) 
   then have "genesis_nodeAlt G \<in> verts G" using hd_in_set genesis_nodeAlt.simps bD exone
     by (metis one set_sorted_list_of_set sorted_list_of_set.infinite) 
-  then show one_sound: "blockDAG.is_genesis_node G (genesis_nodeAlt G)"
-    using bD one 
-    by (metis blockDAG.blockDAG_size_cases blockDAG.reduce_less
-        blockDAG.reduce_past_dagbased less_one not_one_less_zero)
+  then show one_sound: "B.is_genesis_node (genesis_nodeAlt G)"
+    using one B.blockDAG_size_cases B.reduce_less
+        B.reduce_past_dagbased less_one B.genesis_unique_exists B.is_genesis_node.elims(2) exone
+    by (metis)
 qed
 
 lemma genesis_nodeAlt_sound : 
@@ -1027,6 +1035,7 @@ next
     "(\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> card (verts V) < c \<Longrightarrow> 
   blockDAG.is_genesis_node V (genesis_nodeAlt V))"
   assume bD: "blockDAG W"
+  interpret B: blockDAG "W" using bD by simp
   assume cd: "card (verts W) = c" 
   consider (one) "card (verts W) = 1" | (more) "card (verts W) > 1"
     using bD blockDAG.blockDAG_size_cases by blast
@@ -1039,7 +1048,7 @@ next
     case more
     then have not_one: "1 \<noteq> card (verts W)" by auto
     have se: " set (sorted_list_of_set (tips W)) = tips W"  
-      by (simp add: bD subs  tips_def fin_digraph.finite_verts)
+      by (simp add: tips_def)
     obtain a where a_def: "a = hd (sorted_list_of_set (tips W))"
       by simp 
     have tip: "a \<in> tips W"  
@@ -1053,19 +1062,21 @@ next
       by metis 
     then have cd2: "card ( verts (reduce_past W a)) < c"
       using cd by simp
-    have n_gen: "\<not> blockDAG.is_genesis_node W a"
-      using blockDAG.tips_unequal_gen bD more tip  tips_def Collect_mem_eq by fastforce
+    have "is_tip W a" using tip CollectD unfolding tips_def by simp
+    then have n_gen: "\<not> B.is_genesis_node a"
+      using B.tips_unequal_gen more by simp 
     then have bD2: "blockDAG (reduce_past W a)"
-      using blockDAG.reduce_past_dagbased ver bD by auto
+      using B.reduce_past_dagbased ver bD by auto
     have ff: "blockDAG.is_genesis_node (reduce_past W a)
      (genesis_nodeAlt (reduce_past W a))" using cd2 basis bD2 more
       by blast
-    have rec: "genesis_nodeAlt W = genesis_nodeAlt (reduce_past W (hd (sorted_list_of_set (tips W))))"
+    have rec: 
+      "genesis_nodeAlt W = genesis_nodeAlt (reduce_past W (hd (sorted_list_of_set (tips W))))"
       using genesis_nodeAlt.simps not_one bD
       by metis 
     show ?thesis using rec ff bD n_gen ver blockDAG.reduce_past_gen_eq  a_def by metis
   qed
-qed
+qed                                  
 
 
 end

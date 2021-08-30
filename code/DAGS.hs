@@ -1,8 +1,8 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
 module
-  DAGS(Int, Linorder, Nat, Set(..), Pre_digraph_ext(..), anticone, blockDAG,
-        top_sort, orderDAG_Int, spectreOrder_Int, vote_Spectre_Int)
+  DAGS(Int, Linorder, Nat, Set(..), Pre_digraph_ext(..), anticone, top_sort,
+        blockDAG, orderDAG_Int, spectreOrder_Int, vote_Spectre_Int)
   where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
@@ -352,6 +352,40 @@ nat_of_num (Bit0 n) = let {
                       } in plus_nat m m;
 nat_of_num One = one_nat;
 
+less_num :: Num -> Num -> Bool;
+less_num (Bit1 m) (Bit0 n) = less_num m n;
+less_num (Bit1 m) (Bit1 n) = less_num m n;
+less_num (Bit0 m) (Bit1 n) = less_eq_num m n;
+less_num (Bit0 m) (Bit0 n) = less_num m n;
+less_num One (Bit1 n) = True;
+less_num One (Bit0 n) = True;
+less_num m One = False;
+
+less_eq_num :: Num -> Num -> Bool;
+less_eq_num (Bit1 m) (Bit0 n) = less_num m n;
+less_eq_num (Bit1 m) (Bit1 n) = less_eq_num m n;
+less_eq_num (Bit0 m) (Bit1 n) = less_eq_num m n;
+less_eq_num (Bit0 m) (Bit0 n) = less_eq_num m n;
+less_eq_num (Bit1 m) One = False;
+less_eq_num (Bit0 m) One = False;
+less_eq_num One n = True;
+
+less_int :: Int -> Int -> Bool;
+less_int (Neg k) (Neg l) = less_num l k;
+less_int (Neg k) (Pos l) = True;
+less_int (Neg k) Zero_int = True;
+less_int (Pos k) (Neg l) = False;
+less_int (Pos k) (Pos l) = less_num k l;
+less_int (Pos k) Zero_int = False;
+less_int Zero_int (Neg l) = False;
+less_int Zero_int (Pos l) = True;
+less_int Zero_int Zero_int = False;
+
+signum :: Int -> Int;
+signum a =
+  (if less_int Zero_int a then one_int
+    else (if less_int a Zero_int then uminus_int one_int else Zero_int));
+
 past_nodes :: forall a b. (Eq a) => Pre_digraph_ext a b () -> a -> Set a;
 past_nodes g a =
   filtera (\ b -> member (a, b) (trancl (arcs_ends g))) (verts g);
@@ -367,6 +401,18 @@ induce_subgraph g vs =
 reduce_past ::
   forall a b. (Eq a) => Pre_digraph_ext a b () -> a -> Pre_digraph_ext a b ();
 reduce_past g a = induce_subgraph g (past_nodes g a);
+
+top_insert ::
+  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> a -> [a];
+top_insert g [] a = [a];
+top_insert g (b : l) a =
+  (if member (b, a) (trancl (arcs_ends g)) then a : b : l
+    else b : top_insert g l a);
+
+top_sort ::
+  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> [a];
+top_sort g [] = [];
+top_sort g (a : l) = top_insert g (top_sort g l) a;
 
 future_nodes :: forall a b. (Eq a) => Pre_digraph_ext a b () -> a -> Set a;
 future_nodes g a =
@@ -481,18 +527,6 @@ genesis_nodeAlt g =
            else genesis_nodeAlt
                   (reduce_past g (hd (sorted_list_of_set (tips g))))));
 
-top_insert ::
-  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> a -> [a];
-top_insert g [] a = [a];
-top_insert g (b : l) a =
-  (if member (a, b) (trancl (arcs_ends g)) then b : top_insert g l a
-    else a : b : l);
-
-top_sort ::
-  forall a b. (Eq a, Linorder a) => Pre_digraph_ext a b () -> [a] -> [a];
-top_sort g [] = [];
-top_sort g (a : l) = top_insert g (top_sort g l) a;
-
 orderDAG ::
   forall a b.
     (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> Nat -> (Set a, [a]);
@@ -584,44 +618,10 @@ orderDAG_Int v a = orderDAG v (nat_of_integer a);
 sum_list :: forall a. (Monoid_add a) => [a] -> a;
 sum_list xs = foldr plus xs zero;
 
-less_num :: Num -> Num -> Bool;
-less_num (Bit1 m) (Bit0 n) = less_num m n;
-less_num (Bit1 m) (Bit1 n) = less_num m n;
-less_num (Bit0 m) (Bit1 n) = less_eq_num m n;
-less_num (Bit0 m) (Bit0 n) = less_num m n;
-less_num One (Bit1 n) = True;
-less_num One (Bit0 n) = True;
-less_num m One = False;
-
-less_eq_num :: Num -> Num -> Bool;
-less_eq_num (Bit1 m) (Bit0 n) = less_num m n;
-less_eq_num (Bit1 m) (Bit1 n) = less_eq_num m n;
-less_eq_num (Bit0 m) (Bit1 n) = less_eq_num m n;
-less_eq_num (Bit0 m) (Bit0 n) = less_eq_num m n;
-less_eq_num (Bit1 m) One = False;
-less_eq_num (Bit0 m) One = False;
-less_eq_num One n = True;
-
-less_int :: Int -> Int -> Bool;
-less_int (Neg k) (Neg l) = less_num l k;
-less_int (Neg k) (Pos l) = True;
-less_int (Neg k) Zero_int = True;
-less_int (Pos k) (Neg l) = False;
-less_int (Pos k) (Pos l) = less_num k l;
-less_int (Pos k) Zero_int = False;
-less_int Zero_int (Neg l) = False;
-less_int Zero_int (Pos l) = True;
-less_int Zero_int Zero_int = False;
-
 tie_break_int :: forall a. (Linorder a) => a -> a -> Int -> Int;
 tie_break_int a b i =
   (if equal_int i Zero_int
-    then (if less b a then uminus_int one_int else one_int)
-    else (if less_int Zero_int i then one_int else uminus_int one_int));
-
-sumlist_break :: forall a. (Linorder a) => a -> a -> [Int] -> Int;
-sumlist_break a b [] = Zero_int;
-sumlist_break a b (x : xs) = tie_break_int a b (sum_list (x : xs));
+    then (if less b a then uminus_int one_int else one_int) else i);
 
 vote_Spectre ::
   forall a b.
@@ -640,21 +640,25 @@ vote_Spectre v a b c =
                          then uminus_int one_int
                          else (if member (a, b) (trancl (arcs_ends v)) &&
                                     member (a, c) (trancl (arcs_ends v))
-                                then sumlist_break b c
-                                       (map
- (\ i -> vote_Spectre (reduce_past v a) i b c)
- (sorted_list_of_set (past_nodes v a)))
-                                else sumlist_break b c
-                                       (map (\ i -> vote_Spectre v i b c)
- (sorted_list_of_set (future_nodes v a))))))));
+                                then tie_break_int b c
+                                       (signum
+ (sum_list
+   (map (\ i -> vote_Spectre (reduce_past v a) i b c)
+     (sorted_list_of_set (past_nodes v a)))))
+                                else signum
+                                       (sum_list
+ (map (\ i -> vote_Spectre v i b c)
+   (sorted_list_of_set (future_nodes v a)))))))));
 
 spectre_Order ::
   forall a b.
     (Eq a, Linorder a, Eq b) => Pre_digraph_ext a b () -> a -> a -> Bool;
 spectre_Order g a b =
   equal_int
-    (sumlist_break a b
-      (map (\ i -> vote_Spectre g i a b) (sorted_list_of_set (verts g))))
+    (tie_break_int a b
+      (signum
+        (sum_list
+          (map (\ i -> vote_Spectre g i a b) (sorted_list_of_set (verts g))))))
     one_int;
 
 spectreOrder_Int ::
