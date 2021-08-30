@@ -358,11 +358,168 @@ qed
 lemma Spectre_Order_Appending_Mono:
   assumes "Honest_Append_One G G_A app"
   and "a \<in> verts G"
-  and "b \<in> verts G"
+  and "b \<in> verts G" 
   and "c \<in> verts G"
   and "Spectre_Order G b c"
 shows "vote_Spectre G a b c \<le> vote_Spectre G_A a b c"
-proof -
-  interpret H: Append_One  using assms(1) Honest_Append_One_def by metis
-  have "app \<in> verts G_A" using H.app_in oops
+  using assms
+proof(induction G a b c rule: vote_Spectre.induct)
+  case (1 G a b c)
+  interpret HB1: Honest_Append_One "G" using 1(3)
+    by metis
+  interpret B2: blockDAG "G_A" using HB1.bD_A 
+    by metis
+  have a_in_G_A: "a \<in> verts G_A" using 1(4) HB1.append_verts_in by simp
+  have b_in_G_A: "b \<in> verts G_A" using 1(5) HB1.append_verts_in by simp
+  have c_in_G_A: "c \<in> verts G_A" using 1(6) HB1.append_verts_in by simp
+  show "vote_Spectre G a b c \<le> vote_Spectre G_A a b c"
+  proof(cases a b c G rule:Spectre_casesAlt)
+    case no_bD
+    then show ?thesis using HB1.bD 1(4,5,6) by auto   
+  next
+    case equal    
+    then show "vote_Spectre G a b c \<le> vote_Spectre G_A a b c"
+      using B2.blockDAG_axioms a_in_G_A b_in_G_A c_in_G_A by auto
+  next
+    case one
+    then have "(a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b \<or> a = b) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c)" using HB1.reachable1_preserve by auto
+  then show ?thesis using one B2.blockDAG_axioms a_in_G_A b_in_G_A c_in_G_A by auto
+next
+  case two
+  then have "\<not>((a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b \<or> a = b) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c))" using HB1.reachable1_preserve by auto
+  moreover have " (a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c \<or> a = c) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b)" 
+    using two HB1.reachable1_preserve by auto
+  ultimately show ?thesis using two by auto
+next
+  have ppp: "past_nodes G_A a = past_nodes G a" using 1(4) HB1.append_past_nodes by auto
+  have rrp: "reduce_past G_A a = reduce_past G a" using 1(4) HB1.append_reduce_some by auto
+  case three
+  then have ins: " vote_Spectre G a b c = (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+ (vote_Spectre (reduce_past G a) i b c)) (sorted_list_of_set (past_nodes G a))))))"
+    by auto
+  have "\<not>((a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b \<or> a = b) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c))" using HB1.reachable1_preserve three by auto
+  moreover have "\<not> ((a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c \<or> a = c) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b))" 
+    using three HB1.reachable1_preserve by auto
+  moreover have "a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c" using three HB1.reachable1_preserve by auto
+  ultimately have  " vote_Spectre G_A a b c = (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+ (vote_Spectre (reduce_past G_A a) i b c)) (sorted_list_of_set (past_nodes G_A a))))))"
+    using three a_in_G_A b_in_G_A c_in_G_A B2.blockDAG_axioms by auto
+  then have ins_2: "vote_Spectre G_A a b c = (tie_break_int b c (signum (sum_list (map (\<lambda>i.
+ (vote_Spectre (reduce_past G a) i b c)) (sorted_list_of_set (past_nodes G a))))))"
+  unfolding ppp rrp by auto
+  show ?thesis  unfolding ins ins_2 by simp
+next
+  case four
+  then have ins: "vote_Spectre G a b c = signum (sum_list (map (\<lambda>i.
+   (vote_Spectre G i b c)) (sorted_list_of_set (future_nodes G a))))"
+    by auto
+   have "\<not>((a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b \<or> a = b) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c))" using HB1.reachable1_preserve four by auto
+  moreover have "\<not> ((a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c \<or> a = c) \<and> (\<not> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b))" 
+    using four HB1.reachable1_preserve by auto
+  moreover have "\<not> (a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b \<and> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c)" using four HB1.reachable1_preserve by auto
+  ultimately have ins2:
+  "vote_Spectre G_A a b c = signum (sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (future_nodes G_A a))))"
+    using B2.blockDAG_axioms a_in_G_A b_in_G_A c_in_G_A vote_Spectre.simps four by auto
+  have "\<And>x . x \<in> set (sorted_list_of_set (future_nodes G a)) \<Longrightarrow>  x \<in> verts G
+    \<Longrightarrow> vote_Spectre G x b c \<le> vote_Spectre G_A x b c" 
+  using 1(2,3) four
+  "1.prems"(5) by blast 
+  
+  then have fut: "\<forall>x \<in> set (sorted_list_of_set (future_nodes G a)). 
+     (vote_Spectre G x b c) \<le> (vote_Spectre G_A x b c)"
+    using HB1.finite_past HB1.past_nodes_verts 
+    by simp
+  have futN: "future_nodes G a = future_nodes G_A a - {app}" using HB1.append_future 1(4) by auto 
+  have appfut: "app \<in> future_nodes G_A a" using HB1.append_future2 1(4) by auto
+  have bbb: "sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (future_nodes G a)))
+  = sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (future_nodes G_A a)))
+  - (vote_Spectre G_A app b c)"
+    unfolding futN 
+    using append_diff_sorted_set B2.finite_future appfut
+    by blast 
+  have "vote_Spectre G_A app b c = 1"
+    using "1.prems" Spectre_equals_vote_Spectre_honest
+    by blast 
+  then have sp1: "sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (future_nodes G_A a))) = 
+    sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (future_nodes G a))) + 1" 
+    using bbb by auto
+  have sp2: "sum_list (map (\<lambda>i.(vote_Spectre G i b c))
+                 (sorted_list_of_set (future_nodes G a))) 
+                  \<le>  sum_list (map (\<lambda>i.
+                  (vote_Spectre G_A i b c)) (sorted_list_of_set (future_nodes G a)))"
+    by (metis fut sum_list_mono )
+  show ?thesis unfolding ins ins2
+  proof (rule signum_mono)
+    show "(\<Sum>i\<leftarrow>sorted_list_of_set (future_nodes G a). vote_Spectre G i b c)
+    \<le> (\<Sum>i\<leftarrow>sorted_list_of_set (future_nodes G_A a). vote_Spectre G_A i b c)"
+      unfolding sp1 using sp2
+      by linarith 
+    qed
+  qed
+qed
+
+lemma "One_Appending_Monotone SPECTRE"
+  unfolding One_Appending_Monotone_def 
+proof safe
+  fix G G_A::"('a::linorder,'b) pre_digraph" and app b c::'a
+  assume "Honest_Append_One G G_A app"
+  and bcS: "(b, c) \<in> SPECTRE G"
+  then interpret H1: Honest_Append_One G G_A app by auto
+  interpret B1: blockDAG G_A using H1.bD_A by auto
+  have b_in: "b \<in> verts G"
+  and c_in: "c \<in> verts G" using bcS unfolding SPECTRE_def by auto
+  then have b_in2: "b \<in> verts G_A"
+  and c_in2: "c \<in> verts G_A" using H1.append_verts_in by auto
+  then show "(b, c) \<in> SPECTRE G_A"
+    unfolding SPECTRE_def 
+  proof(simp)
+    have so: "Spectre_Order G b c" using bcS unfolding SPECTRE_def by auto
+    then have vv: "vote_Spectre G_A app b c = 1"
+      using Spectre_equals_vote_Spectre_honest b_in c_in H1.Honest_Append_One_axioms
+      by blast 
+    have bbb: "(\<Sum>i\<leftarrow>sorted_list_of_set (verts G). vote_Spectre G_A i b c) =
+     (\<Sum>i\<leftarrow>sorted_list_of_set (verts G_A). vote_Spectre G_A i b c) - vote_Spectre G_A app b c"
+    unfolding H1.append_verts_diff 
+    using append_diff_sorted_set B1.finite_verts H1.app_in 
+    by blast 
+   have sp1: "sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (verts G_A))) = 
+    sum_list (map (\<lambda>i.
+   (vote_Spectre G_A i b c)) (sorted_list_of_set (verts G))) + 1" 
+    unfolding bbb vv by auto  
+    have leee: "(\<Sum>i\<leftarrow>sorted_list_of_set (verts G). vote_Spectre G i b c) \<le>
+          (\<Sum>i\<leftarrow>sorted_list_of_set (verts G). vote_Spectre G_A i b c)"
+    proof(rule sum_list_mono)
+      fix a 
+      assume "a \<in> set (sorted_list_of_set (verts G))"
+      then have "a \<in> verts G" using sorted_list_of_set(1) H1.finite_verts by auto
+      then show "vote_Spectre G a b c \<le> vote_Spectre G_A a b c"
+        using Spectre_Order_Appending_Mono H1.Honest_Append_One_axioms b_in c_in so by blast
+    qed
+    have "(\<Sum>i\<leftarrow>sorted_list_of_set (verts G). vote_Spectre G i b c) \<le>
+          (\<Sum>i\<leftarrow>sorted_list_of_set (verts G_A). vote_Spectre G_A i b c)"
+      unfolding sp1 using leee by linarith
+    then have "signum (\<Sum>i\<leftarrow>sorted_list_of_set (verts G).
+       vote_Spectre G i b c) \<le> signum (\<Sum>i\<leftarrow>sorted_list_of_set (verts G_A).
+       vote_Spectre G_A i b c)"
+      by(rule signum_mono)
+    then have "tie_break_int b c (signum (\<Sum>i\<leftarrow>sorted_list_of_set (verts G).
+       vote_Spectre G i b c)) 
+       \<le> tie_break_int b c (signum (\<Sum>i\<leftarrow>sorted_list_of_set (verts G_A).
+       vote_Spectre G_A i b c))"
+      by(rule tie_break_mono)
+    then have "1 \<le> tie_break_int b c (signum (\<Sum>i\<leftarrow>sorted_list_of_set (verts G_A).
+       vote_Spectre G_A i b c)) "
+      using so 
+      unfolding Spectre_Order_def by simp
+    then show " Spectre_Order G_A b c"
+      unfolding Spectre_Order_def using domain_tie_break by auto
+  qed
+qed
+
 end 

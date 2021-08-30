@@ -132,6 +132,14 @@ qed
 
 lemma domain_signum: "signum i \<in> {-1,0,1}" by simp
 
+lemma signum_mono:
+  assumes "i \<le> j"
+  shows "signum i \<le> signum j" using assms by simp
+
+lemma tie_break_mono:
+  assumes "i \<le> j"
+  shows "tie_break_int b c  i \<le> tie_break_int b c j" using assms by simp
+
 lemma domain_tie_break:
   shows "tie_break_int a b (signum i) \<in> {-1 ,1}"
   using  tie_break_int.simps

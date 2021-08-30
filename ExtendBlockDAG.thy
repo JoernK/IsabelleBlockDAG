@@ -39,7 +39,7 @@ qed
   
 
 
-lemma (in Append_One) append_subverts: 
+lemma (in Append_One) append_subverts:            
   "verts G \<subset> verts G_A"
   unfolding GG_A  pre_digraph.verts_del_vert using app_in app_notin by auto
 
@@ -200,8 +200,13 @@ proof(standard)
       then have "y \<rightarrow>\<^bsub>G\<^esub> z" using dominates_preserve y_in by auto
       then show "b \<rightarrow>\<^sup>+ z" using b_y by auto
     qed
-qed
-  
+  qed
+
+lemma (in Append_One) append_past_nodes:
+  assumes "a \<in> verts G"
+  shows "past_nodes G a = past_nodes G_A a"
+  unfolding past_nodes.simps append_verts using 
+  assms reachable1_preserve append_not_reached_all by auto
 
 lemma (in Append_One) append_is_tip:
 "is_tip G_A app"
@@ -292,6 +297,19 @@ lemma (in Honest_Append_One) append_past_all:
   unfolding past_nodes.simps append_verts 
   using reaches_all DAG.cycle_free bD_A subs
   by fastforce 
+
+lemma (in Honest_Append_One) append_future:
+  assumes "a \<in> verts G"
+  shows "future_nodes G a = future_nodes G_A a - {app}"
+  unfolding future_nodes.simps append_verts
+proof(auto simp: assms reaches_all reachable1_preserve app_notin) qed
+
+lemma (in Honest_Append_One) append_future2:
+  assumes "a \<in> verts G"
+  shows "app \<in> future_nodes G_A a"
+  unfolding future_nodes.simps append_verts
+  using assms
+proof(auto simp: reaches_all reachable1_preserve) qed
 
 lemma (in Honest_Append_One) append_is_only_tip:
   "tips G_A = {app}"

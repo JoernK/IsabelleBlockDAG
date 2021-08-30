@@ -12,7 +12,7 @@ definition Order_Preserving:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<Righ
 
 definition One_Appending_Monotone:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<Rightarrow> bool "
   where "One_Appending_Monotone A \<equiv>
-         (\<forall>G G' a b c. Honest_Append_One G G' a \<longrightarrow> ((b,c) \<in> (A G) \<longrightarrow> (b,c) \<in> (A G')))"
+         (\<forall>G G_A a b c. Honest_Append_One G G_A a \<longrightarrow> ((b,c) \<in> (A G) \<longrightarrow> (b,c) \<in> (A G_A)))"
 
 
 definition One_Appending_Robust:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<Rightarrow> bool "
