@@ -28,15 +28,17 @@ locale Append_One_Honest_Dishonest = Honest_Append_One +
 subsection \<open>Append-One Lemmas\<close>
 
 lemma (in Append_One) new_node_alt:
-  "(\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app) \<longleftrightarrow> (\<forall>b. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app)" 
+  "(\<forall>b. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app)" 
 proof(auto)
   fix b
-  assume a1: "\<forall>b\<in>verts G_A. (b, app) \<notin> arcs_ends G_A"
-  and a2: "b \<rightarrow>\<^bsub>G_A\<^esub> app"
+  assume a2: "b \<rightarrow>\<^bsub>G_A\<^esub> app"
   then have "b \<in> verts G_A" using wf_digraph.adj_in_verts(1) bD_A subs by metis
-  then show "False" using a1 a2 by auto
+  then show "False" using new_node a2 by auto
 qed
+
   
+
+
 lemma (in Append_One) append_subverts: 
   "verts G \<subset> verts G_A"
   unfolding GG_A  pre_digraph.verts_del_vert using app_in app_notin by auto
@@ -103,23 +105,103 @@ lemma (in Append_One) append_subgraph:
   using  GG_A blockDAG_axioms subs bD_A
   by (simp add: subs wf_digraph.subgraph_del_vert) 
 
-lemma (in Append_One) append_induced_subgraph: 
- "induced_subgraph G G_A "
-  unfolding induced_subgraph_def
-proof 
-  show "subgraph G G_A" using append_subgraph by simp
-  show "arcs G = {e \<in> arcs G_A. tail G_A e \<in> verts G \<and> head G_A e \<in> verts G}"
+
+lemma (in Append_One) append_induce_subgraph: 
+  "G_A \<restriction> (verts G) = G"  
+proof -
+  have aaa: "arcs G = {e \<in> arcs G_A. tail G_A e \<in> verts G \<and> head G_A e \<in> verts G}"
     unfolding GG_A pre_digraph.arcs_del_vert pre_digraph.verts_del_vert
   using append_verts bD_A subs wf_digraph_def
   by (metis (no_types, lifting) Diff_insert_absorb Un_empty_right
       Un_insert_right app_notin insertE)  
+  show  "G_A \<restriction> verts G = G" 
+    unfolding  induce_subgraph_def
+    using aaa app_notin append_head append_tail 
+        arcs_del_vert del_vert_def del_vert_not_in_graph verts_del_vert
+    by (metis (no_types, lifting)) 
 qed
+
+lemma (in Append_One) append_induced_subgraph: 
+ "induced_subgraph G G_A "
+proof -
+  interpret W: blockDAG "G_A" using bD_A by auto
+  show ?thesis
+  using W.induced_induce append_induce_subgraph append_subverts psubsetE
+  by (metis) 
+qed
+
 
 lemma (in Append_One) append_not_reached:
 "\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app"
   using tranclE wf_digraph.reachable1_in_verts(2) bD_A subs new_node
   by metis  
 
+
+lemma (in Append_One) append_not_reached_all:
+"\<forall>b. \<not> b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app"
+  using tranclE bD_A new_node_alt
+  by metis  
+
+
+lemma (in Append_One) append_not_headed:
+"\<forall>b \<in> arcs G_A. \<not> head G_A b = app"
+proof(rule ccontr, safe)
+  fix b
+  assume "b \<in> arcs G_A"
+  and "app = head G_A b"
+  then have "tail G_A b \<rightarrow>\<^bsub>G_A\<^esub> app"
+    unfolding arcs_ends_def arc_to_ends_def
+    by auto 
+  then show False 
+    by (simp add: new_node_alt) 
+qed
+  
+lemma (in Append_One) dominates_preserve:
+  assumes "b \<in> verts G"
+  shows "b \<rightarrow>\<^bsub>G_A\<^esub> c \<longleftrightarrow> b \<rightarrow>\<^bsub>G\<^esub> c"
+proof  
+  assume " b \<rightarrow>\<^bsub>G\<^esub> c"
+  then show "b \<rightarrow>\<^bsub>G_A\<^esub> c"
+    using append_subgraph pre_digraph.adj_mono
+    by metis
+next 
+  have b_napp : "b \<noteq> app" using assms(1) append_verts_diff by auto
+  assume bc: "b \<rightarrow>\<^bsub>G_A\<^esub> c" 
+  then have  c_napp: "c \<noteq> app" using new_node_alt by auto
+  show "b \<rightarrow>\<^bsub>G\<^esub> c"  unfolding arcs_ends_def arc_to_ends_def
+      using GG_A pre_digraph.arcs_del_vert bc b_napp c_napp
+      using append_head append_tail by fastforce 
+  qed
+
+
+lemma (in Append_One) reachable1_preserve:
+  assumes "b \<in> verts G"
+  shows "(b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c) \<longleftrightarrow> b \<rightarrow>\<^sup>+ c"
+proof(standard)
+    assume  "b \<rightarrow>\<^sup>+ c"
+    then show "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c"
+      using trancl_mono append_subgraph arcs_ends_mono
+      by (metis)  
+  next 
+    interpret B2: blockDAG "G_A" using bD_A by simp
+    assume c_re: "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c"
+    show "b \<rightarrow>\<^sup>+ c"   
+      using c_re
+    proof(cases  rule: trancl_induct)
+      case (base y)
+      then have "b \<rightarrow>\<^bsub>G\<^esub> y" using dominates_preserve assms(1) by auto
+      then show "b \<rightarrow>\<^sup>+ y" by auto
+    next
+      fix y z    
+      assume b_y: "b \<rightarrow>\<^sup>+ y" 
+      then have y_in: "y \<in> verts G" using reachable1_in_verts(2)
+        by (metis) 
+      assume "y \<rightarrow>\<^bsub>G_A\<^esub> z"
+      then have "y \<rightarrow>\<^bsub>G\<^esub> z" using dominates_preserve y_in by auto
+      then show "b \<rightarrow>\<^sup>+ z" using b_y by auto
+    qed
+qed
+  
 
 lemma (in Append_One) append_is_tip:
 "is_tip G_A app"
@@ -161,7 +243,22 @@ proof -
     unfolding s_1 s_2 s_3 by simp
 qed    
 
-
+lemma (in Append_One) append_reduce_some:
+  assumes "a \<in> verts G"
+  shows "reduce_past G_A a = reduce_past G a"
+  unfolding reduce_past.simps past_nodes.simps append_head append_tail 
+  induce_subgraph_def append_verts 
+proof(standard,simp,standard)
+  have "a \<noteq> app" using assms(1) append_verts_diff by auto
+  then show vv: "{b. (b = app \<or> b \<in> verts G) \<and> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b} = {b \<in> verts G. a \<rightarrow>\<^sup>+ b}" 
+    using reachable1_preserve assms reachable1_in_verts(2) by blast  
+  show "{e \<in> arcs G_A.
+     (tail G e = app \<or> tail G e \<in> verts G) \<and>
+     a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> tail G e \<and> (head G e = app \<or> head G e \<in> verts G) \<and> a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> head G e} =
+    {e \<in> arcs G. tail G e \<in> verts G \<and> a \<rightarrow>\<^sup>+ tail G e \<and> head G e \<in> verts G \<and> a \<rightarrow>\<^sup>+ head G e} "
+    unfolding vv GG_A pre_digraph.arcs_del_vert using append_not_reached_all
+    using GG_A append_head append_tail assms reachable1_preserve by fastforce 
+qed
 
 subsection \<open>Honest-Append-One Lemmas\<close>
 
