@@ -351,6 +351,46 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
+\ signum{\isacharunderscore}{\kern0pt}mono{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}i\ {\isasymle}\ j{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}signum\ i\ {\isasymle}\ signum\ j{\isachardoublequoteclose}%
+\isadelimproof
+\ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\ \isacommand{by}\isamarkupfalse%
+\ simp%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}mono{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}i\ {\isasymle}\ j{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ b\ c\ \ i\ {\isasymle}\ tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ b\ c\ j{\isachardoublequoteclose}%
+\isadelimproof
+\ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\ \isacommand{by}\isamarkupfalse%
+\ simp%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
 \ domain{\isacharunderscore}{\kern0pt}tie{\isacharunderscore}{\kern0pt}break{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ a\ b\ {\isacharparenleft}{\kern0pt}signum\ i{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}\ {\isacharcomma}{\kern0pt}{\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
@@ -410,35 +450,6 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ Spectre{\isacharunderscore}{\kern0pt}theo{\isacharcolon}{\kern0pt}\isanewline
-\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}P\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
-\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}tie{\isacharunderscore}{\kern0pt}break{\isacharunderscore}{\kern0pt}int\ b\ c\ {\isacharparenleft}{\kern0pt}signum\ {\isacharparenleft}{\kern0pt}sum{\isacharunderscore}{\kern0pt}list\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
-\ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ {\isacharparenleft}{\kern0pt}reduce{\isacharunderscore}{\kern0pt}past\ V\ a{\isacharparenright}{\kern0pt}\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}past{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}P\ \ {\isacharparenleft}{\kern0pt}signum\ {\isacharparenleft}{\kern0pt}sum{\isacharunderscore}{\kern0pt}list\ {\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}{\isasymlambda}i{\isachardot}{\kern0pt}\isanewline
-\ \ \ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ i\ b\ c{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}future{\isacharunderscore}{\kern0pt}nodes\ V\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{shows}\ {\isachardoublequoteopen}P\ {\isacharparenleft}{\kern0pt}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-%
-\isadelimproof
-\ \ %
-\endisadelimproof
-%
-\isatagproof
-\isacommand{using}\isamarkupfalse%
-\ assms\ vote{\isacharunderscore}{\kern0pt}Spectre{\isachardot}{\kern0pt}simps\isanewline
-\ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}mono{\isacharunderscore}{\kern0pt}tags{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}%
-\endisatagproof
-{\isafoldproof}%
-%
-\isadelimproof
-\ \isanewline
-%
-\endisadelimproof
-\isanewline
-\isanewline
-\isacommand{lemma}\isamarkupfalse%
 \ domain{\isacharunderscore}{\kern0pt}Spectre{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}vote{\isacharunderscore}{\kern0pt}Spectre\ V\ a\ b\ c\ {\isasymin}\ {\isacharbraceleft}{\kern0pt}{\isacharminus}{\kern0pt}{\isadigit{1}}{\isacharcomma}{\kern0pt}\ {\isadigit{0}}{\isacharcomma}{\kern0pt}\ {\isadigit{1}}{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
@@ -448,7 +459,7 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 %
 \isatagproof
 \isacommand{proof}\isamarkupfalse%
-{\isacharparenleft}{\kern0pt}rule\ Spectre{\isacharunderscore}{\kern0pt}theo{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\ \isacommand{qed}\isamarkupfalse%
+{\isacharparenleft}{\kern0pt}rule\ vote{\isacharunderscore}{\kern0pt}Spectre{\isachardot}{\kern0pt}cases{\isacharcomma}{\kern0pt}\ auto{\isacharparenright}{\kern0pt}\ \isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
 {\isafoldproof}%
@@ -521,8 +532,6 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 \isanewline
 %
 \endisadelimproof
-\isanewline
-\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ vote{\isacharunderscore}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}exists{\isacharcolon}{\kern0pt}\isanewline
@@ -826,128 +835,128 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 %:%353=135%:%
 %:%354=135%:%
 %:%355=136%:%
+%:%356=137%:%
 %:%358=137%:%
 %:%362=137%:%
 %:%363=137%:%
-%:%364=138%:%
-%:%365=138%:%
-%:%370=138%:%
+%:%364=137%:%
+%:%371=137%:%
+%:%372=138%:%
 %:%373=139%:%
-%:%374=140%:%
-%:%375=141%:%
-%:%376=142%:%
-%:%377=142%:%
-%:%378=143%:%
-%:%379=144%:%
-%:%380=145%:%
-%:%381=146%:%
-%:%382=147%:%
-%:%383=148%:%
-%:%384=149%:%
-%:%386=151%:%
-%:%387=152%:%
-%:%390=155%:%
-%:%391=156%:%
-%:%394=159%:%
-%:%397=160%:%
-%:%401=160%:%
-%:%402=160%:%
-%:%407=160%:%
-%:%410=161%:%
-%:%411=162%:%
-%:%412=163%:%
-%:%413=163%:%
-%:%414=164%:%
-%:%415=165%:%
-%:%416=166%:%
-%:%417=167%:%
-%:%418=168%:%
-%:%419=169%:%
-%:%420=170%:%
-%:%421=171%:%
-%:%424=172%:%
-%:%428=172%:%
-%:%429=172%:%
-%:%430=173%:%
-%:%431=173%:%
-%:%436=173%:%
-%:%439=174%:%
-%:%440=175%:%
-%:%441=176%:%
-%:%442=176%:%
-%:%443=177%:%
-%:%450=178%:%
-%:%451=178%:%
-%:%457=178%:%
-%:%460=179%:%
-%:%461=180%:%
-%:%462=181%:%
-%:%463=182%:%
-%:%464=182%:%
-%:%465=183%:%
-%:%468=184%:%
-%:%472=184%:%
-%:%473=184%:%
-%:%474=184%:%
-%:%475=184%:%
-%:%480=184%:%
-%:%483=185%:%
-%:%484=186%:%
-%:%485=187%:%
-%:%486=187%:%
-%:%487=188%:%
-%:%494=189%:%
-%:%495=189%:%
-%:%501=189%:%
-%:%504=190%:%
-%:%505=191%:%
-%:%506=192%:%
-%:%507=192%:%
-%:%508=193%:%
-%:%511=194%:%
-%:%515=194%:%
-%:%516=194%:%
-%:%521=194%:%
-%:%524=195%:%
-%:%525=196%:%
-%:%526=197%:%
-%:%527=198%:%
-%:%528=198%:%
-%:%529=199%:%
-%:%530=200%:%
-%:%531=201%:%
-%:%532=202%:%
-%:%539=203%:%
-%:%540=203%:%
-%:%541=204%:%
-%:%542=204%:%
-%:%543=204%:%
-%:%544=204%:%
-%:%545=205%:%
-%:%546=205%:%
-%:%547=206%:%
-%:%548=206%:%
-%:%549=207%:%
-%:%550=207%:%
-%:%551=208%:%
-%:%552=208%:%
-%:%553=209%:%
-%:%554=209%:%
-%:%555=209%:%
-%:%556=210%:%
-%:%557=210%:%
-%:%558=211%:%
-%:%559=211%:%
-%:%560=212%:%
-%:%561=212%:%
-%:%562=213%:%
-%:%563=213%:%
-%:%564=213%:%
-%:%565=214%:%
-%:%566=214%:%
-%:%567=215%:%
-%:%568=215%:%
-%:%569=216%:%
-%:%575=216%:%
-%:%580=217%:%
-%:%585=218%:%
+%:%374=139%:%
+%:%375=140%:%
+%:%376=141%:%
+%:%378=141%:%
+%:%382=141%:%
+%:%383=141%:%
+%:%384=141%:%
+%:%391=141%:%
+%:%392=142%:%
+%:%393=143%:%
+%:%394=143%:%
+%:%395=144%:%
+%:%398=145%:%
+%:%402=145%:%
+%:%403=145%:%
+%:%404=146%:%
+%:%405=146%:%
+%:%410=146%:%
+%:%413=147%:%
+%:%414=148%:%
+%:%415=149%:%
+%:%416=150%:%
+%:%417=150%:%
+%:%418=151%:%
+%:%419=152%:%
+%:%420=153%:%
+%:%421=154%:%
+%:%422=155%:%
+%:%423=156%:%
+%:%424=157%:%
+%:%426=159%:%
+%:%427=160%:%
+%:%430=163%:%
+%:%431=164%:%
+%:%434=167%:%
+%:%437=168%:%
+%:%441=168%:%
+%:%442=168%:%
+%:%447=168%:%
+%:%450=169%:%
+%:%451=170%:%
+%:%452=171%:%
+%:%453=171%:%
+%:%454=172%:%
+%:%461=173%:%
+%:%462=173%:%
+%:%468=173%:%
+%:%471=174%:%
+%:%472=175%:%
+%:%473=176%:%
+%:%474=177%:%
+%:%475=177%:%
+%:%476=178%:%
+%:%479=179%:%
+%:%483=179%:%
+%:%484=179%:%
+%:%485=179%:%
+%:%486=179%:%
+%:%491=179%:%
+%:%494=180%:%
+%:%495=181%:%
+%:%496=182%:%
+%:%497=182%:%
+%:%498=183%:%
+%:%505=184%:%
+%:%506=184%:%
+%:%512=184%:%
+%:%515=185%:%
+%:%516=186%:%
+%:%517=187%:%
+%:%518=187%:%
+%:%519=188%:%
+%:%522=189%:%
+%:%526=189%:%
+%:%527=189%:%
+%:%532=189%:%
+%:%535=190%:%
+%:%536=191%:%
+%:%537=191%:%
+%:%538=192%:%
+%:%539=193%:%
+%:%540=194%:%
+%:%541=195%:%
+%:%548=196%:%
+%:%549=196%:%
+%:%550=197%:%
+%:%551=197%:%
+%:%552=197%:%
+%:%553=197%:%
+%:%554=198%:%
+%:%555=198%:%
+%:%556=199%:%
+%:%557=199%:%
+%:%558=200%:%
+%:%559=200%:%
+%:%560=201%:%
+%:%561=201%:%
+%:%562=202%:%
+%:%563=202%:%
+%:%564=202%:%
+%:%565=203%:%
+%:%566=203%:%
+%:%567=204%:%
+%:%568=204%:%
+%:%569=205%:%
+%:%570=205%:%
+%:%571=206%:%
+%:%572=206%:%
+%:%573=206%:%
+%:%574=207%:%
+%:%575=207%:%
+%:%576=208%:%
+%:%577=208%:%
+%:%578=209%:%
+%:%584=209%:%
+%:%589=210%:%
+%:%594=211%:%

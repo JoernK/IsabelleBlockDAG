@@ -168,22 +168,9 @@ lemma Spectre_casesAlt:
   by auto
 
 
-lemma Spectre_theo:
-  assumes "P 0"
-    and "P 1"
-    and "P (-1)" 
-    and "P (tie_break_int b c (signum (sum_list (map (\<lambda>i.
- (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set ((past_nodes V a)))))))"
-    and "P  (signum (sum_list (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a)))))"
-  shows "P (vote_Spectre V a b c)"
-  using assms vote_Spectre.simps
-  by (metis (mono_tags, lifting)) 
-
-
 lemma domain_Spectre:
   shows "vote_Spectre V a b c \<in> {-1, 0, 1}"
-proof(rule Spectre_theo, auto) qed
+proof(rule vote_Spectre.cases, auto) qed
 
 
 
@@ -200,8 +187,6 @@ proof(induct l, auto) qed
 lemma antisymmetric_signum:
   shows "signum i = - (signum (-i))"
   by auto
-
-
 
 lemma vote_Spectre_one_exists:
   assumes "blockDAG V"

@@ -265,6 +265,40 @@ proof(standard,simp,standard)
     using GG_A append_head append_tail assms reachable1_preserve by fastforce 
 qed
 
+
+
+lemma blockDAG_induct_append[consumes 1, case_names base step]:
+  assumes fund: "blockDAG G"
+  assumes cases: "\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
+    "\<And>G G_A::('a,'b) pre_digraph. \<And>app::'a. 
+   Append_One G G_A app
+  \<Longrightarrow> (P G)
+  \<Longrightarrow> P G_A"
+  shows "P G"
+  using assms
+proof(induct G rule: blockDAG_induct)
+  case (base V)
+  then show ?case by auto
+next
+  case (step H)
+  show ?case proof(cases H rule: blockDAG.blockDAG_cases2, simp add: step)
+    case 2
+    then have "blockDAG (blockDAG.gen_graph H)" using step(2) blockDAG.gen_graph_sound by auto
+    then show ?thesis using step(3) 2 by metis 
+  next
+    case 3
+    then obtain Ha and b where bD_Ha: "blockDAG Ha" and b_in: "b \<in> verts H"
+      and del_v: "Ha = pre_digraph.del_vert H b " and nre:"(\<forall>c\<in>verts H. (c, b) \<notin> (arcs_ends H)\<^sup>+)"
+      by auto
+    then have "b \<notin> verts Ha" unfolding del_v pre_digraph.verts_del_vert by auto
+    then have "Append_One Ha H b" unfolding Append_One_def Append_One_axioms_def 
+      using bD_Ha b_in del_v nre step.hyps(2) by auto 
+    then show ?thesis using step
+      using bD_Ha b_in del_v by auto 
+  qed  
+qed
+
+
 subsection \<open>Honest-Append-One Lemmas\<close>
 
 lemma (in Honest_Append_One) reaches_all:
@@ -360,4 +394,5 @@ proof safe
   then show "x \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app" 
     using as by auto
 qed
+
 end

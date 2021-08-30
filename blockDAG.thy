@@ -925,6 +925,28 @@ lemma (in blockDAG) blockDAG_cases:
   using blockDAG_cases_one blockDAG_cases_more
     blockDAG_size_cases by auto
 
+lemma (in blockDAG) blockDAG_cases_more2:
+  assumes "card (verts G) > 1"
+  shows  "(\<exists>b H. (blockDAG H \<and> b \<in> verts G \<and> del_vert b = H \<and> (\<forall>c \<in> verts G. \<not> c \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b)))"
+proof -
+  obtain tip where tip_tip: "is_tip G tip" using tips_exist by auto
+  then have tip_neq_gen: " \<not> is_genesis_node tip"
+    using assms tips_unequal_gen by auto
+  have tip_in: "tip  \<in> verts G" using tip_tip is_tip.simps by metis
+  have nre: "(\<forall>c. \<not> c \<rightarrow>\<^sup>+\<^bsub>G\<^esub> tip)" using tips_not_referenced tip_tip by auto
+  let ?H = "del_vert tip"
+  have "blockDAG ?H" using del_tips_bDAG tip_tip tip_neq_gen by auto
+  then show ?thesis using nre tip_in
+    by blast 
+qed 
+
+
+lemma (in blockDAG) blockDAG_cases2:
+  obtains (base) "(G = gen_graph)"
+  | (more) "(\<exists>b H. (blockDAG H \<and> b \<in> verts G \<and> del_vert b = H \<and> (\<forall>c \<in> verts G. \<not> c \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b)))"
+  using blockDAG_cases_one blockDAG_cases_more2
+    blockDAG_size_cases by auto
+
 lemma blockDAG_induct[consumes 1, case_names base step]:
   assumes fund: "blockDAG G"
   assumes cases: "\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
