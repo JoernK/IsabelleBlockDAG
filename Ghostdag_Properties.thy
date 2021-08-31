@@ -1,5 +1,5 @@
 theory Ghostdag_Properties
-  imports Ghostdag ExtendblockDAG Properties Codegen
+  imports Ghostdag Extend_blockDAG Properties Codegen
 begin
 
 
@@ -226,7 +226,7 @@ lemma "\<forall>k. One_Appending_Monotone (GHOSTDAG k)"
   by metis
 
 
-subsection \<open>GHOSTDAG One Appending Robust\<close>
+subsection \<open>GHOSTDAG Not One Appending Robust\<close>
 
 datatype  FV = V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | V10
 

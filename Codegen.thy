@@ -4,7 +4,7 @@
 
 
 theory Codegen
-  imports blockDAG Spectre Ghostdag ExtendblockDAG
+  imports blockDAG Spectre Ghostdag Extend_blockDAG
 begin
 
 section \<open>Code Generation\<close>

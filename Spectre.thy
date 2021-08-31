@@ -212,6 +212,19 @@ proof -
     unfolding s_1 s_2 s_3 by simp
 qed  
 
+
+lemma append_diff_sorted_set2:
+  assumes "a \<in> A"
+  and "b \<in> A"
+  and "a \<noteq> b"
+  and "finite A"
+shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+   (sorted_list_of_set (A - {a} - {b}))) 
+  = sum_list ((map P)(sorted_list_of_set (A))) - (P a) - (P b)"
+  using assms append_diff_sorted_set
+  by (metis finite_Diff insert_Diff insert_iff) 
+
+
 lemma vote_Spectre_one_exists:
   assumes "blockDAG V"
     and "a \<in> verts V" 

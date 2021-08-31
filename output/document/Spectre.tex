@@ -595,6 +595,35 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 %
 \endisadelimproof
 \isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ append{\isacharunderscore}{\kern0pt}diff{\isacharunderscore}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}set{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}a\ {\isasymin}\ A{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ A{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ b{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ {\isachardoublequoteopen}finite\ A{\isachardoublequoteclose}\isanewline
+\isakeyword{shows}\ {\isachardoublequoteopen}sum{\isacharunderscore}{\kern0pt}list\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}map\ {\isacharparenleft}{\kern0pt}P{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder\ {\isasymRightarrow}\ int{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ {\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}A\ {\isacharminus}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}\ {\isacharminus}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}b{\isacharbraceright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ \isanewline
+\ \ {\isacharequal}{\kern0pt}\ sum{\isacharunderscore}{\kern0pt}list\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}map\ P{\isacharparenright}{\kern0pt}{\isacharparenleft}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}set\ {\isacharparenleft}{\kern0pt}A{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharminus}{\kern0pt}\ {\isacharparenleft}{\kern0pt}P\ a{\isacharparenright}{\kern0pt}\ {\isacharminus}{\kern0pt}\ {\isacharparenleft}{\kern0pt}P\ b{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\ append{\isacharunderscore}{\kern0pt}diff{\isacharunderscore}{\kern0pt}sorted{\isacharunderscore}{\kern0pt}set\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}metis\ finite{\isacharunderscore}{\kern0pt}Diff\ insert{\isacharunderscore}{\kern0pt}Diff\ insert{\isacharunderscore}{\kern0pt}iff{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\ \isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ vote{\isacharunderscore}{\kern0pt}Spectre{\isacharunderscore}{\kern0pt}one{\isacharunderscore}{\kern0pt}exists{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}blockDAG\ V{\isachardoublequoteclose}\isanewline
@@ -1031,42 +1060,59 @@ Given Spectre-Order calculate the corresponding relation over the nodes of G%
 %:%594=213%:%
 %:%597=214%:%
 %:%598=215%:%
-%:%599=215%:%
+%:%599=216%:%
 %:%600=216%:%
 %:%601=217%:%
 %:%602=218%:%
 %:%603=219%:%
-%:%610=220%:%
-%:%611=220%:%
-%:%612=221%:%
-%:%613=221%:%
-%:%614=221%:%
-%:%615=221%:%
-%:%616=222%:%
-%:%617=222%:%
-%:%618=223%:%
-%:%619=223%:%
-%:%620=224%:%
-%:%621=224%:%
+%:%604=220%:%
+%:%605=221%:%
+%:%607=223%:%
+%:%610=224%:%
+%:%614=224%:%
+%:%615=224%:%
+%:%616=225%:%
+%:%617=225%:%
 %:%622=225%:%
-%:%623=225%:%
-%:%624=226%:%
 %:%625=226%:%
-%:%626=226%:%
-%:%627=227%:%
-%:%628=227%:%
-%:%629=228%:%
-%:%630=228%:%
-%:%631=229%:%
-%:%632=229%:%
-%:%633=230%:%
-%:%634=230%:%
-%:%635=230%:%
-%:%636=231%:%
-%:%637=231%:%
-%:%638=232%:%
-%:%639=232%:%
+%:%626=227%:%
+%:%627=228%:%
+%:%628=228%:%
+%:%629=229%:%
+%:%630=230%:%
+%:%631=231%:%
+%:%632=232%:%
+%:%639=233%:%
 %:%640=233%:%
-%:%646=233%:%
-%:%651=234%:%
-%:%656=235%:%
+%:%641=234%:%
+%:%642=234%:%
+%:%643=234%:%
+%:%644=234%:%
+%:%645=235%:%
+%:%646=235%:%
+%:%647=236%:%
+%:%648=236%:%
+%:%649=237%:%
+%:%650=237%:%
+%:%651=238%:%
+%:%652=238%:%
+%:%653=239%:%
+%:%654=239%:%
+%:%655=239%:%
+%:%656=240%:%
+%:%657=240%:%
+%:%658=241%:%
+%:%659=241%:%
+%:%660=242%:%
+%:%661=242%:%
+%:%662=243%:%
+%:%663=243%:%
+%:%664=243%:%
+%:%665=244%:%
+%:%666=244%:%
+%:%667=245%:%
+%:%668=245%:%
+%:%669=246%:%
+%:%675=246%:%
+%:%680=247%:%
+%:%685=248%:%

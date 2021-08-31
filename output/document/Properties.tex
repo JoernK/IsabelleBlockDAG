@@ -9,7 +9,7 @@
 \isatagtheory
 \isacommand{theory}\isamarkupfalse%
 \ Properties\isanewline
-\ \ \isakeyword{imports}\ blockDAG\ ExtendblockDAG\ Spectre\ Ghostdag\isanewline
+\ \ \isakeyword{imports}\ blockDAG\ Extend{\isacharunderscore}{\kern0pt}blockDAG\ Spectre\ Ghostdag\isanewline
 \isakeyword{begin}%
 \endisatagtheory
 {\isafoldtheory}%
@@ -38,8 +38,8 @@
 \isacommand{definition}\isamarkupfalse%
 \ One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Robust{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool\ {\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\ {\isachardoublequoteopen}One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Robust\ A\ {\isasymequiv}\isanewline
-\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharprime}{\kern0pt}\ G{\isacharprime}{\kern0pt}{\isacharprime}{\kern0pt}\ a\ b\ c\ d{\isachardot}{\kern0pt}\ Append{\isacharunderscore}{\kern0pt}One{\isacharunderscore}{\kern0pt}Honest{\isacharunderscore}{\kern0pt}Dishonest\ G\ G{\isacharprime}{\kern0pt}\ a\ G{\isacharprime}{\kern0pt}{\isacharprime}{\kern0pt}\ b\isanewline
-\ \ \ \ \ \ \ \ \ \ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}c{\isacharcomma}{\kern0pt}d{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}c{\isacharcomma}{\kern0pt}d{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharprime}{\kern0pt}{\isacharprime}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharunderscore}{\kern0pt}A\ G{\isacharunderscore}{\kern0pt}AB\ a\ b\ c\ d{\isachardot}{\kern0pt}\ Append{\isacharunderscore}{\kern0pt}One{\isacharunderscore}{\kern0pt}Honest{\isacharunderscore}{\kern0pt}Dishonest\ G\ G{\isacharunderscore}{\kern0pt}A\ a\ G{\isacharunderscore}{\kern0pt}AB\ b\isanewline
+\ \ \ \ \ \ \ \ \ \ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}c{\isacharcomma}{\kern0pt}d{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}c{\isacharcomma}{\kern0pt}d{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharunderscore}{\kern0pt}AB{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isanewline
 \isanewline

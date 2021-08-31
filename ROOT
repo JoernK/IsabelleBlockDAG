@@ -9,8 +9,10 @@ session Isabelle = HOL +
     Spectre
 	Ghostdag
 	Properties
+	Extend_blockDAG
 	Spectre_Properties
 	Ghostdag_Properties
 	Codegen
+	
   document_files
     "root.tex"
