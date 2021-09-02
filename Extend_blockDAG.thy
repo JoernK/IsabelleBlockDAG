@@ -222,6 +222,23 @@ lemma (in Append_One) append_in_tips:
   using app_in new_node append_is_tip CollectI
   by metis
 
+
+context Append_One
+begin
+interpretation B2: blockDAG G_A using bD_A by simp
+lemma append_tips:
+  "tips G_A = tips G - {v. (app \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> v)} \<union> {app}"
+  unfolding B2.tips_alt tips_alt append_verts is_tip.simps 
+  using append_in_tips 
+proof(safe, auto simp: append_not_reached_all reachable1_preserve) qed
+end
+
+lemma (in Append_One) append_tips_subset:
+  " tips G_A \<subseteq> tips G \<union> {app}"
+  using append_tips
+  by auto 
+
+
 lemma (in Append_One) append_future:
   assumes "a \<in> verts G"
   shows "future_nodes G a = future_nodes G_A a - {app}"
@@ -429,12 +446,12 @@ proof safe
 qed
 
 lemma (in Append_One_Honest_Dishonest) app_not_dis: 
-"app \<noteq> dis"
+  "app \<noteq> dis"
   using app_in Append_One.app_notin app_two by metis
 
 
 lemma (in Append_One_Honest_Dishonest) app_in2: 
-"app \<in> verts G_AB" 
+  "app \<in> verts G_AB" 
   using app_in Append_One.append_verts_in app_two by metis
 
 context Append_One_Honest_Dishonest 
@@ -444,10 +461,10 @@ interpretation A2: Append_One G_A G_AB dis  using local.app_two by auto
 
 
 lemma  app2_head:
-"head G_AB = head G" using append_head A2.append_head by simp
+  "head G_AB = head G" using append_head A2.append_head by simp
 
 lemma  app2_tail:
-"tail G_AB = tail G" using append_tail A2.append_tail by simp
+  "tail G_AB = tail G" using append_tail A2.append_tail by simp
 
 lemma app_in_future2: 
   assumes "a \<in> verts G"  
@@ -483,9 +500,9 @@ lemma  append_induce_subgraph2:
 lemma  append_induced_subgraph2: 
   "induced_subgraph G G_AB"
   using wf_digraph.induced_induce A2.bD_A subs append_induce_subgraph2 append_subverts_leq
-  A2.append_subverts_leq subset_trans
+    A2.append_subverts_leq subset_trans
   by metis
-  
+
 
 
 lemma reduce_append2:
@@ -496,15 +513,15 @@ proof -
     using reaches_all_in_G by auto
   moreover have "{b \<in> verts G. app \<rightarrow>\<^sup>+\<^bsub>G_AB\<^esub> b} = {b \<in> verts G_AB. app \<rightarrow>\<^sup>+\<^bsub>G_AB\<^esub> b}"
     unfolding A2.append_verts append_verts using append_is_tip app_dis_not_reached
-    app_dis_only_tips
-    A2.append_not_reached_all A2.reachable1_preserve by fastforce 
+      app_dis_only_tips
+      A2.append_not_reached_all A2.reachable1_preserve by fastforce 
   ultimately have "{b \<in> verts G_AB. app \<rightarrow>\<^sup>+\<^bsub>G_AB\<^esub> b} = verts G" by simp 
   then show "G_AB \<restriction> {b \<in> verts G_AB. app \<rightarrow>\<^sup>+\<^bsub>G_AB\<^esub> b} = G" 
     using append_induced_subgraph2 
     unfolding induce_subgraph_def induced_subgraph_def app2_head app2_tail
     by (metis (no_types, lifting) Collect_cong app_notin del_vert_def del_vert_not_in_graph 
         pre_digraph.select_convs(2) verts_del_vert)
-    
+
 qed
 
 end

@@ -12,7 +12,7 @@ fun list_to_rel:: "'a list \<Rightarrow> 'a rel"
   | "list_to_rel (x#xs) = {x} \<times> (set (x#xs)) \<union> list_to_rel xs"
 
 
-lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<longrightarrow> a \<in> set L \<and> b \<in> set L" 
+lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<Longrightarrow> a \<in> set L \<and> b \<in> set L" 
 proof(induct L, auto) qed
 
 text \<open>Show soundness of list-to-rel\<close>
@@ -181,6 +181,46 @@ proof(induct L2 arbitrary: L, simp)
   qed
 qed
 
+lemma list_to_rel_mono3:
+  assumes "(a,b) \<in> list_to_rel (L)"
+  shows  "(a,b) \<in> list_to_rel (c # L)"
+  using assms unfolding list_to_rel.simps by auto
+
+
+lemma list_to_rel_mono4:
+  assumes "(a,b) \<in> list_to_rel (L)"
+  and "set L2 = set L"
+shows  "(a,b) \<in> list_to_rel (a # L2)"
+proof -
+  have "b \<in> set (a # L2)"
+    by (metis assms(1) assms(2) list.set_intros(2) list_to_rel_in)  
+  then show ?thesis by auto
+qed
+
+lemma list_to_rel_cases:
+  assumes "(a,b) \<in> list_to_rel (c # L)"
+  shows "(a,b) \<in> list_to_rel (L) \<or> a = c"
+  using assms unfolding list_to_rel.simps by auto
+
+lemma list_to_rel_elim:
+  assumes "(a,b) \<in> list_to_rel (c # L)"
+  and "a \<noteq> c"
+  shows "(a,b) \<in> list_to_rel (L)"
+  using assms unfolding list_to_rel.simps by auto
+
+lemma list_to_rel_elim2:
+  assumes "(a,b) \<notin> list_to_rel (L)"
+  and "a \<noteq> c"
+  shows "(a,b) \<notin> list_to_rel (c # L)"
+  using assms unfolding list_to_rel.simps by auto
+
+lemma list_to_rel_equiv:
+  assumes "a \<in> set L"
+  and "b \<in> set L"
+obtains "(a,b) \<in>  list_to_rel (L)" | "(b,a) \<in>  list_to_rel (L)"
+  using assms
+proof(induct L, auto) qed
+
 lemma list_to_rel_mono2:
   assumes "(a,b) \<in> list_to_rel (L2)"
   shows "(a,b) \<in> list_to_rel (L @ L2)"
@@ -191,7 +231,6 @@ proof(induct L2 arbitrary: L, simp)
   proof(induct L, auto)
   qed
 qed
-
 
 
 lemma map_snd_map: "\<And>L. (map snd (map (\<lambda>i. (P i , i)) L)) =  L" 

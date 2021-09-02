@@ -58,6 +58,9 @@ lemma (in DAG) unidirectional:
 
 subsubsection \<open>Tips\<close>
 
+lemma (in wf_digraph) tips_alt:
+  "tips G = {v. is_tip G v}"
+  unfolding tips_def is_tip.simps by auto
 
 lemma (in wf_digraph) tips_not_referenced:
   assumes "is_tip G t"

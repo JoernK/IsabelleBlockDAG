@@ -14,6 +14,13 @@ definition One_Appending_Monotone:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) 
   where "One_Appending_Monotone A \<equiv>
          (\<forall>G G_A a b c. Honest_Append_One G G_A a \<longrightarrow> ((b,c) \<in> (A G) \<longrightarrow> (b,c) \<in> (A G_A)))"
 
+definition One_Appending_Monotone2:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<Rightarrow> bool "
+  where "One_Appending_Monotone2 A \<equiv>
+         (\<forall>G G_A a b c. (Append_One G G_A a 
+        \<and> ((b \<in> past_nodes G_A a \<and> c \<in> past_nodes G_A a)
+        \<or> (b \<notin> past_nodes G_A a \<and> c \<notin> past_nodes G_A a)))
+        \<longrightarrow> ((b,c) \<in> (A G) \<longrightarrow> (b,c) \<in> (A G_A)))"
+
 
 definition One_Appending_Robust:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<Rightarrow> bool "
   where "One_Appending_Robust A \<equiv>
