@@ -9,7 +9,7 @@
 \isatagtheory
 \isacommand{theory}\isamarkupfalse%
 \ Properties\isanewline
-\ \ \isakeyword{imports}\ blockDAG\ Extend{\isacharunderscore}{\kern0pt}blockDAG\ Spectre\ Ghostdag\isanewline
+\ \ \isakeyword{imports}\ blockDAG\ Extend{\isacharunderscore}{\kern0pt}blockDAG\ \isanewline
 \isakeyword{begin}%
 \endisatagtheory
 {\isafoldtheory}%
@@ -30,9 +30,18 @@
 \isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
+\ Honest{\isacharunderscore}{\kern0pt}One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Monotone{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool\ {\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}Honest{\isacharunderscore}{\kern0pt}One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Monotone\ A\ {\isasymequiv}\isanewline
+\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharunderscore}{\kern0pt}A\ a\ b\ c{\isachardot}{\kern0pt}\ Honest{\isacharunderscore}{\kern0pt}Append{\isacharunderscore}{\kern0pt}One\ G\ G{\isacharunderscore}{\kern0pt}A\ a\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharunderscore}{\kern0pt}A{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
 \ One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Monotone{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcomma}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharparenright}{\kern0pt}\ pre{\isacharunderscore}{\kern0pt}digraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ rel{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ bool\ {\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\ {\isachardoublequoteopen}One{\isacharunderscore}{\kern0pt}Appending{\isacharunderscore}{\kern0pt}Monotone\ A\ {\isasymequiv}\isanewline
-\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharunderscore}{\kern0pt}A\ a\ b\ c{\isachardot}{\kern0pt}\ Honest{\isacharunderscore}{\kern0pt}Append{\isacharunderscore}{\kern0pt}One\ G\ G{\isacharunderscore}{\kern0pt}A\ a\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharunderscore}{\kern0pt}A{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \ \ \ {\isacharparenleft}{\kern0pt}{\isasymforall}G\ G{\isacharunderscore}{\kern0pt}A\ a\ b\ c{\isachardot}{\kern0pt}\ {\isacharparenleft}{\kern0pt}Append{\isacharunderscore}{\kern0pt}One\ G\ G{\isacharunderscore}{\kern0pt}A\ a\ \isanewline
+\ \ \ \ \ \ \ \ {\isasymand}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}b\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G{\isacharunderscore}{\kern0pt}A\ a\ {\isasymand}\ c\ {\isasymin}\ past{\isacharunderscore}{\kern0pt}nodes\ G{\isacharunderscore}{\kern0pt}A\ a{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \ \ \ \ {\isasymor}\ {\isacharparenleft}{\kern0pt}b\ {\isasymnotin}\ past{\isacharunderscore}{\kern0pt}nodes\ G{\isacharunderscore}{\kern0pt}A\ a\ {\isasymand}\ c\ {\isasymnotin}\ past{\isacharunderscore}{\kern0pt}nodes\ G{\isacharunderscore}{\kern0pt}A\ a{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \ \ \ \ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}{\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharparenright}{\kern0pt}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}c{\isacharparenright}{\kern0pt}\ {\isasymin}\ {\isacharparenleft}{\kern0pt}A\ G{\isacharunderscore}{\kern0pt}A{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
@@ -87,9 +96,15 @@
 %:%38=18%:%
 %:%39=18%:%
 %:%40=19%:%
-%:%42=21%:%
-%:%43=22%:%
 %:%44=23%:%
 %:%45=24%:%
-%:%48=25%:%
-%:%53=26%:%
+%:%46=25%:%
+%:%47=26%:%
+%:%48=26%:%
+%:%49=27%:%
+%:%51=29%:%
+%:%52=30%:%
+%:%53=31%:%
+%:%54=32%:%
+%:%57=33%:%
+%:%62=34%:%

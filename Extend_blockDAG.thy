@@ -17,8 +17,7 @@ locale Append_One = blockDAG +
 
 locale Honest_Append_One = Append_One +
   assumes ref_tips: "\<forall>t \<in> tips G. app \<rightarrow>\<^bsub>G_A\<^esub> t"  
-
-
+  
 locale Append_One_Honest_Dishonest = Honest_Append_One + 
   fixes G_AB :: "('a, 'b) pre_digraph" (structure)
     and dis::'a
@@ -268,7 +267,6 @@ proof(standard,simp,standard)
 qed
 
 
-
 lemma blockDAG_induct_append[consumes 1, case_names base step]:
   assumes fund: "blockDAG G"
   assumes cases: "\<And>V::('a,'b) pre_digraph. blockDAG V \<Longrightarrow> P (blockDAG.gen_graph V)"
@@ -299,6 +297,22 @@ next
       using bD_Ha b_in del_v by auto 
   qed  
 qed
+
+lemma (in blockDAG) blockDAG_Append_exists:
+  shows "card (verts G) = 1 \<or> (\<exists>G2 v. Append_One G2 G v)"
+proof(cases rule: blockDAG_cases2)
+  case base
+then show ?thesis using gen_graph_all_one by auto
+next
+  case more
+  then obtain G2 and b where bD_G2: "blockDAG G2" and b_in: "b \<in> verts G"
+      and del_v: "G2 = pre_digraph.del_vert G b " and nre:"(\<forall>c\<in>verts G. (c, b) \<notin> (arcs_ends G)\<^sup>+)"
+      by auto
+    then have "b \<notin> verts G2" unfolding del_v pre_digraph.verts_del_vert by auto
+    then have "Append_One G2 G b" unfolding Append_One_def Append_One_axioms_def 
+      using bD_G2 b_in del_v nre blockDAG_axioms by auto   
+  then show ?thesis by auto
+qed 
 
 
 subsection \<open>Honest-Append-One Lemmas\<close>

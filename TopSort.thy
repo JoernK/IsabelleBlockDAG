@@ -19,6 +19,7 @@ subsubsection \<open>Soundness of the topological sort algorithm\<close>
 lemma top_insert_set: "set (top_insert G L a) = set L \<union> {a}" 
 proof(induct L, simp_all, auto) qed 
 
+
 lemma top_sort_con: "set (top_sort G L) = set L"
 proof(induct L)
   case Nil
@@ -39,6 +40,10 @@ next
   then show ?case using top_insert.simps(2) by auto
 qed
 
+lemma top_insert_not_nil: "top_insert G L a \<noteq> []"
+proof(induct L, auto) qed
+
+
 lemma top_sort_len: "length (top_sort G L) = length L"
 proof(induct L, simp)
   case (Cons a L)
@@ -47,6 +52,24 @@ proof(induct L, simp)
       top_insert_len top_sort.simps(2) Cons
     by (simp add: top_insert_len)  
 qed
+
+
+lemma top_sort_nil: "top_sort G L = [] \<longleftrightarrow> L = []" 
+proof(auto, induct L, auto simp: top_insert_not_nil) qed
+
+
+
+lemma top_sort_distinct_mono:
+  assumes "distinct L"
+  shows  "distinct (top_sort G L)" 
+proof -
+  have cdd: "card (set L) = length L" using assms
+    by (simp add: distinct_card) 
+  then have "card (set (top_sort G L)) = length (top_sort G L)" 
+    unfolding top_sort_len top_sort_con by simp
+  then show ?thesis using card_distinct by auto
+qed
+
 
 lemma top_insert_mono:
   assumes "(y, x) \<in> list_to_rel ls"
@@ -125,7 +148,6 @@ lemma top_insert_elims:
   and "y \<noteq> l"
   shows "(y, x) \<notin> list_to_rel (top_insert G ls l)"
   using assms top_insert_cases by metis
-
 
 lemma top_sort_mono:
   assumes "(y, x) \<in> list_to_rel (top_sort G ls)"
@@ -324,175 +346,97 @@ lemma top_sort_rel2:
   shows "\<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
   using assms top_sort_sorted top_sorted_rel2 top_sort_con by metis
 
-
-lemma top_sort_mono3:
-  assumes "DAG G"
-  assumes "list_to_rel (top_sort G L) \<subseteq> list_to_rel (top_sort G L2)"
-  shows "list_to_rel (top_sort G (s1 # L)) \<subseteq> list_to_rel (top_sort G (s1 # L2))"
-  using assms top_sort_mono2 
-  sorry
-  
-  
-   
-
-lemma insort_add_mono:
-  assumes "DAG G"
-  and "(x,y) \<in> list_to_rel (L)"
-shows "(x,y) \<in> list_to_rel (insort a L)"
-proof-
-  have " (insort a L) \<noteq> []" using insort_not_Nil by auto
-  then show ?thesis 
-    using assms(2)
-proof(induct "(insort a L)" arbitrary: L a rule: list_nonempty_induct)
-  case (single x)
+lemma top_insert_remove:
+  assumes "distinct L"
+  and "a \<notin> set L"
+shows "L = remove1 a (top_insert G L a)"
+  using assms 
+proof(induct L, simp)
+  case (Cons a L)
   then show ?case
-    by (metis Suc_length_conv length_0_conv length_insort
-        list.inject list_to_rel_mono self_append_conv2) 
-next
-  case (cons x2 xs)
-  have lS: "length (insort a L) = length L + 1"
     by auto 
-  have "1 \<le> length xs" using cons(1)
-    using not_less_eq_eq by auto 
-  then have "2 \<le> length (x2 # xs)" by auto
-  then have "2 \<le> length (insort a L)" using cons(3) by auto 
-  then have "1 \<le> length L" using lS by auto
-  then obtain s1 sr where s1_sr_def: "L = s1 # sr"
-    by (metis One_nat_def Suc_le_length_iff) 
-  then consider "a \<le> s1" | "\<not> a \<le> s1" by auto
-  then show ?case proof(cases) 
-  case 1
-    then have iii: "(insort a L) = a # L" unfolding s1_sr_def by auto 
-    show ?thesis using cons(4) unfolding iii by auto
-  next
-    case 2 
-    then have iii: "(insort a L) = s1 # insort a sr" unfolding s1_sr_def
-      by simp 
-    then have "xs = insort a sr" using cons(3) by auto
-    consider (xs1) "x = s1" | (xyr) "(x,y) \<in> list_to_rel ( insort a sr)"
-      using list_to_rel_cases cons iii
-      unfolding s1_sr_def by auto
-    then show ?thesis proof(cases)
-      have "y \<in> set L" 
-        using list_to_rel_in cons(4)
-        by metis 
-      then have y_in: "y \<in> set (insort a L)"  unfolding set_insort_key
-        by auto 
-      case xs1      
-      then show ?thesis using y_in unfolding iii xs1 list_to_rel.simps(2)
-        by auto 
-    next
-      case xyr
-      then have "(x, y) \<in> list_to_rel (s1 # (insort a sr))"
-        by simp 
-      then show ?thesis unfolding iii by simp
-      qed   
-    qed
-  qed
 qed
 
-lemma list_to_rel_top_sort_subset:
-  assumes "DAG G"
-  shows "list_to_rel (top_sort G L) \<subseteq> list_to_rel (top_sort G (insort a L))"
-proof -
-  have "(insort a L) \<noteq> []" using insort_not_Nil 
-    by (metis) 
-  then show ?thesis 
-proof(induction " (insort a L)" arbitrary: L a rule: list_nonempty_induct)
-  case (single x)
-  have "length [x] = length (insort a L)" unfolding single(1) top_sort_len by simp
-  then have "L = []" using set_insort_key by auto
-  then show ?case using single by auto
-next
-  case (cons x2 xs)
-  have lS: "length (insort a L) = length L + 1"
+
+lemma top_insert_remove2:
+  assumes "distinct L"
+  and "a \<notin> set L"
+shows "L = remove1 a (top_insert G L a)"
+  using assms 
+proof(induct L, simp)
+  case (Cons a L)
+  then show ?case
     by auto 
-  have "1 \<le> length xs" using cons(1)
-    using not_less_eq_eq by auto 
-  then have "2 \<le> length (x2 # xs)" by auto
-  then have "2 \<le> length (insort a L)" using cons(3)
-    by (simp add: top_sort_len) 
-  then have "1 \<le> length L" using lS by auto
-  then obtain s1 sr where s1_sr_def: "L = s1 # sr"
-    by (metis One_nat_def Suc_le_length_iff) 
-  then consider "a \<le> s1" | "\<not> a \<le> s1" by auto
+qed
+
+lemma top_sort_remove:
+  assumes "DAG G"
+  and  "distinct L"
+  and "\<forall>y \<in> (set L). (a = y \<or> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> \<not> y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
+shows "top_sort G (remove1 a L) = remove1 a (top_sort G L)"
+  using assms(2,3)
+proof(induct L, simp)
+  case (Cons a2 x)
+  then have dd1: "distinct x" by auto
+  moreover have rea: "\<forall>y\<in>set x. (a = y \<or> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> \<not> y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a" using Cons by auto
+  ultimately have ind: "top_sort G (remove1 a x) = remove1 a (top_sort G x)" using Cons by auto
+  have dd2: "distinct (top_sort G x)" using dd1 top_sort_distinct_mono by auto 
+  consider (aa2) "a = a2" | (naa2)"a \<noteq> a2" by auto
   then show ?case proof(cases)
-    case 1
-    then have iii: "(insort a L) = a # L" unfolding s1_sr_def by auto 
-    show ?thesis using cons unfolding iii using top_sort_mono by auto
+    case aa2
+    then have anin: "a \<notin> (set x)" using Cons(2)
+      by auto 
+    then have anin2: "a \<notin> (set (top_sort G x))" using top_sort_con by auto
+    have rr: "remove1 a2 (a2 # x) = x" by auto 
+    show ?thesis unfolding rr top_sort.simps 
+      using anin2  top_insert_remove dd2 aa2 by auto
   next
-    have lll: "list_to_rel (top_sort G L) = list_to_rel (top_sort G (s1 # sr))"
-      using s1_sr_def by auto
-    case 2 
-    then have bbb: "(insort a L) = s1 # insort a sr" unfolding s1_sr_def
-      by simp 
-    then have "list_to_rel (top_sort G sr) \<subseteq> list_to_rel (top_sort G (insort a sr))"
-      using cons
-      by auto 
-    then show ?thesis unfolding bbb lll using top_sort_mono3 assms
-      by blast 
+    have r2: "\<forall>y\<in>set (top_sort G x).(a = y \<or> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y) \<and> \<not> y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
+      using rea unfolding top_sort_con by auto
+    case naa2
+    then have rr2: "remove1 a (a2 # x) = a2 # remove1 a x" by auto
+    show ?thesis unfolding rr2 top_sort.simps ind 
+      using r2 
+    proof(induct "(top_sort G x)", simp add: naa2 )
+    case (Cons a xa)
+    then show ?case sorry
+  qed 
   qed
- qed
 qed
-
-
-
-lemma top_sort_add_mono:
+  
+lemma top_sort_remove2:
   assumes "DAG G"
-  and "(x,y) \<in> list_to_rel (top_sort G L)"
-shows "(x,y) \<in> list_to_rel (top_sort G (insort a L))"   
-  using assms  list_to_rel_top_sort_subset
-  by auto 
-
-
-lemma top_sort_add_mono2:
-  assumes "DAG G"
-  and "finite S"
-  and "(x,y) \<in> list_to_rel (top_sort G (sorted_list_of_set S))"
-shows "(x,y) \<in> list_to_rel (top_sort G (sorted_list_of_set (insert a S)))"
-proof -
-have  "(sorted_list_of_set (insert a S)) =  insort a (sorted_list_of_set (S - {a}))"
-  by (simp add: assms(2)) 
-  moreover have "distinct (sorted_list_of_set (S - {a}))" by auto
-  moreover have "a \<notin> set  (sorted_list_of_set (S - {a}))"
-    using assms(2) by auto 
-  ultimately show ?thesis using top_sort_add_mono
-    by (metis Diff_empty Diff_insert0 assms(1) assms(3) insert_Diff insert_Diff_single) 
-qed
-
-
-
-lemma top_sort_add_mono3:
-  assumes "DAG G"
-  and "finite S2"
-  and "S \<subseteq> S2"
-  and "(x,y) \<in> list_to_rel (top_sort G (sorted_list_of_set S))"
-shows "(x,y) \<in> list_to_rel (top_sort G (sorted_list_of_set (S2)))" 
-proof -
-  have "finite(S2 - S)"
-    by (simp add: assms(2))
-  then show ?thesis
-    using assms(3,4)
-  proof(induct "S2 - S" arbitrary: S S2 rule: finite_induct)
-    case empty
-    then have "S = S2"
+  and  "distinct L"
+  and "\<forall>y \<in> (set L). \<not> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y \<and> \<not> y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
+shows "top_sort G (remove1 a L) = remove1 a (top_sort G L)"
+  using assms(2,3)
+proof(induct L, simp)
+  case (Cons a2 x)
+  then have dd1: "distinct x" by auto
+  moreover have rea: "\<forall>y\<in>set x. \<not> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y \<and> \<not> y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a" using Cons by auto
+  ultimately have ind: "top_sort G (remove1 a x) = remove1 a (top_sort G x)" using Cons by auto
+  have dd2: "distinct (top_sort G x)" using dd1 top_sort_distinct_mono by auto 
+  consider (aa2) "a = a2" | (naa2)"a \<noteq> a2" by auto
+  then show ?case proof(cases)
+    case aa2
+    then have anin: "a \<notin> (set x)" using Cons(2)
       by auto 
-    then show ?case using empty
-      by auto 
+    then have anin2: "a \<notin> (set (top_sort G x))" using top_sort_con by auto
+    have rr: "remove1 a2 (a2 # x) = x" by auto 
+    show ?thesis unfolding rr top_sort.simps 
+      using anin2  top_insert_remove dd2 aa2 by auto
   next
-    case (insert x2 F)
-    then have fS: "finite S"
-      by (metis emptyE list_to_rel.simps(1) sorted_list_of_set.infinite top_sort.simps(1)) 
-   have "F = S2 - (insert x2 S)"
-      by (metis insert(2,4) Diff_insert Diff_insert_absorb)
-   moreover have "(x, y) \<in> list_to_rel (top_sort G (sorted_list_of_set (insert x2 S)))"
-      using assms(1) top_sort_add_mono2 insert(6) fS
-      by (metis)  
-    moreover have "(insert x2 S) \<subseteq> S2" using insert
-      by (metis Diff_subset insert_subset) 
-    ultimately show ?case
-      by (simp add: insert.hyps(3)) 
+    have r2: "\<forall>y\<in>set (top_sort G x).  \<not> a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y \<and> \<not> y \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
+      using rea unfolding top_sort_con by auto
+    case naa2
+    then have rr2: "remove1 a (a2 # x) = a2 # remove1 a x" by auto
+    show ?thesis unfolding rr2 top_sort.simps ind 
+      using r2 
+    proof(induct "(top_sort G x)", simp add: naa2 )
+    case (Cons a xa)
+    then show ?case sorry
+  qed 
   qed
-qed  
+qed
 
 end

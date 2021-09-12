@@ -463,8 +463,8 @@ proof(induction G a b c rule: vote_Spectre.induct)
   qed
 qed
 
-lemma "One_Appending_Monotone SPECTRE"
-  unfolding One_Appending_Monotone_def 
+lemma "Honest_One_Appending_Monotone SPECTRE"
+  unfolding Honest_One_Appending_Monotone_def 
 proof safe
   fix G G_A::"('a::linorder,'b) pre_digraph" and app b c::'a
   assume "Honest_Append_One G G_A app"

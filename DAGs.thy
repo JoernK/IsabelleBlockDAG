@@ -32,6 +32,9 @@ fun past_nodes_refl :: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a se
 fun anticone:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
   where "anticone G a = {b \<in> verts G. \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b \<or>  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a \<or> a = b)}" 
 
+fun cone:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
+  where "cone G a = {b \<in> verts G. (a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b \<or>  b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a \<or> a = b)}"
+
 fun reduce_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> ('a,'b) pre_digraph"
   where 
     "reduce_past G a = induce_subgraph G (past_nodes G a)"

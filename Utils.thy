@@ -12,7 +12,15 @@ fun list_to_rel:: "'a list \<Rightarrow> 'a rel"
   | "list_to_rel (x#xs) = {x} \<times> (set (x#xs)) \<union> list_to_rel xs"
 
 
+lemma list_to_rel_empty : " list_to_rel L = {} \<Longrightarrow> L = []" 
+proof(induct L, auto) qed
+
 lemma list_to_rel_in : " (a,b)  \<in> (list_to_rel L) \<Longrightarrow> a \<in> set L \<and> b \<in> set L" 
+proof(induct L, auto) qed
+
+
+
+lemma list_to_rel_reflexive : "a \<in> set L \<Longrightarrow> (a,a)  \<in> (list_to_rel L)" 
 proof(induct L, auto) qed
 
 text \<open>Show soundness of list-to-rel\<close>
