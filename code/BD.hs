@@ -1,8 +1,9 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
 module
-  DAGS(Int, Linorder, Nat, Set(..), Pre_digraph_ext(..), anticone, top_sort,
-        blockDAG, orderDAG_Int, spectreOrder_Int, vote_Spectre_Int)
+  BD(Int, Set(..), FV, Linorder, Nat, Pre_digraph_ext(..), BlockDAG, anticone,
+      top_sort, blockDAG, orderDAG_Int, spectreOrder_Int, vote_Spectre_Int,
+      vote_Spectre_typed_FV)
   where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
@@ -11,6 +12,25 @@ import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
   zip, null, takeWhile, dropWhile, all, any, Integer, negate, abs, divMod,
   String, Bool(True, False), Maybe(Nothing, Just));
 import qualified Prelude;
+
+class Countable a where {
+};
+
+class (Countable a) => Finite a where {
+};
+
+class (Finite a) => Enum a where {
+  enum :: [a];
+  enum_all :: (a -> Bool) -> Bool;
+  enum_ex :: (a -> Bool) -> Bool;
+};
+
+equal_fun :: forall a b. (Enum a, Eq b) => (a -> b) -> (a -> b) -> Bool;
+equal_fun f g = enum_all (\ x -> f x == g x);
+
+instance (Enum a, Eq b) => Eq (a -> b) where {
+  a == b = equal_fun a b;
+};
 
 data Num = One | Bit0 Num | Bit1 Num;
 
@@ -114,48 +134,7 @@ class (One a, Zero a) => Zero_neq_one a where {
 instance Zero_neq_one Int where {
 };
 
-class Ord a where {
-  less_eq :: a -> a -> Bool;
-  less :: a -> a -> Bool;
-};
-
-instance Ord Integer where {
-  less_eq = (\ a b -> a <= b);
-  less = (\ a b -> a < b);
-};
-
-class (Ord a) => Preorder a where {
-};
-
-class (Preorder a) => Order a where {
-};
-
-instance Preorder Integer where {
-};
-
-instance Order Integer where {
-};
-
-class (Order a) => Linorder a where {
-};
-
-instance Linorder Integer where {
-};
-
-data Nat = Zero_nat | Suc Nat;
-
 data Set a = Set [a] | Coset [a];
-
-data Pre_digraph_ext a b c =
-  Pre_digraph_ext (Set a) (Set b) (b -> a) (b -> a) c;
-
-bex :: forall a. Set a -> (a -> Bool) -> Bool;
-bex (Set xs) p = any p xs;
-
-minus_nat :: Nat -> Nat -> Nat;
-minus_nat (Suc m) (Suc n) = minus_nat m n;
-minus_nat Zero_nat n = Zero_nat;
-minus_nat m Zero_nat = m;
 
 membera :: forall a. (Eq a) => [a] -> a -> Bool;
 membera [] y = False;
@@ -164,6 +143,23 @@ membera (x : xs) y = x == y || membera xs y;
 member :: forall a. (Eq a) => a -> Set a -> Bool;
 member x (Coset xs) = not (membera xs x);
 member x (Set xs) = membera xs x;
+
+less_eq_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
+less_eq_set (Coset []) (Set []) = False;
+less_eq_set a (Coset ys) = all (\ y -> not (member y a)) ys;
+less_eq_set (Set xs) b = all (\ x -> member x b) xs;
+
+equal_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
+equal_set a b = less_eq_set a b && less_eq_set b a;
+
+instance (Eq a) => Eq (Set a) where {
+  a == b = equal_set a b;
+};
+
+bot_set :: forall a. Set a;
+bot_set = Set [];
+
+data FV = V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | V10;
 
 removeAll :: forall a. (Eq a) => a -> [a] -> [a];
 removeAll x [] = [];
@@ -175,6 +171,281 @@ inserta x xs = (if membera xs x then xs else x : xs);
 insert :: forall a. (Eq a) => a -> Set a -> Set a;
 insert x (Coset xs) = Coset (removeAll x xs);
 insert x (Set xs) = Set (inserta x xs);
+
+ball :: forall a. Set a -> (a -> Bool) -> Bool;
+ball (Set xs) p = all p xs;
+
+equal_FV :: FV -> FV -> Bool;
+equal_FV V9 V10 = False;
+equal_FV V10 V9 = False;
+equal_FV V8 V10 = False;
+equal_FV V10 V8 = False;
+equal_FV V8 V9 = False;
+equal_FV V9 V8 = False;
+equal_FV V7 V10 = False;
+equal_FV V10 V7 = False;
+equal_FV V7 V9 = False;
+equal_FV V9 V7 = False;
+equal_FV V7 V8 = False;
+equal_FV V8 V7 = False;
+equal_FV V6 V10 = False;
+equal_FV V10 V6 = False;
+equal_FV V6 V9 = False;
+equal_FV V9 V6 = False;
+equal_FV V6 V8 = False;
+equal_FV V8 V6 = False;
+equal_FV V6 V7 = False;
+equal_FV V7 V6 = False;
+equal_FV V5 V10 = False;
+equal_FV V10 V5 = False;
+equal_FV V5 V9 = False;
+equal_FV V9 V5 = False;
+equal_FV V5 V8 = False;
+equal_FV V8 V5 = False;
+equal_FV V5 V7 = False;
+equal_FV V7 V5 = False;
+equal_FV V5 V6 = False;
+equal_FV V6 V5 = False;
+equal_FV V4 V10 = False;
+equal_FV V10 V4 = False;
+equal_FV V4 V9 = False;
+equal_FV V9 V4 = False;
+equal_FV V4 V8 = False;
+equal_FV V8 V4 = False;
+equal_FV V4 V7 = False;
+equal_FV V7 V4 = False;
+equal_FV V4 V6 = False;
+equal_FV V6 V4 = False;
+equal_FV V4 V5 = False;
+equal_FV V5 V4 = False;
+equal_FV V3 V10 = False;
+equal_FV V10 V3 = False;
+equal_FV V3 V9 = False;
+equal_FV V9 V3 = False;
+equal_FV V3 V8 = False;
+equal_FV V8 V3 = False;
+equal_FV V3 V7 = False;
+equal_FV V7 V3 = False;
+equal_FV V3 V6 = False;
+equal_FV V6 V3 = False;
+equal_FV V3 V5 = False;
+equal_FV V5 V3 = False;
+equal_FV V3 V4 = False;
+equal_FV V4 V3 = False;
+equal_FV V2 V10 = False;
+equal_FV V10 V2 = False;
+equal_FV V2 V9 = False;
+equal_FV V9 V2 = False;
+equal_FV V2 V8 = False;
+equal_FV V8 V2 = False;
+equal_FV V2 V7 = False;
+equal_FV V7 V2 = False;
+equal_FV V2 V6 = False;
+equal_FV V6 V2 = False;
+equal_FV V2 V5 = False;
+equal_FV V5 V2 = False;
+equal_FV V2 V4 = False;
+equal_FV V4 V2 = False;
+equal_FV V2 V3 = False;
+equal_FV V3 V2 = False;
+equal_FV V1 V10 = False;
+equal_FV V10 V1 = False;
+equal_FV V1 V9 = False;
+equal_FV V9 V1 = False;
+equal_FV V1 V8 = False;
+equal_FV V8 V1 = False;
+equal_FV V1 V7 = False;
+equal_FV V7 V1 = False;
+equal_FV V1 V6 = False;
+equal_FV V6 V1 = False;
+equal_FV V1 V5 = False;
+equal_FV V5 V1 = False;
+equal_FV V1 V4 = False;
+equal_FV V4 V1 = False;
+equal_FV V1 V3 = False;
+equal_FV V3 V1 = False;
+equal_FV V1 V2 = False;
+equal_FV V2 V1 = False;
+equal_FV V10 V10 = True;
+equal_FV V9 V9 = True;
+equal_FV V8 V8 = True;
+equal_FV V7 V7 = True;
+equal_FV V6 V6 = True;
+equal_FV V5 V5 = True;
+equal_FV V4 V4 = True;
+equal_FV V3 V3 = True;
+equal_FV V2 V2 = True;
+equal_FV V1 V1 = True;
+
+instance Eq FV where {
+  a == b = equal_FV a b;
+};
+
+enum_all_FV :: (FV -> Bool) -> Bool;
+enum_all_FV p =
+  ball (insert V1
+         (insert V2
+           (insert V3
+             (insert V4
+               (insert V5
+                 (insert V6
+                   (insert V7
+                     (insert V8 (insert V9 (insert V10 bot_set))))))))))
+    p;
+
+bex :: forall a. Set a -> (a -> Bool) -> Bool;
+bex (Set xs) p = any p xs;
+
+enum_ex_FV :: (FV -> Bool) -> Bool;
+enum_ex_FV p =
+  bex (insert V1
+        (insert V2
+          (insert V3
+            (insert V4
+              (insert V5
+                (insert V6
+                  (insert V7 (insert V8 (insert V9 (insert V10 bot_set))))))))))
+    p;
+
+enum_FV :: [FV];
+enum_FV = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10];
+
+instance Countable FV where {
+};
+
+instance Finite FV where {
+};
+
+instance Enum FV where {
+  enum = enum_FV;
+  enum_all = enum_all_FV;
+  enum_ex = enum_ex_FV;
+};
+
+fV_Suc :: FV -> Set FV;
+fV_Suc V1 =
+  insert V1
+    (insert V2
+      (insert V3
+        (insert V4
+          (insert V5
+            (insert V6
+              (insert V7 (insert V8 (insert V9 (insert V10 bot_set)))))))));
+fV_Suc V2 =
+  insert V2
+    (insert V3
+      (insert V4
+        (insert V5
+          (insert V6
+            (insert V7 (insert V8 (insert V9 (insert V10 bot_set))))))));
+fV_Suc V3 =
+  insert V3
+    (insert V4
+      (insert V5
+        (insert V6 (insert V7 (insert V8 (insert V9 (insert V10 bot_set)))))));
+fV_Suc V4 =
+  insert V4
+    (insert V5
+      (insert V6 (insert V7 (insert V8 (insert V9 (insert V10 bot_set))))));
+fV_Suc V5 =
+  insert V5
+    (insert V6 (insert V7 (insert V8 (insert V9 (insert V10 bot_set)))));
+fV_Suc V6 = insert V6 (insert V7 (insert V8 (insert V9 (insert V10 bot_set))));
+fV_Suc V7 = insert V7 (insert V8 (insert V9 (insert V10 bot_set)));
+fV_Suc V8 = insert V8 (insert V9 (insert V10 bot_set));
+fV_Suc V9 = insert V9 (insert V10 bot_set);
+fV_Suc V10 = insert V10 bot_set;
+
+less_eq_FV :: FV -> FV -> Bool;
+less_eq_FV a b = member b (fV_Suc a);
+
+less_eq_FVa :: FV -> FV -> Bool;
+less_eq_FVa = less_eq_FV;
+
+class Ord a where {
+  less_eq :: a -> a -> Bool;
+  less :: a -> a -> Bool;
+};
+
+less_FV :: FV -> FV -> Bool;
+less_FV a b = not (equal_FV a b) && less_eq_FV a b;
+
+less_FVa :: FV -> FV -> Bool;
+less_FVa = less_FV;
+
+instance Ord FV where {
+  less_eq = less_eq_FVa;
+  less = less_FVa;
+};
+
+class (Ord a) => Preorder a where {
+};
+
+class (Preorder a) => Order a where {
+};
+
+instance Preorder FV where {
+};
+
+instance Order FV where {
+};
+
+class (Order a) => Linorder a where {
+};
+
+instance Linorder FV where {
+};
+
+enum_all_prod :: forall a b. (Enum a, Enum b) => ((a, b) -> Bool) -> Bool;
+enum_all_prod p = enum_all (\ x -> enum_all (\ y -> p (x, y)));
+
+enum_ex_prod :: forall a b. (Enum a, Enum b) => ((a, b) -> Bool) -> Bool;
+enum_ex_prod p = enum_ex (\ x -> enum_ex (\ y -> p (x, y)));
+
+product :: forall a b. [a] -> [b] -> [(a, b)];
+product [] uu = [];
+product (x : xs) ys = map (\ a -> (x, a)) ys ++ product xs ys;
+
+enum_prod :: forall a b. (Enum a, Enum b) => [(a, b)];
+enum_prod = product enum enum;
+
+instance (Countable a, Countable b) => Countable (a, b) where {
+};
+
+instance (Finite a, Finite b) => Finite (a, b) where {
+};
+
+instance (Enum a, Enum b) => Enum (a, b) where {
+  enum = enum_prod;
+  enum_all = enum_all_prod;
+  enum_ex = enum_ex_prod;
+};
+
+instance Ord Integer where {
+  less_eq = (\ a b -> a <= b);
+  less = (\ a b -> a < b);
+};
+
+instance Preorder Integer where {
+};
+
+instance Order Integer where {
+};
+
+instance Linorder Integer where {
+};
+
+data Nat = Zero_nat | Suc Nat;
+
+data Pre_digraph_ext a b c =
+  Pre_digraph_ext (Set a) (Set b) (b -> a) (b -> a) c;
+
+newtype BlockDAG a = Abs_BlockDAG (Pre_digraph_ext a (a, a) ());
+
+minus_nat :: Nat -> Nat -> Nat;
+minus_nat (Suc m) (Suc n) = minus_nat m n;
+minus_nat Zero_nat n = Zero_nat;
+minus_nat m Zero_nat = m;
 
 fold :: forall a b. (a -> b -> b) -> [a] -> b -> b;
 fold f (x : xs) s = fold f xs (f x s);
@@ -238,9 +509,6 @@ image f (Set xs) = Set (map f xs);
 
 arcs_ends :: forall a b. Pre_digraph_ext a b () -> Set (a, a);
 arcs_ends g = image (arc_to_ends g) (arcs g);
-
-ball :: forall a. Set a -> (a -> Bool) -> Bool;
-ball (Set xs) p = all p xs;
 
 wf_digraph :: forall a b. (Eq a) => Pre_digraph_ext a b () -> Bool;
 wf_digraph g =
@@ -318,11 +586,6 @@ anticone g a =
       not (member (a, b) (trancl (arcs_ends g)) ||
             (member (b, a) (trancl (arcs_ends g)) || a == b)))
     (verts g);
-
-less_eq_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
-less_eq_set (Coset []) (Set []) = False;
-less_eq_set a (Coset ys) = all (\ y -> not (member y a)) ys;
-less_eq_set (Set xs) b = all (\ x -> member x b) xs;
 
 inf_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
 inf_set a (Coset xs) = fold remove xs a;
@@ -465,9 +728,6 @@ sort_key f xs =
 
 sorted_list_of_set :: forall a. (Eq a, Linorder a) => Set a -> [a];
 sorted_list_of_set (Set xs) = sort_key (\ x -> x) (remdups xs);
-
-bot_set :: forall a. Set a;
-bot_set = Set [];
 
 add_set_list_tuple ::
   forall a. (Eq a, Linorder a) => ((Set a, [a]), a) -> (Set a, [a]);
@@ -752,5 +1012,94 @@ vote_Spectre_Int ::
   Pre_digraph_ext Integer (Integer, Integer) () ->
     Integer -> Integer -> Integer -> Integer;
 vote_Spectre_Int v a b c = integer_of_int (vote_Spectre v a b c);
+
+simp_blockDAG_axioms :: forall a. (Eq a) => Pre_digraph_ext a (a, a) () -> Bool;
+simp_blockDAG_axioms g = blockDAG g;
+
+simp_pre_digraph ::
+  forall a. (Enum a, Eq a) => Pre_digraph_ext a (a, a) () -> Bool;
+simp_pre_digraph g = tail g == fst && head g == snd;
+
+simp_blockDAG ::
+  forall a. (Enum a, Eq a) => Pre_digraph_ext a (a, a) () -> Bool;
+simp_blockDAG g = simp_pre_digraph g && simp_blockDAG_axioms g;
+
+empty_graph :: forall a. Pre_digraph_ext a (a, a) ();
+empty_graph = Pre_digraph_ext bot_set bot_set fst snd ();
+
+balance_BD ::
+  forall a.
+    (Enum a,
+      Eq a) => Pre_digraph_ext a (a, a) () -> Pre_digraph_ext a (a, a) ();
+balance_BD g = (if simp_blockDAG g then g else empty_graph);
+
+pre_digraph_of_BlockDAG :: forall a. BlockDAG a -> Pre_digraph_ext a (a, a) ();
+pre_digraph_of_BlockDAG (Abs_BlockDAG x) = x;
+
+past_nodesa :: forall a. (Eq a) => BlockDAG a -> a -> Set a;
+past_nodesa x = past_nodes (pre_digraph_of_BlockDAG x);
+
+reduce_past_empty ::
+  forall a.
+    (Enum a,
+      Eq a) => Pre_digraph_ext a (a, a) () -> a -> Pre_digraph_ext a (a, a) ();
+reduce_past_empty g a = balance_BD (reduce_past g a);
+
+reduce_pasta :: forall a. (Enum a, Eq a) => BlockDAG a -> a -> BlockDAG a;
+reduce_pasta xb xc =
+  Abs_BlockDAG (reduce_past_empty (pre_digraph_of_BlockDAG xb) xc);
+
+empty_graph_typed :: forall a. BlockDAG a;
+empty_graph_typed = Abs_BlockDAG empty_graph;
+
+equal_BlockDAG :: forall a. (Eq a) => BlockDAG a -> BlockDAG a -> Bool;
+equal_BlockDAG b1 b2 =
+  verts (pre_digraph_of_BlockDAG b1) == verts (pre_digraph_of_BlockDAG b2) &&
+    equal_set (arcs (pre_digraph_of_BlockDAG b1))
+      (arcs (pre_digraph_of_BlockDAG b2));
+
+vote_Spectre_typed ::
+  forall a. (Enum a, Eq a, Linorder a) => BlockDAG a -> a -> a -> a -> Int;
+vote_Spectre_typed g a b c =
+  (if equal_BlockDAG g empty_graph_typed ||
+        (not (member a (verts (pre_digraph_of_BlockDAG g))) ||
+          (not (member b (verts (pre_digraph_of_BlockDAG g))) ||
+            not (member c (verts (pre_digraph_of_BlockDAG g)))))
+    then Zero_int
+    else (if b == c then one_int
+           else (if (member (a, b)
+                       (trancl (arcs_ends (pre_digraph_of_BlockDAG g))) ||
+                      a == b) &&
+                      not (member (a, c)
+                            (trancl (arcs_ends (pre_digraph_of_BlockDAG g))))
+                  then one_int
+                  else (if (member (a, c)
+                              (trancl
+                                (arcs_ends (pre_digraph_of_BlockDAG g))) ||
+                             a == c) &&
+                             not (member (a, b)
+                                   (trancl
+                                     (arcs_ends (pre_digraph_of_BlockDAG g))))
+                         then uminus_int one_int
+                         else (if member (a, b)
+                                    (trancl
+                                      (arcs_ends
+(pre_digraph_of_BlockDAG g))) &&
+                                    member (a, c)
+                                      (trancl
+(arcs_ends (pre_digraph_of_BlockDAG g)))
+                                then tie_break_int b c
+                                       (signum
+ (sum_list
+   (map (\ i -> vote_Spectre_typed (reduce_pasta g a) i b c)
+     (sorted_list_of_set (past_nodesa g a)))))
+                                else signum
+                                       (sum_list
+ (map (\ i -> vote_Spectre_typed g i b c)
+   (sorted_list_of_set (future_nodes (pre_digraph_of_BlockDAG g) a)))))))));
+
+vote_Spectre_typed_FV :: BlockDAG FV -> FV -> FV -> FV -> Integer;
+vote_Spectre_typed_FV =
+  (\ g a b c -> integer_of_int (vote_Spectre_typed g a b c));
 
 }

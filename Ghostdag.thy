@@ -260,11 +260,12 @@ lemma chosen_max_tip:
        (sorted_list_of_set (tips G))))" 
   shows  "x \<in> set (sorted_list_of_set (tips G))" and " x \<in> tips G"
 proof - 
+  interpret bD: blockDAG using assms by auto
   obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
    (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
   have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-      digraph.tips_finite subs assms(1)
-      list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
+      bD.tips_finite 
+      list.map_disc_iff sorted_list_of_set_eq_Nil_iff bD.tips_not_empty 
     by (metis (mono_tags, lifting))  
   then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
     by auto 
@@ -284,7 +285,7 @@ proof -
     using mm2 pp_in  by auto
   then show "x \<in> set (sorted_list_of_set (tips G))" using pp_in assms(2) kk by blast 
   then show "x \<in> tips G"
-    using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
+    using bD.tips_finite sorted_list_of_set(1) kk assms pp_in by auto
 qed
 
 
@@ -306,11 +307,12 @@ lemma chosen_map_simps:
   blockDAG (reduce_past G (snd (choose_max_blue_set x)))"
     and "OrderDAG (reduce_past G (snd (choose_max_blue_set x))) k = fst (choose_max_blue_set x)"
 proof - 
+  interpret bD: blockDAG using assms(1) by auto
   obtain pp where pp_in: "pp =  (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
    (sorted_list_of_set (tips G)))" using blockDAG.tips_exist by auto
   have mm: "choose_max_blue_set pp \<in> set pp" using pp_in choose_max_blue_avoid_empty
-      digraph.tips_finite subs assms(1)
-      list.map_disc_iff sorted_list_of_set_eq_Nil_iff blockDAG.tips_not_empty 
+      bD.tips_finite
+      list.map_disc_iff sorted_list_of_set_eq_Nil_iff bD.tips_not_empty 
     by (metis (mono_tags, lifting))  
   then have kk: "snd (choose_max_blue_set pp) \<in> set (map  snd pp)"
     by auto 
@@ -319,7 +321,7 @@ proof -
   then show "snd (choose_max_blue_set x) \<in> set (sorted_list_of_set (tips G))" 
     using pp_in assms(2) kk by blast 
   then show tip: "snd (choose_max_blue_set x) \<in> tips G"
-    using digraph.tips_finite sorted_list_of_set(1) kk subs assms pp_in by auto
+    using bD.tips_finite sorted_list_of_set(1) kk pp_in by auto
   show "set (map snd x) = set (sorted_list_of_set (tips G))"
     using map_snd_map assms(2) 
     by simp
@@ -329,7 +331,7 @@ proof -
     by (metis (no_types) assms(2) chosen_map_simps1 mm pp_in) 
   assume "\<not> blockDAG.is_genesis_node G (snd (choose_max_blue_set x))"
   then show " blockDAG (reduce_past G (snd (choose_max_blue_set x)))"
-    using tip blockDAG.reduce_past_dagbased assms(1) digraph.tips_in_verts subs subsetD
+    using tip bD.reduce_past_dagbased bD.tips_in_verts subsetD
     by metis    
 qed
 
@@ -388,7 +390,7 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
         have "x \<in> set (snd (fold (app_if_blue_else_add_end G k)
                  (top_sort G (sorted_list_of_set (anticone G (snd (choose_max_blue_set pp)))))
                    ttt))" 
-          using pp_in sorted_list_of_set(1) anti bD subs
+          using pp_in sorted_list_of_set(1) anti bD subs(1)
             DAG.anticon_finite fold_app_mono2 surj_pair top_sort_con  by metis 
         then show "x \<in> set (snd (OrderDAG G k))" using OrderDAG.simps pp_in bD cDm ttt_in 1
           by (metis (no_types, lifting) map_eq_conv) 
@@ -399,7 +401,8 @@ proof(induct G k  arbitrary: x rule: OrderDAG.induct)
         have cd1: "card (verts G) > 1" using cDm bD
           using blockDAG.blockDAG_size_cases by blast 
         have "(snd (choose_max_blue_set pp)) \<in> set (sorted_list_of_set (tips G))" using tt2
-            digraph.tips_finite bD subs sorted_list_of_set(1) by auto
+            digraph.tips_finite bD subs sorted_list_of_set(1)
+          by blast 
         moreover 
         have "blockDAG (reduce_past G (snd (choose_max_blue_set pp)))" using 
             blockDAG.reduce_past_dagbased bD tt2  blockDAG.tips_unequal_gen 
@@ -467,7 +470,7 @@ proof(induction G k arbitrary: x rule: OrderDAG.induct)
       then show "x \<in> verts G" proof(cases)
         case ac
         then show ?thesis using top_sort_con DAG.anticone_in_verts val 
-            sorted_list_of_set(1) subs
+            sorted_list_of_set(1) subs(1)
           by (metis DAG.anticon_finite subsetD) 
       next
         case co
@@ -538,7 +541,7 @@ proof(induct G k rule: OrderDAG.induct)
       then have "length (snd (add_set_list_tuple ma)) = 1 + card (verts (reduce_past G (snd ma)))"
         by (metis add_set_list_tuple_length plus_1_eq_Suc prod.collapse)
       then show ?thesis unfolding backw
-        using subs DAG.verts_size_comp ttt
+        using subs(1) DAG.verts_size_comp ttt
           add.assoc add.commute bD fold_app_length length_sorted_list_of_set top_sort_len
         by (metis (full_types))   
     qed

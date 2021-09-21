@@ -10,7 +10,7 @@ section  \<open>blockDAGs\<close>
 
 locale blockDAG = DAG  +
   assumes genesis:  "\<exists>p \<in> verts G. \<forall>r. r \<in> verts G  \<longrightarrow> (r \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p \<or> r = p)"       
-    and only_new: "\<forall>e. (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v)"
+    and only_new: "\<forall>e u v. arc e (u,v) \<longrightarrow> \<not> (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v)"
 begin 
 
 lemma bD: "blockDAG G" using blockDAG_axioms by simp
@@ -20,7 +20,7 @@ end
 subsection  \<open>Functions and Definitions\<close>
 
 fun (in blockDAG) is_genesis_node :: "'a \<Rightarrow> bool" where
-  "is_genesis_node v = ((v \<in> verts G) \<and> (ALL x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
+  "is_genesis_node v = ((v \<in> verts G) \<and> (\<forall>x. (x \<in> verts G) \<longrightarrow>  x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> v))"
 
 definition (in blockDAG) genesis_node:: "'a"
   where "genesis_node = (THE x. is_genesis_node x)"
@@ -29,8 +29,13 @@ definition (in blockDAG) genesis_node:: "'a"
 subsection \<open>Lemmas\<close>
 lemma subs:
   assumes "blockDAG G"
-  shows "DAG G \<and> digraph G \<and> fin_digraph G \<and> wf_digraph G"
-  using assms blockDAG_def DAG_def digraph_def fin_digraph_def by blast
+  shows "DAG G" and  "digraph G" and "fin_digraph G" and  "wf_digraph G"
+  using assms blockDAG_def DAG_def digraph_def fin_digraph_def by auto
+
+lemma only_new_alt: 
+"(\<forall>e u v. arc e (u,v) \<longrightarrow> \<not> (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v)) 
+\<longleftrightarrow> (\<forall>e u v. (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v))" 
+proof(standard, auto) qed
 
 subsubsection \<open>Genesis\<close>
 
@@ -473,7 +478,7 @@ next
       then have "\<not> u \<rightarrow>\<^sup>+\<^bsub>del_arc e\<^esub> v"
         using only_new by auto        
       then show "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past G a) e\<^esub> v \<Longrightarrow> False"
-        using DAG.past_nodes_verts reduce_past.simps blockDAG_axioms subs
+        using DAG.past_nodes_verts reduce_past.simps blockDAG_axioms subs(1)
           del_arc_subgraph digraph.digraph_subgraph digraph_axioms 
           subgraph_induce_subgraphI
         by (metis arcs_ends_mono trancl_mono)
@@ -620,13 +625,9 @@ next
     by (meson arcs_ends_mono induced_subgraph_altdef trancl_mono) 
 next
   show "blockDAG_axioms (reduce_past_refl G a)"
-    unfolding blockDAG_axioms
-  proof
-    fix u v 
-    show "\<forall>e. u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v
-         \<longrightarrow> \<not> wf_digraph.arc (reduce_past_refl G a) e (u, v)"
-    proof safe
-      fix e 
+    unfolding blockDAG_axioms_def only_new_alt
+  proof safe
+    fix e u v 
       assume a: " wf_digraph.arc (reduce_past_refl G a) e (u, v)"
         and b: "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v"
       have edge: "wf_digraph.arc G e (u, v)"
@@ -648,7 +649,6 @@ next
         by metis
       then show False
         using edge only_new by simp
-    qed
   next
     obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
     have pe: "p \<in> verts (reduce_past_refl G a)"

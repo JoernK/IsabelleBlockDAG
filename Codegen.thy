@@ -83,6 +83,16 @@ notepad begin
   value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"
 end
 
+notepad begin
+  let ?G = "\<lparr>verts = {1::int,2,3,4,5}, arcs = {(4,1),(3,4),(5,1),
+  (2,5)}, tail = fst, head = snd\<rparr>"
+  let ?a = "4"
+  let ?b = "5"
+  let ?c = "2"
+  value "blockDAG ?G"
+  value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"
+end
+
 
 subsection \<open>Extend Graph\<close>
 

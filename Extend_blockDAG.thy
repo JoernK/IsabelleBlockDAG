@@ -15,14 +15,35 @@ locale Append_One = blockDAG +
     and GG_A : "G = pre_digraph.del_vert G_A app"
     and new_node: "\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> app"
 
+
+locale Append = blockDAG +
+  fixes G_A::"('a,'b) pre_digraph" (structure)
+    and A::"'a set"
+  assumes bD_A: "blockDAG G_A"
+    and A_union: "verts G_A = verts G \<union> A"
+    and A_inter: "A \<inter> verts G = {}"
+    and GG_A : "G = G_A \<restriction> (verts G_A - A)"
+    and new_nodes: "\<forall>a \<in> A. \<forall>b \<in> verts G. \<not> b \<rightarrow>\<^bsub>G_A\<^esub> a"
+
 locale Honest_Append_One = Append_One +
   assumes ref_tips: "\<forall>t \<in> tips G. app \<rightarrow>\<^bsub>G_A\<^esub> t"  
-  
+
+
+locale Honest_Append = Append +
+  assumes ref_tips: "\<forall>a \<in>  A. \<forall>t \<in> tips G. a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> t"  
+
 locale Append_One_Honest_Dishonest = Honest_Append_One + 
   fixes G_AB :: "('a, 'b) pre_digraph" (structure)
     and dis::'a
   assumes app_two:"Append_One G_A G_AB dis"
     and dis_n_app: "\<not> dis \<rightarrow>\<^bsub>G_AB\<^esub> app"
+
+
+locale Append_Honest_Dishonest = Honest_Append + 
+  fixes G_AB :: "('a, 'b) pre_digraph" (structure)
+    and B::"'a set"
+  assumes app_two:"Append G_A G_AB B"
+    and "card B \<le> card A"
 
 subsection \<open>Append-One Lemmas\<close>
 
@@ -31,10 +52,9 @@ lemma (in Append_One) new_node_alt:
 proof(auto)
   fix b
   assume a2: "b \<rightarrow>\<^bsub>G_A\<^esub> app"
-  then have "b \<in> verts G_A" using wf_digraph.adj_in_verts(1) bD_A subs by metis
+  then have "b \<in> verts G_A" using wf_digraph.adj_in_verts(1) bD_A subs(4) by metis
   then show "False" using new_node a2 by auto
 qed
-
 
 lemma (in Append_One) append_subverts_leq:            
   "verts G \<subseteq> verts G_A"
@@ -77,16 +97,16 @@ proof
       genesis_in_verts new_node psubsetD tranclE new_node_alt
     by (metis (mono_tags, lifting))
   then obtain walk where walk_in: " pre_digraph.awalk G_A app walk gen \<and> walk \<noteq> []" 
-    using wf_digraph.reachable1_awalk bD_A subs
+    using wf_digraph.reachable1_awalk bD_A subs(4)
     by metis 
   then obtain e where "\<exists>es. walk = e # es"
     by (metis list.exhaust) 
   then have e_in: "e \<in> arcs G_A \<and> tail G_A e = app"
     using wf_digraph.awalk_simps(2)
-      bD_A subs walk_in
+      bD_A subs(4) walk_in
     by metis 
   then have "e \<notin> arcs G" using wf_digraph_def app_notin 
-      blockDAG_axioms subs GG_A pre_digraph.tail_del_vert
+      blockDAG_axioms subs(4) GG_A pre_digraph.tail_del_vert
     by metis 
   then show "arcs G \<noteq> arcs G_A" using e_in by auto
 qed
@@ -112,7 +132,7 @@ lemma (in Append_One) append_induce_subgraph:
 proof -
   have aaa: "arcs G = {e \<in> arcs G_A. tail G_A e \<in> verts G \<and> head G_A e \<in> verts G}"
     unfolding GG_A pre_digraph.arcs_del_vert pre_digraph.verts_del_vert
-    using append_verts bD_A subs wf_digraph_def
+    using append_verts bD_A subs(4) wf_digraph_def
     by (metis (no_types, lifting) Diff_insert_absorb Un_empty_right
         Un_insert_right app_notin insertE)  
   show  "G_A \<restriction> verts G = G" 
@@ -134,7 +154,7 @@ qed
 
 lemma (in Append_One) append_not_reached:
   "\<forall>b \<in> verts G_A. \<not> b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> app"
-  using tranclE wf_digraph.reachable1_in_verts(2) bD_A subs new_node
+  using tranclE wf_digraph.reachable1_in_verts(2) bD_A subs(4) new_node
   by metis  
 
 
@@ -315,6 +335,21 @@ next
 qed 
 
 
+sublocale Append_One \<subseteq> Append G G_A "{app}" 
+  using Append_One_axioms  
+  unfolding Append_One_def Append_One_axioms_def 
+  Append_def Append_axioms_def
+  using append_induce_subgraph append_verts by auto 
+  
+lemma A1_sub:
+  assumes "Append_One G G_A app"
+  shows "Append G G_A {app}"
+proof -
+  interpret A1: Append_One G G_A app using assms by simp
+  show ?thesis using A1.Append_axioms by simp
+qed
+
+
 subsection \<open>Honest-Append-One Lemmas\<close>
 
 lemma (in Honest_Append_One) reaches_all:
@@ -407,8 +442,235 @@ proof safe
     using as by auto
 qed
 
-subsection \<open>Honest-Dishonest-Append-One Lemmas\<close>
 
+
+sublocale Honest_Append_One \<subseteq> Honest_Append G G_A "{app}" 
+  using Honest_Append_One_axioms Append_axioms
+  unfolding Honest_Append_One_def Honest_Append_One_axioms_def 
+  Honest_Append_def Honest_Append_axioms_def
+  by blast
+
+lemma HA1_sub:
+  assumes "Honest_Append_One G G_A app"
+  shows "Honest_Append G G_A {app}"
+proof -
+  interpret HA1: Honest_Append_One G G_A app using assms by simp
+  show ?thesis using HA1.Honest_Append_axioms by simp
+qed
+
+subsection \<open>Append More\<close>
+
+lemma (in Append) A_finite:
+  "finite A"
+  using fin_digraph.finite_verts bD_A subs(3) A_union
+  by fastforce
+  
+
+lemma (in Append) append_subverts_leq:            
+  "verts G \<subseteq> verts G_A"
+  using A_union by auto
+
+lemma (in Append) append_verts_in: 
+  assumes "a \<in> verts G"
+  shows "a \<in> verts G_A"
+  unfolding A_union
+  by (simp add: assms) 
+
+lemma (in Append) append_verts_diff: 
+  shows "verts G_A - A = verts G"
+  using A_union A_inter by auto
+
+
+lemma (in Append) append_verts_diff': 
+  shows "verts G = verts G_A - A"
+  using append_verts_diff by auto
+
+lemma (in Append) GG_A':
+  shows "G = G_A \<restriction> (verts G)"
+  unfolding append_verts_diff' using GG_A 
+  by simp 
+
+lemma (in Append) append_verts_cases: 
+  assumes "a \<in> verts G_A"
+  obtains (a_in_G) "a \<in> verts G" | (a_eq_app) "a \<in> A"
+  using A_union assms by auto
+
+lemma (in Append) append_verts_elims: 
+  assumes "a \<in> verts G"
+  shows "a \<notin> A"
+  using A_inter assms by auto
+
+lemma (in Append) append_verts_elims': 
+  assumes "a \<in> A"
+  shows "a \<notin> verts G"
+  using A_inter assms by auto
+
+lemma (in Append) append_subarcs_leq: 
+  "arcs G \<subseteq> arcs G_A"
+  using GG_A 
+  by simp 
+
+lemma (in Append) append_arcs_mono:
+  assumes "x \<in> arcs G"
+  shows "x \<in> arcs G_A"
+  using assms append_subarcs_leq
+  by auto
+
+lemma (in Append) append_head: 
+  "head G_A = head G"
+  using GG_A 
+  by simp
+
+lemma (in Append) append_tail: 
+  "tail G_A = tail G"
+  using GG_A 
+  by simp
+
+
+lemma (in Append) append_head': 
+  "head G = head G_A"
+  using GG_A 
+  by simp
+
+lemma (in Append) append_tail': 
+  "tail G = tail G_A"
+  using GG_A 
+  by simp
+
+
+
+lemma (in Append) append_induced_subgraph: 
+  "induced_subgraph G G_A "
+proof -
+  interpret bD2: blockDAG G_A using bD_A by simp
+  show ?thesis 
+  unfolding GG_A 
+  using bD2.induced_induce 
+  by simp
+qed
+
+
+lemma (in Append) append_subgraph: 
+  "subgraph G G_A "
+  using append_induced_subgraph by auto
+
+
+lemma (in Append) append_not_reached:
+  "\<forall>a \<in> A. \<forall>b \<in> verts G. \<not> b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> a"
+  using new_nodes 
+proof(safe, simp)
+  fix a b 
+  assume a_in: "a \<in> A"
+  and b_in: "b \<in> verts G"
+  and ba: "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> a"
+  show False using ba a_in b_in
+  proof(induct  rule: trancl_induct)
+    case (base y)
+    then show ?thesis using new_nodes by auto 
+  next
+    case (step c y)
+    have "c \<in> verts G_A" using step(1) bD_A  subs(4) wf_digraph.reachable1_in_verts(2)
+      by metis
+    then consider "c \<in> A" | "c \<in> verts G" using append_verts_cases by auto
+    then show ?thesis proof(cases)
+      case 1
+      then show ?thesis using step by simp
+      next
+      case 2
+        then show ?thesis using new_nodes step by simp
+      qed
+  qed 
+qed    
+
+lemma (in Append) dominates_preserve:
+  assumes "b \<in> verts G"
+  shows "b \<rightarrow>\<^bsub>G_A\<^esub> c \<longleftrightarrow> b \<rightarrow>\<^bsub>G\<^esub> c"
+proof  
+  assume " b \<rightarrow>\<^bsub>G\<^esub> c"
+  then show "b \<rightarrow>\<^bsub>G_A\<^esub> c"
+    using append_subgraph GG_A dominates_induce_subgraphD
+    by metis    
+next
+  interpret B2: blockDAG G_A using bD_A by simp
+  have b_napp : "b \<in> verts G" using assms(1) append_verts_diff by auto
+  assume bc: "b \<rightarrow>\<^bsub>G_A\<^esub> c" 
+  then have c_na:  "c \<notin> A" using new_nodes b_napp by auto
+  have "c \<in> verts G_A" 
+    using B2.reachable1_in_verts(2) bc by auto
+  then have "c \<in> verts G" using c_na unfolding append_verts_diff' by simp  
+  then show "b \<rightarrow>\<^bsub>G\<^esub> c"  unfolding arcs_ends_def arc_to_ends_def
+    using GG_A bc b_napp append_subarcs_leq
+    unfolding append_verts_diff 
+    using append_head' append_tail' arcs_ends_conv image_cong 
+      in_arcs_imp_in_arcs_ends induce_subgraph_arcs mem_Collect_eq reachableE
+    by (metis (no_types, lifting))    
+qed
+
+
+lemma (in Append) reachable1_preserve:
+  assumes "b \<in> verts G"
+  shows "(b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c) \<longleftrightarrow> b \<rightarrow>\<^sup>+ c"
+proof(standard)
+  assume  "b \<rightarrow>\<^sup>+ c"
+  then show "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c"
+    using trancl_mono append_subgraph arcs_ends_mono
+    by metis
+next 
+  interpret B2: blockDAG "G_A" using bD_A by simp
+  assume c_re: "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c"
+  show "b \<rightarrow>\<^sup>+ c"   
+    using c_re
+  proof(cases  rule: trancl_induct)
+    case (base y)
+    then have "b \<rightarrow>\<^bsub>G\<^esub> y" using dominates_preserve assms(1) by auto
+    then show "b \<rightarrow>\<^sup>+ y" by auto
+  next
+    fix y z    
+    assume b_y: "b \<rightarrow>\<^sup>+ y" 
+    then have y_in: "y \<in> verts G" using reachable1_in_verts(2)
+      by (metis) 
+    assume "y \<rightarrow>\<^bsub>G_A\<^esub> z"
+    then have "y \<rightarrow>\<^bsub>G\<^esub> z" using dominates_preserve y_in by auto
+    then show "b \<rightarrow>\<^sup>+ z" using b_y by auto
+  qed
+qed
+
+lemma (in Append) append_past_nodes:
+  assumes "a \<in> verts G"
+  shows "past_nodes G a = past_nodes G_A a"
+  unfolding past_nodes.simps A_union using 
+    assms reachable1_preserve
+  using append_not_reached by auto
+
+
+context Append
+begin
+interpretation B2: blockDAG G_A using bD_A by simp
+
+lemma (in Append) append_future:
+  assumes "a \<in> verts G"
+  shows "future_nodes G a = future_nodes G_A a - A"
+  unfolding future_nodes.simps A_union
+proof(auto simp: assms reachable1_preserve append_verts_elims) qed
+
+lemma (in Append) append_reduce_some:
+  assumes "a \<in> verts G"
+  shows "reduce_past G_A a = reduce_past G a"
+proof -
+  have rr: "\<And>c. (a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> c) = (a \<rightarrow>\<^sup>+ c)" using reachable1_preserve assms by auto
+  have bb: "{b \<in> verts G_A. a \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> b} =  {b \<in> verts G. a \<rightarrow>\<^sup>+ b} " using assms 
+      reachable1_preserve rr 
+    using append_not_reached
+    using append_verts_diff' by blast 
+  have "G_A \<restriction> {b \<in> verts G. a \<rightarrow>\<^sup>+ b}
+   = (G_A \<restriction> verts G)  \<restriction> {b \<in> verts G. a \<rightarrow>\<^sup>+ b}" 
+    unfolding induce_subgraph_def append_head append_tail 
+  proof(standard, simp, safe) qed
+  then show ?thesis using GG_A unfolding reduce_past.simps past_nodes.simps bb by auto
+qed
+end
+
+subsection \<open>Honest-Dishonest-Append-One Lemmas\<close>
 
 
 lemma (in Append_One_Honest_Dishonest) app_dis_not_reached:
@@ -513,7 +775,7 @@ lemma  append_induce_subgraph2:
 
 lemma  append_induced_subgraph2: 
   "induced_subgraph G G_AB"
-  using wf_digraph.induced_induce A2.bD_A subs append_induce_subgraph2 append_subverts_leq
+  using wf_digraph.induced_induce A2.bD_A subs(4) append_induce_subgraph2 append_subverts_leq
     A2.append_subverts_leq subset_trans
   by metis
 
@@ -537,8 +799,13 @@ proof -
         pre_digraph.select_convs(2) verts_del_vert)
 
 qed
-
 end
 
+sublocale Append_One_Honest_Dishonest \<subseteq> Append_Honest_Dishonest G G_A "{app}" G_AB "{dis}"
+  using Append_One_Honest_Dishonest_axioms Honest_Append_axioms
+  unfolding Append_One_Honest_Dishonest_def Append_One_Honest_Dishonest_axioms_def 
+  Append_Honest_Dishonest_def Append_Honest_Dishonest_axioms_def 
+  by (simp add: A1_sub)
+  
 
 end

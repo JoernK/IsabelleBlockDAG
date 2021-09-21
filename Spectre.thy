@@ -27,67 +27,67 @@ text \<open>Spectre core algorithm, $vote-Spectre V a b c$ returns
      $-1$ if a votes in favour of $c$, $0$ otherwise\<close>
 function vote_Spectre :: "('a::linorder,'b) pre_digraph \<Rightarrow>'a \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> int" 
   where
-    "vote_Spectre V a b c = (
-  if (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V) then 0 else 
+    "vote_Spectre G a b c = (
+  if (\<not> blockDAG G \<or> a \<notin> verts G \<or> b \<notin> verts G \<or> c \<notin> verts G) then 0 else 
   if (b=c)  then 1 else 
-  if (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 1  else
-  if (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)) then -1 else
-  if ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) then 
+  if (((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) then 1  else
+  if (((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b)) then -1 else
+  if ((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) then 
    (tie_break_int b c (signum (sum_list (map (\<lambda>i.
- (vote_Spectre (reduce_past V a) i b c)) (sorted_list_of_set (past_nodes V a))))))
+ (vote_Spectre (reduce_past G a) i b c)) (sorted_list_of_set (past_nodes G a))))))
  else 
    signum (sum_list (map (\<lambda>i.
-   (vote_Spectre V i b c)) (sorted_list_of_set (future_nodes V a)))))"
+   (vote_Spectre G i b c)) (sorted_list_of_set (future_nodes G a)))))"
   by auto
 termination
 proof
-  let ?R = " measures [( \<lambda>(V, a, b, c). (card (verts V))),  ( \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a})]"  
+  let ?R = " measures [( \<lambda>(G, a, b, c). (card (verts G))),  ( \<lambda>(G, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a})]"  
   show "wf ?R"
     by simp 
 next 
-  fix V::"('a::linorder, 'b) pre_digraph" 
+  fix G::"('a::linorder, 'b) pre_digraph" 
   fix x a b c
-  assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
-  then have "a \<in> verts V"  by simp
-  then have "card (verts (reduce_past V a)) < card (verts V)"   
+  assume bD: " \<not> (\<not> blockDAG G \<or> a \<notin> verts G \<or> b \<notin> verts G \<or> c \<notin> verts G)"
+  then have "a \<in> verts G"  by simp
+  then have "card (verts (reduce_past G a)) < card (verts G)"   
     using bD blockDAG.reduce_less
     by metis
-  then show "((reduce_past V a, x, b, c), V, a, b, c)
+  then show "((reduce_past G a, x, b, c), G, a, b, c)
        \<in> measures
-           [\<lambda>(V, a, b, c). card (verts V),  
-            \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]" (* In the recursive step, either the number of
+           [\<lambda>(G, a, b, c). card (verts G),  
+            \<lambda>(G, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a}]" (* In the recursive step, either the number of
              nodes decreases or the number of nodes that reach the voter a*)
     by simp
 next 
-  fix V::"('a::linorder, 'b) pre_digraph" 
+  fix G::"('a::linorder, 'b) pre_digraph" 
   fix x a b c
-  assume bD: " \<not> (\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
-  then have a_in: "a \<in> verts V" using bD by simp
-  assume "x \<in> set (sorted_list_of_set (future_nodes V a))"
-  then have "x \<in> future_nodes V a" using DAG.finite_future
-      set_sorted_list_of_set bD subs
+  assume cc: " \<not> (\<not> blockDAG G \<or> a \<notin> verts G \<or> b \<notin> verts G \<or> c \<notin> verts G)"
+  then have a_in: "a \<in> verts G"  by simp
+  interpret bD: blockDAG G using cc by auto
+  assume "x \<in> set (sorted_list_of_set (future_nodes G a))"
+  then have "x \<in> future_nodes G a" using bD.finite_future
+      set_sorted_list_of_set cc
     by metis
-  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>V\<^esub> a" using future_nodes.simps bD mem_Collect_eq
+  then have rr: "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a" using future_nodes.simps mem_Collect_eq
     by simp  
-  then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x" using bD DAG.unidirectional subs by metis
-  have bD2: "blockDAG V" using bD by simp
-  have "\<forall>x. {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} \<subseteq> verts V" using subs bD2  subsetI
-      wf_digraph.reachable_in_verts(1) mem_Collect_eq
+  then have a_not: "\<not> a \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x" using bD.unidirectional  by metis
+  have "\<forall>x. {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x} \<subseteq> verts G" using subsetI
+      bD.reachable_in_verts(1) mem_Collect_eq
     by metis 
-  then have fin: "\<forall>x. finite {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x}" using subs bD2 fin_digraph.finite_verts 
+  then have fin: "\<forall>x. finite {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x}" using bD.finite_verts 
       finite_subset
     by metis
-  have "x \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a" using rr wf_digraph.reachable1_reachable subs bD2 by metis
-  then have "{e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} \<subseteq> {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}" using rr
-      wf_digraph.reachable_trans Collect_mono subs bD2 by metis
-  then have "{e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} \<subset> {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}" using a_not
-      subs bD2 a_in mem_Collect_eq psubsetI wf_digraph.reachable_refl
+  have "x \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a" using rr bD.reachable1_reachable by metis
+  then have "{e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x} \<subseteq> {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a}" using rr
+      bD.reachable_trans Collect_mono by metis
+  then have "{e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x} \<subset> {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a}" using a_not
+      a_in mem_Collect_eq psubsetI bD.reachable_refl
     by metis 
-  then have "card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> x} < card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}" using fin
+  then have "card {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> x} < card {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a}" using fin
     by (simp add: psubset_card_mono)
-  then show "((V, x, b, c), V, a, b, c)
+  then show "((G, x, b, c), G, a, b, c)
        \<in> measures
-           [\<lambda>(V, a, b, c). card (verts V), \<lambda>(V, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>V\<^esub> a}]"
+           [\<lambda>(G, a, b, c). card (verts G), \<lambda>(G, a, b, c). card {e. e \<rightarrow>\<^sup>*\<^bsub>G\<^esub> a}]"
     by simp
 qed
 
@@ -148,28 +148,28 @@ lemma domain_tie_break:
 
 
 lemma Spectre_casesAlt:
-  fixes V:: "('a::linorder,'b) pre_digraph"
+  fixes G:: "('a::linorder,'b) pre_digraph"
     and a :: "'a::linorder" and  b :: "'a::linorder" and c :: "'a::linorder"
-  obtains (no_bD) "(\<not> blockDAG V \<or> a \<notin> verts V \<or> b \<notin> verts V \<or> c \<notin> verts V)"
-  | (equal) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b = c" 
-  | (one) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and>
-         b \<noteq> c  \<and> (((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))" 
-  | (two) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b \<noteq> c 
-  \<and> \<not>(((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) \<and> 
-  ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b)"
-  | (three) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b \<noteq> c 
-   \<and> \<not>(((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) \<and>  
-   \<not>(((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b))\<and> 
-  ((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))"
-  | (four) "(blockDAG V \<and> a \<in> verts V \<and> b \<in> verts V \<and> c \<in> verts V) \<and> b \<noteq> c  \<and>
-  \<not>(((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c)) \<and>  
-   \<not>(((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b))\<and>  
-  \<not>((a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>V\<^esub> c))"
+  obtains (no_bD) "(\<not> blockDAG G \<or> a \<notin> verts G \<or> b \<notin> verts G \<or> c \<notin> verts G)"
+  | (equal) "(blockDAG G \<and> a \<in> verts G \<and> b \<in> verts G \<and> c \<in> verts G) \<and> b = c" 
+  | (one) "(blockDAG G \<and> a \<in> verts G \<and> b \<in> verts G \<and> c \<in> verts G) \<and>
+         b \<noteq> c  \<and> (((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c))" 
+  | (two) "(blockDAG G \<and> a \<in> verts G \<and> b \<in> verts G \<and> c \<in> verts G) \<and> b \<noteq> c 
+  \<and> \<not>(((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) \<and> 
+  ((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b)"
+  | (three) "(blockDAG G \<and> a \<in> verts G \<and> b \<in> verts G \<and> c \<in> verts G) \<and> b \<noteq> c 
+   \<and> \<not>(((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) \<and>  
+   \<not>(((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b))\<and> 
+  ((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c))"
+  | (four) "(blockDAG G \<and> a \<in> verts G \<and> b \<in> verts G \<and> c \<in> verts G) \<and> b \<noteq> c  \<and>
+  \<not>(((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<or> a = b) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) \<and>  
+   \<not>(((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c) \<or> a = c) \<and> \<not>(a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b))\<and>  
+  \<not>((a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> b) \<and> (a \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c))"
   by auto
 
 
 lemma domain_Spectre:
-  shows "vote_Spectre V a b c \<in> {-1, 0, 1}"
+  shows "vote_Spectre G a b c \<in> {-1, 0, 1}"
 proof(rule vote_Spectre.cases, auto) qed
 
 
@@ -224,26 +224,67 @@ shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
   using assms append_diff_sorted_set
   by (metis finite_Diff insert_Diff insert_iff) 
 
+lemma append_diff_sorted_set3:
+  assumes "B \<subseteq> A"
+  and "finite A"
+shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+   (sorted_list_of_set (A - B))) 
+  = sum_list ((map P)(sorted_list_of_set (A))) - sum_list ((map P)(sorted_list_of_set (B)))"
+proof - 
+    have "finite B" using assms
+      using rev_finite_subset by auto 
+  have "finite (A - B)"
+    by (simp add: assms(2))  
+  then show ?thesis 
+    using assms
+proof(induct "A - B" arbitrary: A rule: finite_induct)
+  case empty
+  then have ee: "A - B = {}" by simp
+  have AB: "B = A" using empty
+    by auto 
+  show ?case unfolding ee unfolding AB sorted_list_of_set_empty by force
+next
+  case (insert x F)
+  then have xA: "x \<in> A" by auto
+  have "x \<notin> B" using insert by auto
+  then have xAB: "x \<in> (A - B)" using xA by auto
+  then have "B \<subseteq> A - {x}" using insert by auto
+  moreover have "F = (A - {x}) - B" using insert by auto
+  moreover have ff: "finite (A - {x})" using insert by auto
+  ultimately have ind: "
+  sum_list (map P (sorted_list_of_set ((A - {x}) - B))) =
+    sum_list (map P (sorted_list_of_set (A - {x}))) - sum_list (map P (sorted_list_of_set B))"
+    using insert(3)
+    by simp 
+  then have "sum_list (map P (sorted_list_of_set ((A - {x}) - B))) =
+    sum_list (map P (sorted_list_of_set (A))) - P x - sum_list (map P (sorted_list_of_set B))"
+    using xA ff 
+    by (simp add: append_diff_sorted_set) 
+  then have "sum_list (map P (sorted_list_of_set ((A - B) - {x}))) =
+    sum_list (map P (sorted_list_of_set (A))) - P x - sum_list (map P (sorted_list_of_set B))"
+    by (metis Diff_insert Diff_insert2) 
+  then have "sum_list (map P (sorted_list_of_set ((A - B)))) - P x =
+    sum_list (map P (sorted_list_of_set (A))) - P x - sum_list (map P (sorted_list_of_set B))"
+    using xAB append_diff_sorted_set finite_Diff insert.prems(2)
+    by metis
+  then show ?case
+    by auto 
+  qed
+qed  
+
+
 
 lemma vote_Spectre_one_exists:
-  assumes "blockDAG V"
-    and "a \<in> verts V" 
-    and "b \<in> verts V" 
-  shows "\<exists> i \<in> verts V. vote_Spectre V i a b \<noteq> 0"
+  assumes "blockDAG G"
+    and "a \<in> verts G" 
+    and "b \<in> verts G" 
+  shows "\<exists> i \<in> verts G. vote_Spectre G i a b \<noteq> 0"
 proof
-  show "a \<in> verts V" using assms(2) by simp
-  show "vote_Spectre V a a b \<noteq> 0"
+  show "a \<in> verts G" using assms(2) by simp
+  show "vote_Spectre G a a b \<noteq> 0"
     using assms
-  proof(cases a b a V rule: Spectre_casesAlt, simp, simp, simp, simp)
-    case three
-    then show ?thesis
-      by (meson DAG.cycle_free blockDAG.axioms(1)) 
-  next
-    case four
-    then show ?thesis
-      by blast 
+  proof(cases a b a G rule: Spectre_casesAlt, simp+)
   qed
 qed
-
 end
 
