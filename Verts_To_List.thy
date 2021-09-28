@@ -61,26 +61,20 @@ fun Depth_first_search_a:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a \<Rig
 fun Depth_first_search:: "('a::linorder,'b) pre_digraph \<Rightarrow> 'a list"
   where "Depth_first_search G =  Depth_first_search_a G (genesis_nodeAlt G)"
 
-lemma Depth_first_search_sub:
-  fixes G::"('a::linorder, 'b) pre_digraph"
-shows "set (Depth_first_search G) \<subseteq> verts G"
-  unfolding Depth_first_search.simps  Depth_first_search_a.simps
-sorry
-
-
-lemma Depth_first_search_top:
-  assumes "blockDAG G" 
-  and "b \<rightarrow>\<^sup>+\<^bsub>G\<^esub> a"
-shows "(a,b) \<in> list_to_rel (Depth_first_search G)"
-  using assms(1,2)
-proof(induct G rule: blockDAG_induct_append)
-  case (base V)
-  then interpret bV: blockDAG V by auto
-  have False using base(2) 
-    unfolding arcs_ends_def bV.gen_graph_empty_arcs arc_to_ends_def by force
-  then show ?case by auto
-next
-  case (step H)
-  then show ?case sorry
+lemma unfold_referencing_verts_sound:
+  assumes "\<not> blockDAG.is_genesis_node G x"
+  and "x \<in> verts G" 
+  and "blockDAG G"
+shows "\<exists>y. x \<in> set (unfold_referencing_verts_ex G y)"
+proof-
+  interpret bD: blockDAG using assms(3) by auto
+  have sss: "\<And>y. set (sorted_list_of_set {b \<in> verts G. b \<rightarrow>\<^bsub>G\<^esub> y}) = {b \<in> verts G. b \<rightarrow>\<^bsub>G\<^esub> y} "
+    using bD.finite_verts
+    by simp 
+  show ?thesis  
+  using assms blockDAG.genesis_reaches_elim  assms
+  unfolding unfold_referencing_verts_ex.simps sss
+  by (metis (lifting) mem_Collect_eq)
 qed
+
 end

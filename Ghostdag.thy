@@ -9,6 +9,14 @@ text \<open>Based on the GHOSTDAG blockDAG consensus algorithmus by Sompolinsky 
 
 subsection \<open>Funcitions and Definitions\<close>    
 
+fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a set  \<Rightarrow> bool"
+  where  "kCluster G k C =  (if (C \<subseteq> (verts G))
+   then (\<forall>a \<in> C. card ((anticone G a) \<inter> C) \<le> k) else False)"
+
+fun max_kCluster:: "('a,'b) pre_digraph  \<Rightarrow> nat \<Rightarrow> 'a set"
+  where "max_kCluster G k = arg_max_on card {C \<in> (Pow (verts G)). kCluster G k C}"
+
+
 text \<open>Function to compare the size of set and break ties. Used for the GHOSTDAG maximum blue 
       cluster selection\<close>
 fun larger_blue_tuple ::
@@ -93,6 +101,10 @@ lemma add_set_list_tuple_mono2:
   shows "set (snd (add_set_list_tuple ((S,L),a))) \<subseteq> set L \<union> {a} "
   using add_set_list_tuple.simps by auto
 
+lemma add_set_list_tuple_mono3:
+  shows "(fst (add_set_list_tuple ((S,L),a))) \<subseteq> S \<union> {a} "
+  using add_set_list_tuple.simps by auto
+
 lemma add_set_list_tuple_length:
   shows "length (snd (add_set_list_tuple ((S,L),a))) = Suc (length L)"
 proof(induct L, auto) qed
@@ -101,10 +113,9 @@ proof(induct L, auto) qed
 subsubsection \<open>Soundness of the $add-if-blue$ function\<close>
 
 lemma app_if_blue_mono:
-  assumes "finite S"
   shows  "(fst (S,L)) \<subseteq> (fst (app_if_blue_else_add_end G k a (S,L)))"
   unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
-  by (simp add: assms card_mono subset_insertI)
+  by (simp add:  card_mono subset_insertI)
 
 lemma app_if_blue_mono2:
   shows  "set (snd (S,L)) \<subseteq> set (snd (app_if_blue_else_add_end G k a (S,L) ))"
@@ -221,6 +232,30 @@ lemma fold_app_mono3:
 lemma fold_app_mono_ex: 
   shows "set (snd (fold (app_if_blue_else_add_end G k) L2 (S,L1))) = (set L2 \<union> set L1)" 
   unfolding fold_app_mono by auto
+
+lemma fold_app_mono_fst_sub: 
+  shows " S \<subseteq>  (fst (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
+proof(induct L2 arbitrary: S L1, simp)
+  case (Cons a L2)
+  then consider " (app_if_blue_else_add_end G k a (S, L1)) =  (S \<union> {a}, L1 @ [a])"
+    |  "(app_if_blue_else_add_end G k a (S, L1)) =  (S, L1 @ [a])"
+    unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
+    by metis
+  then show ?case
+    by (metis Cons.hyps Un_empty_right Un_insert_right fold_simps(2) insert_subset)  
+qed
+
+lemma fold_app_mono_fst_sub': 
+  shows "(fst (fold (app_if_blue_else_add_end G k) L2 (S,L1))) \<subseteq> set L2 \<union> S" 
+proof(induct L2 arbitrary: S L1, simp)
+  case (Cons a L2)
+  then consider " (app_if_blue_else_add_end G k a (S, L1)) =  (S \<union> {a}, L1 @ [a])"
+    |  "(app_if_blue_else_add_end G k a (S, L1)) =  (S, L1 @ [a])"
+  unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
+  by metis
+  then show ?case using Cons
+    by (metis Un_empty_right Un_insert_left Un_insert_right fold_simps(2) le_supI1 list.simps(15))      
+qed
 
 
 lemma fold_app_mono_rel: 
@@ -561,8 +596,39 @@ lemma  OrderDAG_distinct:
     card_distinct assms
   by metis 
 
-
-
+lemma OrderDAG_kCluster:
+  assumes "blockDAG G"
+  shows "kCluster G k (fst (OrderDAG G k))" 
+  using assms proof(induct G k rule: OrderDAG.induct)
+case (1 G k)
+then show ?case proof (cases G rule: OrderDAG_casesAlt)
+    case ntB
+    then show ?thesis using 1 by auto
+  next
+    case one
+    then have fsG: "(fst (OrderDAG G k)) = {genesis_nodeAlt G}" using OrderDAG.simps by auto
+    have aG: "(anticone G (genesis_nodeAlt G)) \<inter> {genesis_nodeAlt G} = {}"
+      by simp
+    have sG: " {genesis_nodeAlt G} \<subseteq> verts G"
+    proof(safe, metis 1(2) genesis_nodeAlt_vert) qed
+    have  ttt: "?thesis = (card (anticone G (genesis_nodeAlt G) \<inter> {genesis_nodeAlt G}) \<le> k)"  
+      unfolding kCluster.simps fsG using sG
+      by auto 
+    show ?thesis unfolding  ttt aG by auto 
+  next
+    case more
+    interpret bD: blockDAG G using 1(2) by auto
+    obtain ma where pp_in: "ma = (choose_max_blue_set (map (\<lambda>i. (OrderDAG (reduce_past G i) k, i))
+       (sorted_list_of_set (tips G))))"
+        by (metis)
+    then have backw: "OrderDAG G k = fold (app_if_blue_else_add_end G k) 
+            (top_sort G (sorted_list_of_set (anticone G (snd ma))))
+            (add_set_list_tuple ma)" using OrderDAG.simps pp_in more
+      by (metis (mono_tags, lifting) less_numeral_extra(4)) 
+    then have "fst (OrderDAG G k) \<subseteq> (anticone G (snd ma)) \<union> (fst (add_set_list_tuple ma))"
+      using top_sort_con sorted_list_of_set(1) bD.anticon_finite fold_app_mono_fst_sub'
+      by (metis prod.collapse) 
+qed 
 
 
 

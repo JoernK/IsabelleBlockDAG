@@ -13,8 +13,6 @@ section \<open>DAG\<close>
 locale DAG = digraph +
   assumes cycle_free: "\<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)" 
 
-sublocale DAG \<subseteq> wf_digraph using DAG_def digraph_def nomulti_digraph_def DAG_axioms by auto
-
 subsection  \<open>Functions and Definitions\<close>
 
 fun  direct_past:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> 'a set"
@@ -49,9 +47,6 @@ fun is_tip:: "('a,'b) pre_digraph \<Rightarrow> 'a \<Rightarrow> bool"
 definition tips:: "('a,'b) pre_digraph \<Rightarrow> 'a set"
   where "tips G = {v \<in> verts G. is_tip G v}"
 
-fun kCluster:: "('a,'b) pre_digraph \<Rightarrow> nat \<Rightarrow> 'a set  \<Rightarrow> bool"
-  where  "kCluster G k C =  (if (C \<subseteq> (verts G))
-   then (\<forall>a \<in> C. card ((anticone G a) \<inter> C) \<le> k) else False)"
 
 subsection \<open>Lemmas\<close>
 

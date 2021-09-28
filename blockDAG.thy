@@ -43,6 +43,10 @@ lemma (in blockDAG) genesisAlt :
   "(is_genesis_node a) \<longleftrightarrow> ((a \<in> verts G) \<and> (\<forall>r.  (r \<in> verts G) \<longrightarrow> r \<rightarrow>\<^sup>* a))"
   by simp
 
+lemma (in blockDAG) genesisAlt2 :
+  "(is_genesis_node a) \<longleftrightarrow> ((a \<in> verts G) \<and> (\<forall>r.  (r \<in> verts G) \<longrightarrow> r \<rightarrow>\<^sup>+ a \<or> r = a))"
+  by (metis genesis is_genesis_node.simps reachable1_reachable reachable_refl unidirectional) 
+
 lemma (in blockDAG) genesis_existAlt:
   "\<exists>a. is_genesis_node a"
   using genesis genesisAlt
@@ -69,7 +73,13 @@ lemma (in blockDAG) genesis_reaches_nothing:
     reachable1_reachable_trans  assms reachable1_in_verts(2)
   by (metis) 
 
-
+lemma (in blockDAG) genesis_reaches_elim:
+  assumes "\<not> is_genesis_node a"
+  and "a \<in> verts G"
+  shows "\<exists>b \<in> (verts G). dominates G a b"
+  using assms genesisAlt2 adj_in_verts(2) converse_tranclE genesis_unique_exists
+  by metis
+  
 
 subsubsection \<open>Tips\<close>
 
@@ -1099,6 +1109,11 @@ next
     show ?thesis using rec ff bD n_gen ver blockDAG.reduce_past_gen_eq  a_def by metis
   qed
 qed                                  
+
+lemma genesis_nodeAlt_vert : 
+  assumes "blockDAG G"
+  shows "(genesis_nodeAlt G) \<in> verts G" 
+  using assms genesis_nodeAlt_sound blockDAG.is_genesis_node.simps by metis
 
 
 end
