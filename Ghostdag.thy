@@ -17,6 +17,30 @@ fun max_kCluster:: "('a,'b) pre_digraph  \<Rightarrow> nat \<Rightarrow> 'a set"
   where "max_kCluster G k = arg_max_on card {C \<in> (Pow (verts G)). kCluster G k C}"
 
 
+lemma sub_kCluster:
+  assumes "kCluster G k C"
+  and "finite C"
+  and "C' \<subseteq> C"  
+shows "kCluster G k C'" 
+proof-
+  have "C \<subseteq> verts G"  using assms(1) unfolding kCluster.simps by metis 
+  then have C'_sub:"C' \<subseteq> verts G"  using assms(3) by auto
+  have "\<And>a. (anticone G a \<inter> C') \<subseteq> (anticone G a \<inter> C)" using assms(3)
+    by auto 
+  then have "\<And>a. card (anticone G a \<inter> C') \<le> card (anticone G a \<inter> C)"
+    using card_mono assms(2) finite_Int
+    by metis
+  then show ?thesis using assms(1) C'_sub assms(3) order.trans subset_iff
+    unfolding  kCluster.simps
+    by metis   
+qed
+
+
+lemma (in blockDAG)  reduce_kCluster:
+  assumes "kCluster (reduce_past G a) k C"
+shows "kCluster G k C" using assms unfolding kCluster.simps sorry
+
+
 text \<open>Function to compare the size of set and break ties. Used for the GHOSTDAG maximum blue 
       cluster selection\<close>
 fun larger_blue_tuple ::
@@ -257,6 +281,20 @@ proof(induct L2 arbitrary: S L1, simp)
     by (metis Un_empty_right Un_insert_left Un_insert_right fold_simps(2) le_supI1 list.simps(15))      
 qed
 
+
+lemma fold_app_mono_fst_kCluster: 
+  assumes "kCluster G k S"
+  shows "kCluster G k (fst (fold (app_if_blue_else_add_end G k) L2 (S,L1)))" 
+  using assms 
+proof(induct L2 arbitrary: S L1, simp)
+  case (Cons a L2)
+  then consider " (app_if_blue_else_add_end G k a (S, L1)) =  (S \<union> {a}, L1 @ [a])"
+    |  "(app_if_blue_else_add_end G k a (S, L1)) =  (S, L1 @ [a])"
+  unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
+  by metis
+  then show ?case
+    by (metis Cons.hyps Cons.prems app_if_blue_else_add_end.simps fold_simps(2)) 
+qed
 
 lemma fold_app_mono_rel: 
   assumes "(x,y) \<in> list_to_rel L1"
@@ -625,9 +663,25 @@ then show ?case proof (cases G rule: OrderDAG_casesAlt)
             (top_sort G (sorted_list_of_set (anticone G (snd ma))))
             (add_set_list_tuple ma)" using OrderDAG.simps pp_in more
       by (metis (mono_tags, lifting) less_numeral_extra(4)) 
-    then have "fst (OrderDAG G k) \<subseteq> (anticone G (snd ma)) \<union> (fst (add_set_list_tuple ma))"
-      using top_sort_con sorted_list_of_set(1) bD.anticon_finite fold_app_mono_fst_sub'
-      by (metis prod.collapse) 
+    have tt: "snd ma \<in> set (sorted_list_of_set (tips G))" 
+      using chosen_map_simps(1) bD.blockDAG_axioms unfolding pp_in
+      by auto 
+    then have "\<not> bD.is_genesis_node (snd ma)" using sorted_list_of_set(1) bD.tips_finite 
+    bD.tips_unequal_gen more tips_tips
+      by (metis) 
+    then have bDR: "blockDAG (reduce_past G (snd ma))" 
+      using chosen_map_simps(5) bD.blockDAG_axioms unfolding pp_in
+      by blast 
+    then have kBase: "kCluster (reduce_past G (snd ma)) k (fst (OrderDAG (reduce_past G (snd ma)) k))" 
+      using tt 1 more  bD.reduce_kCluster nat_neq_iff by blast 
+    have fff: "(fst (OrderDAG (reduce_past G (snd ma)) k)) = (fst (fst ma))"
+      using chosen_map_simps(6) bD.blockDAG_axioms unfolding pp_in
+      by fastforce  
+    then have "kCluster (reduce_past G (snd ma)) k (fst (fst ma))"
+      using kBase
+      unfolding fff pp_in by auto
+    show ?thesis sorry
+  qed 
 qed 
 
 

@@ -319,22 +319,6 @@ anticone g a =
             (member (b, a) (trancl (arcs_ends g)) || a == b)))
     (verts g);
 
-less_eq_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
-less_eq_set (Coset []) (Set []) = False;
-less_eq_set a (Coset ys) = all (\ y -> not (member y a)) ys;
-less_eq_set (Set xs) b = all (\ x -> member x b) xs;
-
-inf_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
-inf_set a (Coset xs) = fold remove xs a;
-inf_set a (Set xs) = Set (filter (\ x -> member x a) xs);
-
-kCluster ::
-  forall a b. (Eq a) => Pre_digraph_ext a b () -> Nat -> Set a -> Bool;
-kCluster g k c =
-  (if less_eq_set c (verts g)
-    then ball c (\ a -> less_eq_nat (card (inf_set (anticone g a) c)) k)
-    else False);
-
 arcAlt ::
   forall a b. (Eq a, Eq b) => Pre_digraph_ext a b () -> b -> (a, a) -> Bool;
 arcAlt g e uv = member e (arcs g) && tail g e == fst uv && head g e == snd uv;
@@ -472,6 +456,22 @@ bot_set = Set [];
 add_set_list_tuple ::
   forall a. (Eq a, Linorder a) => ((Set a, [a]), a) -> (Set a, [a]);
 add_set_list_tuple ((s, l), a) = (sup_set s (insert a bot_set), l ++ [a]);
+
+less_eq_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
+less_eq_set (Coset []) (Set []) = False;
+less_eq_set a (Coset ys) = all (\ y -> not (member y a)) ys;
+less_eq_set (Set xs) b = all (\ x -> member x b) xs;
+
+inf_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
+inf_set a (Coset xs) = fold remove xs a;
+inf_set a (Set xs) = Set (filter (\ x -> member x a) xs);
+
+kCluster ::
+  forall a b. (Eq a) => Pre_digraph_ext a b () -> Nat -> Set a -> Bool;
+kCluster g k c =
+  (if less_eq_set c (verts g)
+    then ball c (\ a -> less_eq_nat (card (inf_set (anticone g a) c)) k)
+    else False);
 
 app_if_blue_else_add_end ::
   forall a b.

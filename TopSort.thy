@@ -368,7 +368,7 @@ proof(induct L, simp)
   then show ?case
     by auto 
 qed
-
+(**
 lemma top_sort_remove:
   assumes "DAG G"
   and  "distinct L"
@@ -439,4 +439,5 @@ proof(induct L, simp)
   qed
 qed
 
+**)
 end
