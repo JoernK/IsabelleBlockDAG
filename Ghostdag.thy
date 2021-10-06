@@ -1,6 +1,6 @@
 
 theory Ghostdag  
-  imports blockDAG Utils TopSort
+  imports TopSort blockDAG 
 begin
 
 section \<open>GHOSTDAG\<close>
@@ -35,11 +35,11 @@ proof-
     by metis   
 qed
 
-
+(**
 lemma (in blockDAG)  reduce_kCluster:
   assumes "kCluster (reduce_past G a) k C"
 shows "kCluster G k C" using assms unfolding kCluster.simps sorry
-
+**)
 
 text \<open>Function to compare the size of set and break ties. Used for the GHOSTDAG maximum blue 
       cluster selection\<close>
@@ -633,7 +633,7 @@ lemma  OrderDAG_distinct:
   using OrderDAG_length OrderDAG_total
     card_distinct assms
   by metis 
-
+(**
 lemma OrderDAG_kCluster:
   assumes "blockDAG G"
   shows "kCluster G k (fst (OrderDAG G k))" 
@@ -684,6 +684,5 @@ then show ?case proof (cases G rule: OrderDAG_casesAlt)
   qed 
 qed 
 
-
-
+**)
 end

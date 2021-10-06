@@ -4,7 +4,7 @@
 
 
 theory Codegen
-  imports blockDAG Spectre Ghostdag Extend_blockDAG Verts_To_List
+  imports blockDAG Spectre Ghostdag Extend_blockDAG 
 begin
 
 section \<open>Code Generation\<close>
@@ -73,6 +73,9 @@ export_code top_sort anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_
  SpectreOrder_Int OrderDAG_Int
  in Haskell module_name DAGS file "code/" 
 
+subsection \<open>Show that SPECTRE is not linear\<close>
+
+text\<open>Example that SPECTRE is not linear without tie-breaks\<close>
 notepad begin
   let ?G = "\<lparr>verts = {1::int,2,3,4,5,6,7,8,9,10}, arcs = {(2,1),(3,1),(4,1),
   (5,2),(6,3),(7,4),(8,5),(8,3),(9,6),(9,4),(10,7),(10,2)}, tail = fst, head = snd\<rparr>"
@@ -80,9 +83,12 @@ notepad begin
   let ?b = "3"
   let ?c = "4"
   value "blockDAG ?G"
+  text\<open>@{value "blockDAG ?G"}\<close>
   value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"
+  text\<open>@{value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"}\<close>
 end
 
+text\<open>Example that SPECTRE is not linear with tie-breaks\<close>
 notepad begin
   let ?G = "\<lparr>verts = {1::int,2,3,4,5}, arcs = {(4,1),(3,4),(5,1),
   (2,5)}, tail = fst, head = snd\<rparr>"
@@ -90,7 +96,9 @@ notepad begin
   let ?b = "5"
   let ?c = "2"
   value "blockDAG ?G"
+  text\<open>@{value "blockDAG ?G"}\<close>
   value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"
+  text\<open>@{value "Spectre_Order ?G ?a ?b \<and> Spectre_Order ?G ?b ?c \<and> \<not> Spectre_Order ?G ?a ?c"}\<close>
 end
 
 
@@ -110,6 +118,7 @@ declare Append_One_Honest_Dishonest_def [code]
 
 subsection \<open>GHOSTDAG Not One Appending Robust\<close>
 
+text\<open>We first introduce a simple finite block datatype to use derived code for blockDAG extensions\<close>
 datatype  FV = V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | V10
 
 fun FV_Suc ::" FV \<Rightarrow> FV set" 
@@ -207,6 +216,8 @@ qed
 
 end 
 
+text\<open>Finally, we implement an counterexample and show that it violates OneAppendingRobustness\<close>
+
 notepad 
 begin
   let ?G = "\<lparr>verts = {V1,V2,V3,V4,V5,V6,V7,V8}, arcs = {(V2,V1),(V3,V2),(V4,V2),(V5,V2),
@@ -223,21 +234,26 @@ begin
   (V6,V1),(V7,V6),(V8,V7),(V9,V3),(V9,V4),(V9,V5),(V9,V8),(V10,V3),(V10,V4),(V10,V5)},
    tail = fst, head = snd\<rparr>"
   value "blockDAG ?G3"
+  text\<open>@{value "blockDAG ?G3"}\<close>
   value "Append_One ?G2 ?G3 V10"
+  text\<open>@{value "Append_One ?G2 ?G3 V10"}\<close>
   value "Append_One_Honest_Dishonest ?G ?G2 V9 ?G3 V10"
+  text\<open>@{value "Append_One_Honest_Dishonest ?G ?G2 V9 ?G3 V10"}\<close>
   value "OrderDAG ?G3 2"
+  text\<open>@{value "OrderDAG ?G3 2"}\<close>
   value "(V6,V2) \<in> GHOSTDAG 2 ?G" 
+  text\<open>@{value "(V6,V2) \<in> GHOSTDAG 2 ?G"}\<close> 
   value "(V6,V2) \<notin> GHOSTDAG 2 ?G3"
+  text\<open>@{value "(V6,V2) \<notin> GHOSTDAG 2 ?G3"}\<close> 
 
-
+(**
   let ?G4 = "\<lparr>verts = {V1,V2,V3,V4}, arcs = {(V2,V1),(V3,V1),(V4,V2)}, tail = fst, head = snd\<rparr>"
   value "blockDAG ?G4"
+  text\<open>@{value "blockDAG ?G4"}\<close>
   value "top_sort ?G4 (sorted_list_of_set (verts ?G4 - {V4,V1}))"
   value "top_sort ?G4 (sorted_list_of_set (verts ?G4 - {V1}))"
   
-  value "Depth_first_search ?G3"
+  value "Depth_first_search ?G3" -- needs Verts_To_List import**)
 
 end
-
-
 end

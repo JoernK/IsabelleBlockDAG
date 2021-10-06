@@ -3,8 +3,8 @@ session Isabelle = HOL +
   sessions "Graph_Theory"
   theories
 	Utils
-	DigraphUtils
 	TopSort
+	DigraphUtils
 	blockDAG
     Spectre
 	Ghostdag
@@ -13,6 +13,5 @@ session Isabelle = HOL +
 	Spectre_Properties
 	Ghostdag_Properties
 	Codegen
-	
   document_files
     "root.tex"

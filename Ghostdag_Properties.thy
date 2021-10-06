@@ -1,5 +1,5 @@
 theory Ghostdag_Properties
-  imports Ghostdag Extend_blockDAG Properties 
+  imports Properties Ghostdag  
 begin
 
 
@@ -20,9 +20,10 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
   next
     case one
     then have "\<not> x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> y"
-      using subs wf_digraph.reachable1_in_verts 1
-      by (metis DAG.cycle_free OrderDAG_casesAlt blockDAG.reduce_less
-          blockDAG.reduce_past_dagbased blockDAG.unique_genesis less_one not_one_less_zero) 
+      using subs(1,4) wf_digraph.reachable1_in_verts 1 DAG.cycle_free OrderDAG_casesAlt
+        blockDAG.reduce_less blockDAG.reduce_past_dagbased blockDAG.unique_genesis less_one
+        not_one_less_zero
+      by metis  
     then show ?thesis using 1 by simp
   next  
     case more
@@ -56,7 +57,7 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
     then show ?thesis proof(cases)
       case ind
       then have "x \<rightarrow>\<^sup>+\<^bsub>reduce_past G ma\<^esub> y" using DAG.reduce_past_path2 more  
-          1 subs
+          1 subs(1)
         by (metis) 
       moreover have ma_tips: " ma \<in> set (sorted_list_of_set (tips G))" 
         using chosen_map_simps(1) pp_in more(1) 
@@ -86,7 +87,7 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
         unfolding ma_def using chosen_map_simps(6) more pp_in
         by fastforce 
       consider (x_t) "x = ma" | (x_ant) "x \<in> anticone G ma" using DAG.verts_comp2 
-          subs 1  ma_tip ma_vert 
+          subs(1,4) 1  ma_tip ma_vert 
           mem_Collect_eq tips_def wf_digraph.reachable1_in_verts(1) x_in
         by (metis (no_types, lifting)) 
       then show ?thesis proof(cases)
@@ -102,7 +103,7 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
       next
         case x_ant
         then have "x \<in> set (sorted_list_of_set (anticone G ma))" 
-          using sorted_list_of_set(1) more subs
+          using sorted_list_of_set(1) more subs(1)
           by (metis DAG.anticon_finite) 
         moreover have "y \<in> set (snd (add_set_list_tuple (choose_max_blue_set pp)))"
           using  add_set_list_tuple_mono in_mono prod.collapse y_in_base
@@ -113,13 +114,13 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
     next
       case y_in
       then have "y \<in> past_nodes G ma" unfolding past_nodes.simps using 1(2,3)
-          wf_digraph.reachable1_in_verts(2) subs mem_Collect_eq trancl_trans
+          wf_digraph.reachable1_in_verts(2) subs(4) mem_Collect_eq trancl_trans
         by (metis (mono_tags, lifting)) 
       then show ?thesis using y_in by simp 
     next
       case both_nin
       consider (x_t) "x = ma" | (x_ant) "x \<in> anticone G ma" using DAG.verts_comp2 
-          subs 1  ma_tip ma_vert 
+          subs(1,4) 1  ma_tip ma_vert 
           mem_Collect_eq tips_def wf_digraph.reachable1_in_verts(1) both_nin
         by (metis (no_types, lifting)) 
       then show ?thesis proof(cases)
@@ -137,12 +138,12 @@ proof(induct G k arbitrary: x y rule: OrderDAG.induct )
               ma_tip both_nin
             by fastforce  
           then have "x \<rightarrow>\<^sup>+\<^bsub>G\<^esub> ma" using 1(3) by auto
-          then show False using subs  1(2)
+          then show False using subs(4)  1(2)
             by (metis wf_digraph.tips_not_referenced ma_tip)  
         qed
         case x_ant
         then have "(y,x) \<in> list_to_rel (top_sort G (sorted_list_of_set (anticone G ma)))"
-          using y_ina DAG.anticon_finite subs 1(2,3) sorted_list_of_set(1) top_sort_rel
+          using y_ina DAG.anticon_finite subs(1) 1(2,3) sorted_list_of_set(1) top_sort_rel
           by metis
         then show ?thesis unfolding backw ma_def  using
             fold_app_mono list_to_rel_mono2

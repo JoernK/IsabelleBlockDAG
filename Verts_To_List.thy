@@ -1,5 +1,5 @@
 theory Verts_To_List
-  imports Utils  "HOL-Library.Comparator" Extend_blockDAG
+  imports Utils Extend_blockDAG
 begin
 
 
