@@ -190,7 +190,7 @@ proof -
   have "(tips G_A) = {a}" using Honest_Append_One.append_is_only_tip assms by metis
   then have tips_app: "(sorted_list_of_set (tips G_A)) = [a]" by auto 
   obtain the_map where the_map_in:
-   "the_map = ((map (\<lambda>i.(((OrderDAG (reduce_past G_A i) k)) , i)) (sorted_list_of_set (tips G_A))))"
+    "the_map = ((map (\<lambda>i.(((OrderDAG (reduce_past G_A i) k)) , i)) (sorted_list_of_set (tips G_A))))"
     by auto
   then have m_l: " the_map = [((OrderDAG (reduce_past G_A a) k), a)]"
     unfolding the_map_in using tips_app by auto
@@ -220,7 +220,7 @@ proof -
     using OrderDAG.simps bD_A g1 eml fold_simps(1) list.simps(8) list.simps(9) the_map_in tips_app
     by (metis (no_types, lifting)) 
 qed 
-  
+
 lemma "\<forall>k. Honest_One_Appending_Monotone (GHOSTDAG k)"
   unfolding Honest_One_Appending_Monotone_def GHOSTDAG.simps 
   using list_to_rel_mono OrderDAG_append_one

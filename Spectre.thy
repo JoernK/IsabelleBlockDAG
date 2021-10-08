@@ -192,14 +192,14 @@ lemma antisymmetric_signum:
 
 lemma append_diff_sorted_set:
   assumes "a \<in> A"
-  and "finite A"
-shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+    and "finite A"
+  shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
    (sorted_list_of_set (A - {a}))) 
   = sum_list ((map P)(sorted_list_of_set (A))) - (P a)"
 proof -
   let ?L1 =  "(sorted_list_of_set (A))"
   have d_1: "distinct ?L1" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
-   then have s_1: "sum_list ((map P) ?L1) 
+  then have s_1: "sum_list ((map P) ?L1) 
   = sum P (set ?L1)" using sum_list_distinct_conv_sum_set by metis
   let ?L2 = " (sorted_list_of_set (A - {a}))"
   have d_2: "distinct ?L2" using sum_list_distinct_conv_sum_set sorted_list_of_set(2) by auto
@@ -215,10 +215,10 @@ qed
 
 lemma append_diff_sorted_set2:
   assumes "a \<in> A"
-  and "b \<in> A"
-  and "a \<noteq> b"
-  and "finite A"
-shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+    and "b \<in> A"
+    and "a \<noteq> b"
+    and "finite A"
+  shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
    (sorted_list_of_set (A - {a} - {b}))) 
   = sum_list ((map P)(sorted_list_of_set (A))) - (P a) - (P b)"
   using assms append_diff_sorted_set
@@ -226,49 +226,49 @@ shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
 
 lemma append_diff_sorted_set3:
   assumes "B \<subseteq> A"
-  and "finite A"
-shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
+    and "finite A"
+  shows "sum_list ((map (P::('a::linorder \<Rightarrow> int)))
    (sorted_list_of_set (A - B))) 
   = sum_list ((map P)(sorted_list_of_set (A))) - sum_list ((map P)(sorted_list_of_set (B)))"
 proof - 
-    have "finite B" using assms
-      using rev_finite_subset by auto 
+  have "finite B" using assms
+    using rev_finite_subset by auto 
   have "finite (A - B)"
     by (simp add: assms(2))  
   then show ?thesis 
     using assms
-proof(induct "A - B" arbitrary: A rule: finite_induct)
-  case empty
-  then have ee: "A - B = {}" by simp
-  have AB: "B = A" using empty
-    by auto 
-  show ?case unfolding ee unfolding AB sorted_list_of_set_empty by force
-next
-  case (insert x F)
-  then have xA: "x \<in> A" by auto
-  have "x \<notin> B" using insert by auto
-  then have xAB: "x \<in> (A - B)" using xA by auto
-  then have "B \<subseteq> A - {x}" using insert by auto
-  moreover have "F = (A - {x}) - B" using insert by auto
-  moreover have ff: "finite (A - {x})" using insert by auto
-  ultimately have ind: "
+  proof(induct "A - B" arbitrary: A rule: finite_induct)
+    case empty
+    then have ee: "A - B = {}" by simp
+    have AB: "B = A" using empty
+      by auto 
+    show ?case unfolding ee unfolding AB sorted_list_of_set_empty by force
+  next
+    case (insert x F)
+    then have xA: "x \<in> A" by auto
+    have "x \<notin> B" using insert by auto
+    then have xAB: "x \<in> (A - B)" using xA by auto
+    then have "B \<subseteq> A - {x}" using insert by auto
+    moreover have "F = (A - {x}) - B" using insert by auto
+    moreover have ff: "finite (A - {x})" using insert by auto
+    ultimately have ind: "
   sum_list (map P (sorted_list_of_set ((A - {x}) - B))) =
     sum_list (map P (sorted_list_of_set (A - {x}))) - sum_list (map P (sorted_list_of_set B))"
-    using insert(3)
-    by simp 
-  then have "sum_list (map P (sorted_list_of_set ((A - {x}) - B))) =
+      using insert(3)
+      by simp 
+    then have "sum_list (map P (sorted_list_of_set ((A - {x}) - B))) =
     sum_list (map P (sorted_list_of_set (A))) - P x - sum_list (map P (sorted_list_of_set B))"
-    using xA ff 
-    by (simp add: append_diff_sorted_set) 
-  then have "sum_list (map P (sorted_list_of_set ((A - B) - {x}))) =
+      using xA ff 
+      by (simp add: append_diff_sorted_set) 
+    then have "sum_list (map P (sorted_list_of_set ((A - B) - {x}))) =
     sum_list (map P (sorted_list_of_set (A))) - P x - sum_list (map P (sorted_list_of_set B))"
-    by (metis Diff_insert Diff_insert2) 
-  then have "sum_list (map P (sorted_list_of_set ((A - B)))) - P x =
+      by (metis Diff_insert Diff_insert2) 
+    then have "sum_list (map P (sorted_list_of_set ((A - B)))) - P x =
     sum_list (map P (sorted_list_of_set (A))) - P x - sum_list (map P (sorted_list_of_set B))"
-    using xAB append_diff_sorted_set finite_Diff insert.prems(2)
-    by metis
-  then show ?case
-    by auto 
+      using xAB append_diff_sorted_set finite_Diff insert.prems(2)
+      by metis
+    then show ?case
+      by auto 
   qed
 qed  
 

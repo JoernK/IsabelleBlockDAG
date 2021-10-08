@@ -19,9 +19,9 @@ fun max_kCluster:: "('a,'b) pre_digraph  \<Rightarrow> nat \<Rightarrow> 'a set"
 
 lemma sub_kCluster:
   assumes "kCluster G k C"
-  and "finite C"
-  and "C' \<subseteq> C"  
-shows "kCluster G k C'" 
+    and "finite C"
+    and "C' \<subseteq> C"  
+  shows "kCluster G k C'" 
 proof-
   have "C \<subseteq> verts G"  using assms(1) unfolding kCluster.simps by metis 
   then have C'_sub:"C' \<subseteq> verts G"  using assms(3) by auto
@@ -275,8 +275,8 @@ proof(induct L2 arbitrary: S L1, simp)
   case (Cons a L2)
   then consider " (app_if_blue_else_add_end G k a (S, L1)) =  (S \<union> {a}, L1 @ [a])"
     |  "(app_if_blue_else_add_end G k a (S, L1)) =  (S, L1 @ [a])"
-  unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
-  by metis
+    unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
+    by metis
   then show ?case using Cons
     by (metis Un_empty_right Un_insert_left Un_insert_right fold_simps(2) le_supI1 list.simps(15))      
 qed
@@ -290,8 +290,8 @@ proof(induct L2 arbitrary: S L1, simp)
   case (Cons a L2)
   then consider " (app_if_blue_else_add_end G k a (S, L1)) =  (S \<union> {a}, L1 @ [a])"
     |  "(app_if_blue_else_add_end G k a (S, L1)) =  (S, L1 @ [a])"
-  unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
-  by metis
+    unfolding app_if_blue_else_add_end.simps add_set_list_tuple.simps
+    by metis
   then show ?case
     by (metis Cons.hyps Cons.prems app_if_blue_else_add_end.simps fold_simps(2)) 
 qed
@@ -633,7 +633,7 @@ lemma  OrderDAG_distinct:
   using OrderDAG_length OrderDAG_total
     card_distinct assms
   by metis 
-(**
+    (**
 lemma OrderDAG_kCluster:
   assumes "blockDAG G"
   shows "kCluster G k (fst (OrderDAG G k))" 

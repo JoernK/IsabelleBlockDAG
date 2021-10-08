@@ -27,8 +27,4 @@ definition One_Appending_Robust:: "(('a,'b) pre_digraph \<Rightarrow> 'a rel) \<
   where "One_Appending_Robust A \<equiv>
          (\<forall>G G_A G_AB a b c d. Append_One_Honest_Dishonest G G_A a G_AB b
           \<longrightarrow> ((c,d) \<in> (A G) \<longrightarrow> (c,d) \<in> (A G_AB)))"
-
-
-
-
 end

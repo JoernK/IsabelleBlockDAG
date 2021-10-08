@@ -322,15 +322,15 @@ lemma (in blockDAG) blockDAG_Append_exists:
   shows "card (verts G) = 1 \<or> (\<exists>G2 v. Append_One G2 G v)"
 proof(cases rule: blockDAG_cases2)
   case base
-then show ?thesis using gen_graph_all_one by auto
+  then show ?thesis using gen_graph_all_one by auto
 next
   case more
   then obtain G2 and b where bD_G2: "blockDAG G2" and b_in: "b \<in> verts G"
-      and del_v: "G2 = pre_digraph.del_vert G b " and nre:"(\<forall>c\<in>verts G. (c, b) \<notin> (arcs_ends G)\<^sup>+)"
-      by auto
-    then have "b \<notin> verts G2" unfolding del_v pre_digraph.verts_del_vert by auto
-    then have "Append_One G2 G b" unfolding Append_One_def Append_One_axioms_def 
-      using bD_G2 b_in del_v nre blockDAG_axioms by auto   
+    and del_v: "G2 = pre_digraph.del_vert G b " and nre:"(\<forall>c\<in>verts G. (c, b) \<notin> (arcs_ends G)\<^sup>+)"
+    by auto
+  then have "b \<notin> verts G2" unfolding del_v pre_digraph.verts_del_vert by auto
+  then have "Append_One G2 G b" unfolding Append_One_def Append_One_axioms_def 
+    using bD_G2 b_in del_v nre blockDAG_axioms by auto   
   then show ?thesis by auto
 qed 
 
@@ -338,9 +338,9 @@ qed
 sublocale Append_One \<subseteq> Append G G_A "{app}" 
   using Append_One_axioms  
   unfolding Append_One_def Append_One_axioms_def 
-  Append_def Append_axioms_def
+    Append_def Append_axioms_def
   using append_induce_subgraph append_verts by auto 
-  
+
 lemma A1_sub:
   assumes "Append_One G G_A app"
   shows "Append G G_A {app}"
@@ -447,7 +447,7 @@ qed
 sublocale Honest_Append_One \<subseteq> Honest_Append G G_A "{app}" 
   using Honest_Append_One_axioms Append_axioms
   unfolding Honest_Append_One_def Honest_Append_One_axioms_def 
-  Honest_Append_def Honest_Append_axioms_def
+    Honest_Append_def Honest_Append_axioms_def
   by blast
 
 lemma HA1_sub:
@@ -464,7 +464,7 @@ lemma (in Append) A_finite:
   "finite A"
   using fin_digraph.finite_verts bD_A subs(3) A_union
   by fastforce
-  
+
 
 lemma (in Append) append_subverts_leq:            
   "verts G \<subseteq> verts G_A"
@@ -544,9 +544,9 @@ lemma (in Append) append_induced_subgraph:
 proof -
   interpret bD2: blockDAG G_A using bD_A by simp
   show ?thesis 
-  unfolding GG_A 
-  using bD2.induced_induce 
-  by simp
+    unfolding GG_A 
+    using bD2.induced_induce 
+    by simp
 qed
 
 
@@ -561,8 +561,8 @@ lemma (in Append) append_not_reached:
 proof(safe, simp)
   fix a b 
   assume a_in: "a \<in> A"
-  and b_in: "b \<in> verts G"
-  and ba: "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> a"
+    and b_in: "b \<in> verts G"
+    and ba: "b \<rightarrow>\<^sup>+\<^bsub>G_A\<^esub> a"
   show False using ba a_in b_in
   proof(induct  rule: trancl_induct)
     case (base y)
@@ -575,10 +575,10 @@ proof(safe, simp)
     then show ?thesis proof(cases)
       case 1
       then show ?thesis using step by simp
-      next
+    next
       case 2
-        then show ?thesis using new_nodes step by simp
-      qed
+      then show ?thesis using new_nodes step by simp
+    qed
   qed 
 qed    
 
@@ -804,8 +804,8 @@ end
 sublocale Append_One_Honest_Dishonest \<subseteq> Append_Honest_Dishonest G G_A "{app}" G_AB "{dis}"
   using Append_One_Honest_Dishonest_axioms Honest_Append_axioms
   unfolding Append_One_Honest_Dishonest_def Append_One_Honest_Dishonest_axioms_def 
-  Append_Honest_Dishonest_def Append_Honest_Dishonest_axioms_def 
+    Append_Honest_Dishonest_def Append_Honest_Dishonest_axioms_def 
   by (simp add: A1_sub)
-  
+
 
 end

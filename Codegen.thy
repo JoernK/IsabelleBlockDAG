@@ -18,14 +18,14 @@ fun iterate:: "('a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool"
 lemma (in DAG) arcAlt_eq:                     
   shows "arcAlt G e uv = wf_digraph.arc G e uv"
   unfolding arc_def arcAlt.simps by simp
-  
+
 lemma [code]: "blockDAG G = (DAG G \<and> ((\<exists> p \<in> verts G. ((\<forall>r \<in> verts G. (r \<rightarrow>\<^sup>+\<^bsub>G\<^esub> p \<or> r = p)))) \<and>
  (\<forall>e \<in> (arcs G). \<forall> u \<in> verts G. \<forall> v \<in> verts G. 
 (u \<rightarrow>\<^sup>+\<^bsub>(pre_digraph.del_arc G  e)\<^esub> v) \<longrightarrow> \<not> arcAlt G e (u,v))))" 
   using  DAG.arcAlt_eq  wf_digraph_def DAG.axioms(1)
     digraph.axioms(1) fin_digraph.axioms(1) wf_digraph.arcE blockDAG_axioms_def blockDAG_def 
   by metis
-     
+
 lemma [code]: "DAG G = (digraph G \<and> (\<forall>v \<in> verts G. \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)))"
   unfolding DAG_axioms_def DAG_def
   by (metis digraph.axioms(1) fin_digraph.axioms(1) wf_digraph.reachable1_in_verts(1)) 
@@ -66,12 +66,12 @@ fun SpectreOrder_Int:: "(integer, integer\<times>integer) pre_digraph \<Rightarr
 
 fun OrderDAG_Int::  "(integer, integer\<times>integer) pre_digraph \<Rightarrow>
  integer \<Rightarrow> (integer set \<times> integer list)" 
- where " OrderDAG_Int V a =  (OrderDAG V (nat_of_integer a))"
- 
+  where " OrderDAG_Int V a =  (OrderDAG V (nat_of_integer a))"
+
 
 export_code top_sort anticone set blockDAG pre_digraph_ext snd fst vote_Spectre_Int
- SpectreOrder_Int OrderDAG_Int
- in Haskell module_name DAGS file "code/" 
+  SpectreOrder_Int OrderDAG_Int
+  in Haskell module_name DAGS file "code/" 
 
 subsection \<open>Show that SPECTRE is not linear\<close>
 
@@ -104,7 +104,7 @@ end
 
 subsection \<open>Extend Graph\<close>
 
-  
+
 declare  pre_digraph.del_vert_def [code]
 declare Append_One_axioms_def [code] 
 declare Honest_Append_One_axioms_def[code] 
@@ -123,16 +123,16 @@ datatype  FV = V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | V10
 
 fun FV_Suc ::" FV \<Rightarrow> FV set" 
   where 
-  "FV_Suc V1 = {V1,V2,V3,V4,V5,V6,V7,V8,V9,V10}" |
-  "FV_Suc V2 = {V2,V3,V4,V5,V6,V7,V8,V9,V10}" |
-  "FV_Suc V3 = {V3,V4,V5,V6,V7,V8,V9,V10}" |
-  "FV_Suc V4 = {V4,V5,V6,V7,V8,V9,V10}" |
-  "FV_Suc V5 = {V5,V6,V7,V8,V9,V10}" |
-  "FV_Suc V6 = {V6,V7,V8,V9,V10}" |
-  "FV_Suc V7 = {V7,V8,V9,V10}" |
-  "FV_Suc V8 = {V8,V9,V10}" |
-  "FV_Suc V9 = {V9,V10}" |
-  "FV_Suc V10 = {V10}"
+    "FV_Suc V1 = {V1,V2,V3,V4,V5,V6,V7,V8,V9,V10}" |
+    "FV_Suc V2 = {V2,V3,V4,V5,V6,V7,V8,V9,V10}" |
+    "FV_Suc V3 = {V3,V4,V5,V6,V7,V8,V9,V10}" |
+    "FV_Suc V4 = {V4,V5,V6,V7,V8,V9,V10}" |
+    "FV_Suc V5 = {V5,V6,V7,V8,V9,V10}" |
+    "FV_Suc V6 = {V6,V7,V8,V9,V10}" |
+    "FV_Suc V7 = {V7,V8,V9,V10}" |
+    "FV_Suc V8 = {V8,V9,V10}" |
+    "FV_Suc V9 = {V9,V10}" |
+    "FV_Suc V10 = {V10}"
 fun less_eq_FV:: "FV \<Rightarrow> FV \<Rightarrow> bool" 
   where "less_eq_FV a b = (b \<in> FV_Suc a)"
 
@@ -159,14 +159,14 @@ proof(standard)
     unfolding less_eq_FV_def less_eq_FV.simps 
     by(cases x rule: FV_cases) (cases y rule: FV_cases, auto)+
   show "(x < y) = (x \<le> y \<and> \<not> y \<le> x)"
-  unfolding less_FV_def less_FV.simps less_eq_FV_def less_eq_FV.simps 
-  by(cases x rule: FV_cases) (cases y rule: FV_cases, auto)
+    unfolding less_FV_def less_FV.simps less_eq_FV_def less_eq_FV.simps 
+    by(cases x rule: FV_cases) (cases y rule: FV_cases, auto)
   show "x \<le> y \<Longrightarrow> y \<le> x \<Longrightarrow> x = y"
-  unfolding less_FV_def less_FV.simps less_eq_FV_def less_eq_FV.simps 
-  by (cases x rule: FV_cases)(cases y rule: FV_cases, auto)+
+    unfolding less_FV_def less_FV.simps less_eq_FV_def less_eq_FV.simps 
+    by (cases x rule: FV_cases)(cases y rule: FV_cases, auto)+
   show "x \<le> y \<Longrightarrow> y \<le> z \<Longrightarrow> x \<le> z"
-  unfolding less_FV_def less_FV.simps less_eq_FV_def less_eq_FV.simps 
-  by (cases x rule: FV_cases)(cases y rule: FV_cases, auto)+
+    unfolding less_FV_def less_FV.simps less_eq_FV_def less_eq_FV.simps 
+    by (cases x rule: FV_cases)(cases y rule: FV_cases, auto)+
 qed
 end
 
@@ -176,11 +176,11 @@ begin
 definition "enum_FV \<equiv> [V1,V2,V3,V4,V5,V6,V7,V8,V9,V10]"
 
 fun enum_all_FV:: "(FV \<Rightarrow> bool) \<Rightarrow> bool "
-where "enum_all_FV P = Ball {V1,V2,V3,V4,V5,V6,V7,V8,V9,V10} P"
+  where "enum_all_FV P = Ball {V1,V2,V3,V4,V5,V6,V7,V8,V9,V10} P"
 
 fun enum_ex_FV:: "(FV \<Rightarrow> bool) \<Rightarrow> bool "
-where "enum_ex_FV P = Bex {V1,V2,V3,V4,V5,V6,V7,V8,V9,V10} P"
-  
+  where "enum_ex_FV P = Bex {V1,V2,V3,V4,V5,V6,V7,V8,V9,V10} P"
+
 instance 
   apply(standard)
      apply(simp_all) 

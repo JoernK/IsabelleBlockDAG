@@ -33,7 +33,7 @@ lemma subs:
   using assms blockDAG_def DAG_def digraph_def fin_digraph_def by auto
 
 lemma only_new_alt: 
-"(\<forall>e u v. arc e (u,v) \<longrightarrow> \<not> (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v)) 
+  "(\<forall>e u v. arc e (u,v) \<longrightarrow> \<not> (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v)) 
 \<longleftrightarrow> (\<forall>e u v. (u \<rightarrow>\<^sup>+\<^bsub>(del_arc e)\<^esub> v) \<longrightarrow> \<not> arc e (u,v))" 
 proof(standard, auto) qed
 
@@ -75,11 +75,11 @@ lemma (in blockDAG) genesis_reaches_nothing:
 
 lemma (in blockDAG) genesis_reaches_elim:
   assumes "\<not> is_genesis_node a"
-  and "a \<in> verts G"
+    and "a \<in> verts G"
   shows "\<exists>b \<in> (verts G). dominates G a b"
   using assms genesisAlt2 adj_in_verts(2) converse_tranclE genesis_unique_exists
   by metis
-  
+
 
 subsubsection \<open>Tips\<close>
 
@@ -638,27 +638,27 @@ next
     unfolding blockDAG_axioms_def only_new_alt
   proof safe
     fix e u v 
-      assume a: " wf_digraph.arc (reduce_past_refl G a) e (u, v)"
-        and b: "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v"
-      have edge: "wf_digraph.arc G e (u, v)"
-        using assms reduce_past_arcs2 induced_subgraph_def arc_def 
-      proof -
-        have "wf_digraph (reduce_past_refl G a)"
-          using reduce_past_refl_digraph digraph_def by auto
-        then have "e \<in> arcs (reduce_past_refl G a) \<and> tail (reduce_past_refl G a) e = u
+    assume a: " wf_digraph.arc (reduce_past_refl G a) e (u, v)"
+      and b: "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc (reduce_past_refl G a) e\<^esub> v"
+    have edge: "wf_digraph.arc G e (u, v)"
+      using assms reduce_past_arcs2 induced_subgraph_def arc_def 
+    proof -
+      have "wf_digraph (reduce_past_refl G a)"
+        using reduce_past_refl_digraph digraph_def by auto
+      then have "e \<in> arcs (reduce_past_refl G a) \<and> tail (reduce_past_refl G a) e = u
                      \<and> head (reduce_past_refl G a) e = v"
-          using wf_digraph.arcE arc_def a
-          by (metis (no_types)) 
-        then show "arc e (u, v)"
-          using arc_def reduce_past_refl.simps by auto
-      qed
-      have "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc G e\<^esub> v"
-        using a b reduce_past_refl_digraph del_arc_subgraph digraph_axioms
-          digraphI_induced past_nodes_refl_verts reduce_past_refl.simps
-          reduce_past_refl_induced_subgraph subgraph_induce_subgraphI arcs_ends_mono trancl_mono
-        by metis
-      then show False
-        using edge only_new by simp
+        using wf_digraph.arcE arc_def a
+        by (metis (no_types)) 
+      then show "arc e (u, v)"
+        using arc_def reduce_past_refl.simps by auto
+    qed
+    have "u \<rightarrow>\<^sup>+\<^bsub>pre_digraph.del_arc G e\<^esub> v"
+      using a b reduce_past_refl_digraph del_arc_subgraph digraph_axioms
+        digraphI_induced past_nodes_refl_verts reduce_past_refl.simps
+        reduce_past_refl_induced_subgraph subgraph_induce_subgraphI arcs_ends_mono trancl_mono
+      by metis
+    then show False
+      using edge only_new by simp
   next
     obtain p where gen: "is_genesis_node p" using genesis_existAlt by auto
     have pe: "p \<in> verts (reduce_past_refl G a)"
@@ -1044,7 +1044,7 @@ proof -
     by (metis one set_sorted_list_of_set sorted_list_of_set.infinite) 
   then show one_sound: "B.is_genesis_node (genesis_nodeAlt G)"
     using one B.blockDAG_size_cases B.reduce_less
-        B.reduce_past_dagbased less_one B.genesis_unique_exists B.is_genesis_node.elims(2) exone
+      B.reduce_past_dagbased less_one B.genesis_unique_exists B.is_genesis_node.elims(2) exone
     by (metis)
 qed
 

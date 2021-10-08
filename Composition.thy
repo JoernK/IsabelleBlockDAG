@@ -11,18 +11,18 @@ section  \<open>Composition\<close>
 locale composition = blockDAG  +
   fixes C ::"'a set"
   assumes "C \<subseteq> verts G"
-  and "blockDAG (G \<restriction> C)"
-  and same_rel:  "\<forall>v \<in> ((verts G)- C). 
+    and "blockDAG (G \<restriction> C)"
+    and same_rel:  "\<forall>v \<in> ((verts G)- C). 
   (\<forall>c \<in> C. (c \<rightarrow>\<^sup>+\<^bsub>G\<^esub> v)) \<or> (\<forall>c \<in> C. (v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) 
    \<or> (\<forall>c \<in> C. \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c) \<and>  \<not>(v \<rightarrow>\<^sup>+\<^bsub>G\<^esub> c)) "       
 
 locale compositionGraph = blockDAG +
   fixes G' ::"('a set, 'b) pre_digraph"
   assumes "\<forall>C \<in> (verts G'). composition G C"
-  and "\<forall> C1 \<in> (verts G'). \<forall> C2 \<in> (verts G'). C1 \<inter> C2 \<noteq> {} \<longrightarrow> C1 = C2"
-  and "\<Union> (verts G') = verts G"
+    and "\<forall> C1 \<in> (verts G'). \<forall> C2 \<in> (verts G'). C1 \<inter> C2 \<noteq> {} \<longrightarrow> C1 = C2"
+    and "\<Union> (verts G') = verts G"
 
- 
+
 subsection  \<open>Functions and Definitions\<close>
 
 subsection \<open>Lemmas\<close>
@@ -46,16 +46,16 @@ proof -
     then show "C \<subseteq> verts G \<and>
     blockDAG (G \<restriction> C) \<and>
     (\<forall>v\<in>verts G - C. (\<forall>c\<in>C. c \<rightarrow>\<^sup>+ v) \<or> (\<forall>c\<in>C. v \<rightarrow>\<^sup>+ c) \<or> (\<forall>c\<in>C. \<not> v \<rightarrow>\<^sup>+ c \<and> \<not> v \<rightarrow>\<^sup>+ c))" 
-        using subset bD by simp
-    qed  
-  qed
+      using subset bD by simp
+  qed  
+qed
 
 lemma (in blockDAG) compositionExists:
   shows "\<exists>C. composition G C"
 proof
   let ?C = "verts G" 
   show "composition G ?C" using trivialComposition by auto 
-  qed
+qed
 
 lemma (in blockDAG)  compositionGraphExists:
   shows "\<exists>G'. compositionGraph G G'"
@@ -63,7 +63,7 @@ proof -
   obtain C where c_def: "C = verts G" by auto
   then have "composition G C" using trivialComposition by simp
   obtain G'::"('a set, 'b) pre_digraph"
-  where g'_def: "verts G' = {C}"
+    where g'_def: "verts G' = {C}"
     by (metis induce_subgraph_verts) 
   have "compositionGraph G G'" unfolding compositionGraph_axioms_def compositionGraph_def
       g'_def c_def 

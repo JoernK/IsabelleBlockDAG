@@ -15,8 +15,6 @@ lemma graph_equality:
   shows "G = C"
   by (simp add: assms(2)) 
 
-
-
 lemma (in digraph) del_vert_not_in_graph:
   assumes "b \<notin> verts G"
   shows "(pre_digraph.del_vert G b) = G"

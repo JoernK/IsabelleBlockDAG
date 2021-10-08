@@ -126,8 +126,8 @@ proof(induct "(top_insert G ls l)" arbitrary: ls l, simp)
         by metis 
       then show ?thesis  using  Cons
         by (metis (no_types, lifting) "2" SigmaI UnI1 Un_iff ay calculation 
-    empty_iff empty_set list.inject list.sel(1) list.sel(2) list.set_intros(1) 
-    list.simps(15) list_to_rel.elims not_Cons_self2 set_ConsD  top_insert_set) 
+            empty_iff empty_set list.inject list.sel(1) list.sel(2) list.set_intros(1) 
+            list.simps(15) list_to_rel.elims not_Cons_self2 set_ConsD  top_insert_set) 
     next
       case bb
       then have "(y, x) \<in> list_to_rel (top_insert G (tl ls) l)"
@@ -144,8 +144,8 @@ qed
 
 lemma top_insert_elims:
   assumes "(y, x) \<notin> list_to_rel ls"
-  and "x \<noteq> l"
-  and "y \<noteq> l"
+    and "x \<noteq> l"
+    and "y \<noteq> l"
   shows "(y, x) \<notin> list_to_rel (top_insert G ls l)"
   using assms top_insert_cases by metis
 
@@ -158,7 +158,7 @@ lemma top_sort_mono:
 
 
 lemma top_sort_mono2:
- "list_to_rel (top_sort G ls) \<subseteq>  list_to_rel (top_sort G (l # ls))"
+  "list_to_rel (top_sort G ls) \<subseteq>  list_to_rel (top_sort G (l # ls))"
   using top_sort_mono
   by (metis subrelI)
 
@@ -311,11 +311,11 @@ proof(rule ccontr)
   then show "False"
     using assms(2,3,4,5)
   proof(induct L, simp)
-   interpret D: DAG G using assms(1) by auto
-   case (Cons a L)
-   then consider "x = a \<and> y = a"
-     |"x = a \<and> y \<in> set L" | "y = a \<and> x \<in> set L" | "x \<in> set L \<and> y \<in> set L"
-    using Cons by auto
+    interpret D: DAG G using assms(1) by auto
+    case (Cons a L)
+    then consider "x = a \<and> y = a"
+      |"x = a \<and> y \<in> set L" | "y = a \<and> x \<in> set L" | "x \<in> set L \<and> y \<in> set L"
+      using Cons by auto
     then show ?case proof(cases)
       case 1
       then show ?thesis using Cons
@@ -348,8 +348,8 @@ lemma top_sort_rel2:
 
 lemma top_insert_remove:
   assumes "distinct L"
-  and "a \<notin> set L"
-shows "L = remove1 a (top_insert G L a)"
+    and "a \<notin> set L"
+  shows "L = remove1 a (top_insert G L a)"
   using assms 
 proof(induct L, simp)
   case (Cons a L)
@@ -360,15 +360,15 @@ qed
 
 lemma top_insert_remove2:
   assumes "distinct L"
-  and "a \<notin> set L"
-shows "L = remove1 a (top_insert G L a)"
+    and "a \<notin> set L"
+  shows "L = remove1 a (top_insert G L a)"
   using assms 
 proof(induct L, simp)
   case (Cons a L)
   then show ?case
     by auto 
 qed
-(**
+  (**
 lemma top_sort_remove:
   assumes "DAG G"
   and  "distinct L"

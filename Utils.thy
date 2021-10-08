@@ -197,8 +197,8 @@ lemma list_to_rel_mono3:
 
 lemma list_to_rel_mono4:
   assumes "(a,b) \<in> list_to_rel (L)"
-  and "set L2 = set L"
-shows  "(a,b) \<in> list_to_rel (a # L2)"
+    and "set L2 = set L"
+  shows  "(a,b) \<in> list_to_rel (a # L2)"
 proof -
   have "b \<in> set (a # L2)"
     by (metis assms(1) assms(2) list.set_intros(2) list_to_rel_in)  
@@ -212,20 +212,20 @@ lemma list_to_rel_cases:
 
 lemma list_to_rel_elim:
   assumes "(a,b) \<in> list_to_rel (c # L)"
-  and "a \<noteq> c"
+    and "a \<noteq> c"
   shows "(a,b) \<in> list_to_rel (L)"
   using assms unfolding list_to_rel.simps by auto
 
 lemma list_to_rel_elim2:
   assumes "(a,b) \<notin> list_to_rel (L)"
-  and "a \<noteq> c"
+    and "a \<noteq> c"
   shows "(a,b) \<notin> list_to_rel (c # L)"
   using assms unfolding list_to_rel.simps by auto
 
 lemma list_to_rel_equiv:
   assumes "a \<in> set L"
-  and "b \<in> set L"
-obtains "(a,b) \<in>  list_to_rel (L)" | "(b,a) \<in>  list_to_rel (L)"
+    and "b \<in> set L"
+  obtains "(a,b) \<in>  list_to_rel (L)" | "(b,a) \<in>  list_to_rel (L)"
   using assms
 proof(induct L, auto) qed
 
