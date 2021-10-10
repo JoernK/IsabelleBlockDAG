@@ -86,8 +86,8 @@ subsubsection \<open>Tips\<close>
 lemma (in blockDAG) tips_exist: 
   "\<exists>x. is_tip G x"
   unfolding is_tip.simps
-proof (rule ccontr)
-  assume "\<nexists>x. x \<in> verts G \<and>(\<forall>xa\<in>verts G. (xa, x) \<notin> (arcs_ends G)\<^sup>+)"
+proof (rule ccontr, simp)
+  assume " \<forall>x. x \<in> verts G \<longrightarrow> (\<exists> y \<in>verts G. y \<rightarrow>\<^sup>+ x)"
   then have contr: "\<forall>x. x \<in> verts G \<longrightarrow> (\<exists>y. y\<rightarrow>\<^sup>+x)"
     by auto  
   have "\<forall> x y. y\<rightarrow>\<^sup>+x \<longrightarrow>  {z. x \<rightarrow>\<^sup>+ z} \<subseteq> {z. y \<rightarrow>\<^sup>+ z}"
@@ -123,7 +123,6 @@ proof (rule ccontr)
     qed
   qed
   then have less: "\<exists>x \<in> verts G.  card (verts G) < card {z. x \<rightarrow>\<^sup>+ z}" by simp
-  also
   have "\<forall>x. card  {z. x \<rightarrow>\<^sup>+ z} \<le> card (verts G)"
     using fin part finite_verts not_le
     by (simp add: card_mono) 
