@@ -26,7 +26,7 @@ proof(induction G a b c rule: vote_Spectre.induct)
   next
     case two
     then show ?thesis
-      by (metis "local.1.prems" trancl_trans) 
+      by (metis 1(3) trancl_trans) 
   next
     case three
     then have a_not_gen: "\<not> blockDAG.is_genesis_node G a"
@@ -172,17 +172,27 @@ proof(induction G a b c rule: vote_Spectre.induct)
     then show ?thesis by fastforce
   next
     case three
+    then interpret B1: blockDAG G using three by auto
+    have Ind: "\<forall> x \<in> set ( sorted_list_of_set (past_nodes G a)). 
+    vote_Spectre (reduce_past G a) x b c 
+    = - vote_Spectre (reduce_past G a) x c b" using 1(1) B1.finite_past sorted_list_of_set(1)
+     three by blast
     then have ff: "vote_Spectre G a b c = tie_break_int b c (signum (sum_list (map (\<lambda>i.
  (vote_Spectre (reduce_past G a) i b c)) (sorted_list_of_set (past_nodes G a)))))"
-      using vote_Spectre.simps 
+      using vote_Spectre.simps three
       by (metis (mono_tags, lifting)) 
     have ff1: "vote_Spectre G a c b = tie_break_int c b (signum (sum_list (map (\<lambda>i.
       (vote_Spectre (reduce_past G a) i c b)) (sorted_list_of_set (past_nodes G a)))))"
       using vote_Spectre.simps three by fastforce 
+    have mmm: "(map (\<lambda>i. vote_Spectre (reduce_past G a) i c b) (sorted_list_of_set (past_nodes G a))) =
+    (map (\<lambda>i. - vote_Spectre (reduce_past G a) i b c) (sorted_list_of_set (past_nodes G a)))"
+     using Ind map_eq_conv by auto
+    have "(\<Sum>i\<leftarrow>sorted_list_of_set (past_nodes G a). vote_Spectre (reduce_past G a) i c b) =
+    (\<Sum>i\<leftarrow>sorted_list_of_set (past_nodes G a). - vote_Spectre (reduce_past G a) i b c)"
+      unfolding sum_list_def sum_list_map_eq_sum_count mmm by simp
     then have ff2: "vote_Spectre G a c b = tie_break_int c b (signum (sum_list (map (\<lambda>i.
     (- vote_Spectre (reduce_past G a) i b c)) (sorted_list_of_set (past_nodes G a)))))" 
-      using three 1 map_eq_conv ff
-      by (smt (verit, best))   
+      unfolding ff1 by simp       
     have "(map (\<lambda>i. - vote_Spectre (reduce_past G a) i b c) (sorted_list_of_set (past_nodes G a)))
      = (map uminus (map (\<lambda>i. vote_Spectre (reduce_past G a) i b c)
        (sorted_list_of_set (past_nodes G a))))" 
@@ -195,14 +205,26 @@ proof(induction G a b c rule: vote_Spectre.induct)
       by presburger 
   next
     case four
-    then have ff: "vote_Spectre G a b c = signum (sum_list (map (\<lambda>i.
+    then interpret B1: blockDAG G using four by auto
+    have "\<forall> x \<in> set (sorted_list_of_set (future_nodes G a)). 
+    vote_Spectre G x b c = - vote_Spectre G x c b" 
+      using 1(2) B1.finite_future sorted_list_of_set(1) four by blast
+    then have mmm: 
+    "(map (\<lambda>i. vote_Spectre G i c b) (sorted_list_of_set (future_nodes G a))) =
+    (map (\<lambda>i. - vote_Spectre G i b c) (sorted_list_of_set (future_nodes G a)))"
+     using map_eq_conv
+     by simp 
+    have ff: "vote_Spectre G a b c = signum (sum_list (map (\<lambda>i.
    (vote_Spectre G i b c)) (sorted_list_of_set (future_nodes G a))))"
-      using vote_Spectre.simps
+      using vote_Spectre.simps four
       by (metis (mono_tags, lifting)) 
-    then have ff2: "vote_Spectre G a c b =  signum (sum_list (map (\<lambda>i.
+    have ff1:  "vote_Spectre G a c b = signum (sum_list (map (\<lambda>i.
+   (vote_Spectre G i c b)) (sorted_list_of_set (future_nodes G a))))"
+      using vote_Spectre.simps four
+      by (metis (mono_tags, lifting))
+    have ff2: "vote_Spectre G a c b =  signum (sum_list (map (\<lambda>i.
     (- vote_Spectre G i b c)) (sorted_list_of_set (future_nodes G a))))" 
-      using four 1 vote_Spectre.simps map_eq_conv
-      by (smt (z3)) 
+      unfolding ff1 mmm by auto      
     have "(map (\<lambda>i. - vote_Spectre G i b c) (sorted_list_of_set (future_nodes G a)))
      = (map uminus (map (\<lambda>i. vote_Spectre G i b c) (sorted_list_of_set (future_nodes G a))))" 
       using map_map by auto       
