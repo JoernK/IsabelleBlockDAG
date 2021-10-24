@@ -552,8 +552,8 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \isacommand{lemma}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}mono{\isadigit{4}}{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}set\ L{\isadigit{2}}\ {\isacharequal}{\kern0pt}\ set\ L{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isadigit{2}}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}set\ L{\isadigit{2}}\ {\isacharequal}{\kern0pt}\ set\ L{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}a\ {\isacharhash}{\kern0pt}\ L{\isadigit{2}}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 %
@@ -605,7 +605,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \isacommand{lemma}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}elim{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}c\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ c{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ c{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
@@ -628,7 +628,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \isacommand{lemma}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}elim{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymnotin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ c{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnoteq}\ c{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymnotin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}c\ {\isacharhash}{\kern0pt}\ L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
@@ -651,8 +651,8 @@ For every distinct L, list-to-rel L return a linear order on set L%
 \isacommand{lemma}\isamarkupfalse%
 \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isacharunderscore}{\kern0pt}equiv{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}a\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
-\isakeyword{obtains}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}a{\isacharparenright}{\kern0pt}\ {\isasymin}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}b\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{obtains}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}a{\isacharcomma}{\kern0pt}b{\isacharparenright}{\kern0pt}\ {\isasymin}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}b{\isacharcomma}{\kern0pt}a{\isacharparenright}{\kern0pt}\ {\isasymin}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}L{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -764,7 +764,7 @@ For every distinct L, list-to-rel L return a linear order on set L%
 %
 \end{isabellebody}%
 \endinput
-%:%file=/cygdrive/c/DAGModelling/Isabelle/Utils.thy%:%
+%:%file=/cygdrive/c/repos/DAGModelling/Isabelle/Utils.thy%:%
 %:%6=1%:%
 %:%11=2%:%
 %:%12=2%:%

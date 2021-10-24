@@ -69,9 +69,9 @@ Based on the GHOSTDAG blockDAG consensus algorithmus by Sompolinsky and Zohar 20
 \isacommand{lemma}\isamarkupfalse%
 \ sub{\isacharunderscore}{\kern0pt}kCluster{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}kCluster\ G\ k\ C{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}finite\ C{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}C{\isacharprime}{\kern0pt}\ {\isasymsubseteq}\ C{\isachardoublequoteclose}\ \ \isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}kCluster\ G\ k\ C{\isacharprime}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}finite\ C{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}C{\isacharprime}{\kern0pt}\ {\isasymsubseteq}\ C{\isachardoublequoteclose}\ \ \isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}kCluster\ G\ k\ C{\isacharprime}{\kern0pt}{\isachardoublequoteclose}\ \isanewline
 %
 \isadelimproof
 %
@@ -895,9 +895,9 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 \ \isacommand{consider}\isamarkupfalse%
 \ {\isachardoublequoteopen}\ {\isacharparenleft}{\kern0pt}app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end\ G\ k\ a\ {\isacharparenleft}{\kern0pt}S{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ \ {\isacharparenleft}{\kern0pt}S\ {\isasymunion}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}\ {\isacharat}{\kern0pt}\ {\isacharbrackleft}{\kern0pt}a{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \ \ {\isacharbar}{\kern0pt}\ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end\ G\ k\ a\ {\isacharparenleft}{\kern0pt}S{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ \ {\isacharparenleft}{\kern0pt}S{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}\ {\isacharat}{\kern0pt}\ {\isacharbrackleft}{\kern0pt}a{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isacommand{unfolding}\isamarkupfalse%
+\ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end{\isachardot}{\kern0pt}simps\ add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple{\isachardot}{\kern0pt}simps\isanewline
-\ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -936,9 +936,9 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 \ \isacommand{consider}\isamarkupfalse%
 \ {\isachardoublequoteopen}\ {\isacharparenleft}{\kern0pt}app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end\ G\ k\ a\ {\isacharparenleft}{\kern0pt}S{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ \ {\isacharparenleft}{\kern0pt}S\ {\isasymunion}\ {\isacharbraceleft}{\kern0pt}a{\isacharbraceright}{\kern0pt}{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}\ {\isacharat}{\kern0pt}\ {\isacharbrackleft}{\kern0pt}a{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \ \ {\isacharbar}{\kern0pt}\ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end\ G\ k\ a\ {\isacharparenleft}{\kern0pt}S{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ \ {\isacharparenleft}{\kern0pt}S{\isacharcomma}{\kern0pt}\ L{\isadigit{1}}\ {\isacharat}{\kern0pt}\ {\isacharbrackleft}{\kern0pt}a{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isacommand{unfolding}\isamarkupfalse%
+\ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ app{\isacharunderscore}{\kern0pt}if{\isacharunderscore}{\kern0pt}blue{\isacharunderscore}{\kern0pt}else{\isacharunderscore}{\kern0pt}add{\isacharunderscore}{\kern0pt}end{\isachardot}{\kern0pt}simps\ add{\isacharunderscore}{\kern0pt}set{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}tuple{\isachardot}{\kern0pt}simps\isanewline
-\ \ \isacommand{by}\isamarkupfalse%
+\ \ \ \ \isacommand{by}\isamarkupfalse%
 \ metis\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
@@ -1830,9 +1830,9 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 \ \isanewline
 %
 \endisadelimproof
+\ \ \ \ \isanewline
 %
 \isadelimtheory
-\isanewline
 %
 \endisadelimtheory
 %
@@ -1848,7 +1848,7 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 %
 \end{isabellebody}%
 \endinput
-%:%file=/cygdrive/c/DAGModelling/Isabelle/Ghostdag.thy%:%
+%:%file=/cygdrive/c/repos/DAGModelling/Isabelle/Ghostdag.thy%:%
 %:%6=1%:%
 %:%11=2%:%
 %:%12=2%:%
@@ -3047,5 +3047,6 @@ Creating a relation on verts $G$ based on the GHOSTDAG OrderDAG algorithm%
 %:%1824=635%:%
 %:%1825=635%:%
 %:%1830=635%:%
-%:%1835=687%:%
+%:%1833=636%:%
+%:%1833=687%:%
 %:%1840=688%:%

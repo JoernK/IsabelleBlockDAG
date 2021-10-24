@@ -410,8 +410,8 @@ $b$ precedes $a$ in the list%
 \ \ Cons\isanewline
 \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}metis\ {\isacharparenleft}{\kern0pt}no{\isacharunderscore}{\kern0pt}types{\isacharcomma}{\kern0pt}\ lifting{\isacharparenright}{\kern0pt}\ {\isachardoublequoteopen}{\isadigit{2}}{\isachardoublequoteclose}\ SigmaI\ UnI{\isadigit{1}}\ Un{\isacharunderscore}{\kern0pt}iff\ ay\ calculation\ \isanewline
-\ \ \ \ empty{\isacharunderscore}{\kern0pt}iff\ empty{\isacharunderscore}{\kern0pt}set\ list{\isachardot}{\kern0pt}inject\ list{\isachardot}{\kern0pt}sel{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ list{\isachardot}{\kern0pt}sel{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ list{\isachardot}{\kern0pt}set{\isacharunderscore}{\kern0pt}intros{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ \isanewline
-\ \ \ \ list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isadigit{5}}{\isacharparenright}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isachardot}{\kern0pt}elims\ not{\isacharunderscore}{\kern0pt}Cons{\isacharunderscore}{\kern0pt}self{\isadigit{2}}\ set{\isacharunderscore}{\kern0pt}ConsD\ \ top{\isacharunderscore}{\kern0pt}insert{\isacharunderscore}{\kern0pt}set{\isacharparenright}{\kern0pt}\ \isanewline
+\ \ \ \ \ \ \ \ \ \ \ \ empty{\isacharunderscore}{\kern0pt}iff\ empty{\isacharunderscore}{\kern0pt}set\ list{\isachardot}{\kern0pt}inject\ list{\isachardot}{\kern0pt}sel{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ list{\isachardot}{\kern0pt}sel{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ list{\isachardot}{\kern0pt}set{\isacharunderscore}{\kern0pt}intros{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ \isanewline
+\ \ \ \ \ \ \ \ \ \ \ \ list{\isachardot}{\kern0pt}simps{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isadigit{5}}{\isacharparenright}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel{\isachardot}{\kern0pt}elims\ not{\isacharunderscore}{\kern0pt}Cons{\isacharunderscore}{\kern0pt}self{\isadigit{2}}\ set{\isacharunderscore}{\kern0pt}ConsD\ \ top{\isacharunderscore}{\kern0pt}insert{\isacharunderscore}{\kern0pt}set{\isacharparenright}{\kern0pt}\ \isanewline
 \ \ \ \ \isacommand{next}\isamarkupfalse%
 \isanewline
 \ \ \ \ \ \ \isacommand{case}\isamarkupfalse%
@@ -453,8 +453,8 @@ $b$ precedes $a$ in the list%
 \isacommand{lemma}\isamarkupfalse%
 \ top{\isacharunderscore}{\kern0pt}insert{\isacharunderscore}{\kern0pt}elims{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymnotin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ ls{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}x\ {\isasymnoteq}\ l{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}y\ {\isasymnoteq}\ l{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}x\ {\isasymnoteq}\ l{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}y\ {\isasymnoteq}\ l{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}y{\isacharcomma}{\kern0pt}\ x{\isacharparenright}{\kern0pt}\ {\isasymnotin}\ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}insert\ G\ ls\ l{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
@@ -499,7 +499,7 @@ $b$ precedes $a$ in the list%
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ top{\isacharunderscore}{\kern0pt}sort{\isacharunderscore}{\kern0pt}mono{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
-\ {\isachardoublequoteopen}list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ ls{\isacharparenright}{\kern0pt}\ {\isasymsubseteq}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ {\isacharparenleft}{\kern0pt}l\ {\isacharhash}{\kern0pt}\ ls{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ ls{\isacharparenright}{\kern0pt}\ {\isasymsubseteq}\ \ list{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}rel\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}sort\ G\ {\isacharparenleft}{\kern0pt}l\ {\isacharhash}{\kern0pt}\ ls{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -927,17 +927,17 @@ $b$ precedes $a$ in the list%
 \ assms{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharcomma}{\kern0pt}{\isadigit{3}}{\isacharcomma}{\kern0pt}{\isadigit{4}}{\isacharcomma}{\kern0pt}{\isadigit{5}}{\isacharparenright}{\kern0pt}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
 {\isacharparenleft}{\kern0pt}induct\ L{\isacharcomma}{\kern0pt}\ simp{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \isacommand{interpret}\isamarkupfalse%
+\ \ \ \ \isacommand{interpret}\isamarkupfalse%
 \ D{\isacharcolon}{\kern0pt}\ DAG\ G\ \isacommand{using}\isamarkupfalse%
 \ assms{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
-\ \ \ \isacommand{case}\isamarkupfalse%
+\ \ \ \ \isacommand{case}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}Cons\ a\ L{\isacharparenright}{\kern0pt}\isanewline
-\ \ \ \isacommand{then}\isamarkupfalse%
+\ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{consider}\isamarkupfalse%
 \ {\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ y\ {\isacharequal}{\kern0pt}\ a{\isachardoublequoteclose}\isanewline
-\ \ \ \ \ {\isacharbar}{\kern0pt}{\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ y\ {\isasymin}\ set\ L{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}y\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ x\ {\isasymin}\ set\ L{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymin}\ set\ L\ {\isasymand}\ y\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
-\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ \ \ \ \ \ {\isacharbar}{\kern0pt}{\isachardoublequoteopen}x\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ y\ {\isasymin}\ set\ L{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}y\ {\isacharequal}{\kern0pt}\ a\ {\isasymand}\ x\ {\isasymin}\ set\ L{\isachardoublequoteclose}\ {\isacharbar}{\kern0pt}\ {\isachardoublequoteopen}x\ {\isasymin}\ set\ L\ {\isasymand}\ y\ {\isasymin}\ set\ L{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ Cons\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
@@ -1025,8 +1025,8 @@ $b$ precedes $a$ in the list%
 \isacommand{lemma}\isamarkupfalse%
 \ top{\isacharunderscore}{\kern0pt}insert{\isacharunderscore}{\kern0pt}remove{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}distinct\ L{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnotin}\ set\ L{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}L\ {\isacharequal}{\kern0pt}\ remove{\isadigit{1}}\ a\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}insert\ G\ L\ a{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnotin}\ set\ L{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}L\ {\isacharequal}{\kern0pt}\ remove{\isadigit{1}}\ a\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}insert\ G\ L\ a{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -1058,8 +1058,8 @@ $b$ precedes $a$ in the list%
 \isacommand{lemma}\isamarkupfalse%
 \ top{\isacharunderscore}{\kern0pt}insert{\isacharunderscore}{\kern0pt}remove{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}distinct\ L{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnotin}\ set\ L{\isachardoublequoteclose}\isanewline
-\isakeyword{shows}\ {\isachardoublequoteopen}L\ {\isacharequal}{\kern0pt}\ remove{\isadigit{1}}\ a\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}insert\ G\ L\ a{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isakeyword{and}\ {\isachardoublequoteopen}a\ {\isasymnotin}\ set\ L{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}L\ {\isacharequal}{\kern0pt}\ remove{\isadigit{1}}\ a\ {\isacharparenleft}{\kern0pt}top{\isacharunderscore}{\kern0pt}insert\ G\ L\ a{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -1086,9 +1086,9 @@ $b$ precedes $a$ in the list%
 \isanewline
 %
 \endisadelimproof
+\ \ \isanewline
 %
 \isadelimtheory
-\isanewline
 %
 \endisadelimtheory
 %
@@ -1104,7 +1104,7 @@ $b$ precedes $a$ in the list%
 %
 \end{isabellebody}%
 \endinput
-%:%file=/cygdrive/c/DAGModelling/Isabelle/TopSort.thy%:%
+%:%file=/cygdrive/c/repos/DAGModelling/Isabelle/TopSort.thy%:%
 %:%10=1%:%
 %:%11=1%:%
 %:%12=2%:%
@@ -1880,5 +1880,6 @@ $b$ precedes $a$ in the list%
 %:%1079=369%:%
 %:%1080=370%:%
 %:%1086=370%:%
-%:%1091=442%:%
+%:%1089=371%:%
+%:%1089=442%:%
 %:%1096=443%:%
