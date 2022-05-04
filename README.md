@@ -77,7 +77,7 @@ The repository is structured as follows:
  * `code/`
     Contains all exported Haskell code and a Test.hs file with predefined blockDAGs.
   
-**Documentation** (A *full* documentation can be found [here](document/document.pdf)):
+**Documentation** (A *full* documentation can be found [here](output/document.pdf)):
 
   * `document/`
     Contains the root.tex file used for the auto-generated IsabelleBlockDAG documentation.
